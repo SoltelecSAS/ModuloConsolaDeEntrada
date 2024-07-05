@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportDefectosGases" language="groovy" pageWidth="590" pageHeight="572" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="590" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="13d23fa9-4e6e-4f63-8e36-cadd6203bf7c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="id_hojaprueba" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="isReimpeccion" class="java.lang.String"/>
+	<parameter name="idReinspeccion" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select DISTINCT Nombre_problema,d.Tipo_defecto,Nombre_grupo,d.codigo_super as CARDEFAULT from pruebas as pr
+inner join defxprueba as dp on pr.id_pruebas=dp.id_prueba
+inner join defectos as d on dp.id_defecto = d.CARDEFAULT
+INNER JOIN grupos_sub_grupos gsg on gsg.SCDEFGROUPSUB = d.DEFGROUPSSUB
+inner join grupos as g on gsg.DEFGROUP = g.DEFGROUP
+where
+CASE WHEN $P{isReimpeccion}="NO" THEN
+ pr.id_pruebas in (
+select min(id_pruebas) from pruebas as p where p.hoja_pruebas_for = $P{id_hojaprueba}  and p.Tipo_prueba_for != 1  and p.Finalizada = 'Y'  and p.Abortada = 'N' group by p.Tipo_prueba_for)
+ELSE
+ pr.id_pruebas in (
+ select max(id_pruebas) from pruebas as p where p.hoja_pruebas_for = $P{id_hojaprueba}  and p.Tipo_prueba_for != 1  and p.Finalizada = 'Y'  and p.Abortada = 'N' group by p.Tipo_prueba_for)
+ END
+and pr.hoja_pruebas_for = $P{id_hojaprueba}
+/*and d.CARDEFAULT not in (84000,84001,84002,84003,84010,84011,84012,84009) */]]>
+	</queryString>
+	<field name="Nombre_problema" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Tipo_defecto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Nombre_grupo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CARDEFAULT" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="cuentaDefectosA" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[(($F{Tipo_defecto}.equals("A")) ? 1 : 0)]]></variableExpression>
+	</variable>
+	<variable name="cuentaDefectosB" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[($F{Tipo_defecto}.equals("B") ? 1: 0)]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="e774c366-9e82-47f7-b3d1-98596fccb7c0" x="0" y="0" width="590" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[C. DEFECTOS ENCONTRADOS EN LA INSPECCIÓN MECANIZADA DE ACUERDO CON LOS CRITERIOS DEFINIDOS EN LAS NTC 5375,
+     NTC 6218 Y NTC 6282 (según corresponda).]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f40f0d0b-fe73-43f9-837c-67cf363b157d" x="528" y="19" width="62" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo de defecto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ec27d125-3dc9-470b-9968-e7e2ef04813e" x="449" y="19" width="79" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grupo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bf1ee66a-ece1-4283-a37f-abf73d1b3ab9" x="0" y="19" width="42" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Codigo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5e52602e-ddd2-40fe-b9ea-5d4e42735cbd" x="42" y="19" width="407" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="64f37c13-9116-42eb-9ac6-554fb30118c5" x="528" y="29" width="30" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="59de821c-d02a-4817-8d92-3c71ff99408c" x="558" y="29" width="32" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[B]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="0dd8f622-a0a4-4a22-aa4a-f5d99c016f41" stretchType="RelativeToTallestObject" x="42" y="0" width="407" height="10"/>
+				<box leftPadding="3" rightPadding="3">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre_problema}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="bc10075a-31b3-4172-810c-d890974cdd8e" stretchType="RelativeToTallestObject" x="449" y="0" width="79" height="10"/>
+				<box leftPadding="3">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+					<paragraph lineSpacing="Proportional"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre_grupo}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3f78a1ac-46e5-4763-aa71-7d2a8fcaf0a1" stretchType="RelativeToTallestObject" x="0" y="0" width="42" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CARDEFAULT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="7941193b-ca26-4ac9-9995-bc82a3135aaf" stretchType="RelativeToTallestObject" x="528" y="0" width="30" height="10">
+					<printWhenExpression><![CDATA[$F{Tipo_defecto}.equals("A")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[X]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="838b99cc-d32d-43fe-b236-57ab409227a0" stretchType="RelativeToTallestObject" x="558" y="0" width="32" height="10">
+					<printWhenExpression><![CDATA[$F{Tipo_defecto}.equals("B")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[X]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<summary>
+		<band height="10">
+			<staticText>
+				<reportElement uuid="e3850d4a-26c3-4396-a68c-326703ae16f3" x="449" y="0" width="79" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="312ae176-f19d-4c49-9049-0f02c28f35db" x="528" y="0" width="30" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{cuentaDefectosA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="da74d067-62ed-47ec-b9c6-2b0b91ea9ba2" x="558" y="0" width="32" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{cuentaDefectosB}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

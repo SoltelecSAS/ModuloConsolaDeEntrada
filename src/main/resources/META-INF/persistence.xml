@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="ConsolaEntradaPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.soltelec.consolaentrada.models.entities.Tipocarroceria</class>
+    <class>com.soltelec.consolaentrada.models.entities.Equipo</class>
+    <class>com.soltelec.consolaentrada.models.entities.Reinspeccion</class>
+    <class>com.soltelec.consolaentrada.models.entities.Color</class>
+    <class>com.soltelec.consolaentrada.models.entities.Defectoxmedida</class>
+    <class>com.soltelec.consolaentrada.models.entities.Grupo</class>
+    <class>com.soltelec.consolaentrada.models.entities.Pais</class>
+    <class>com.soltelec.consolaentrada.models.entities.PruebaDTO</class>
+    <class>com.soltelec.consolaentrada.models.entities.SubGrupo</class>
+    <class>com.soltelec.consolaentrada.models.entities.ClaseVehiculo</class>
+    <class>com.soltelec.consolaentrada.models.entities.Certificado</class>
+    <class>com.soltelec.consolaentrada.models.entities.Marca</class>
+    <class>com.soltelec.consolaentrada.models.entities.Permisibles</class>
+    <class>com.soltelec.consolaentrada.models.entities.ServicioEspecial</class>
+    <class>com.soltelec.consolaentrada.models.entities.LineaVehiculo</class>
+    <class>com.soltelec.consolaentrada.models.entities.Aseguradora</class>
+    <class>com.soltelec.consolaentrada.models.entities.TipoCalibracion</class>
+    <class>com.soltelec.consolaentrada.models.entities.Servicio</class>
+    <class>com.soltelec.consolaentrada.models.entities.HojaPruebas</class>
+    <class>com.soltelec.consolaentrada.models.entities.Ciudad</class>
+    <class>com.soltelec.consolaentrada.models.entities.TipoPrueba</class>
+    <class>com.soltelec.consolaentrada.models.entities.Usuario</class>
+    <class>com.soltelec.consolaentrada.models.entities.TipoVehiculo</class>
+    <class>com.soltelec.consolaentrada.models.entities.Medida</class>
+    <class>com.soltelec.consolaentrada.models.entities.Calibracion</class>
+    <class>com.soltelec.consolaentrada.models.entities.Prueba</class>
+    <class>com.soltelec.consolaentrada.models.entities.Cda</class>
+    <class>com.soltelec.consolaentrada.models.entities.Departamento</class>
+    <class>com.soltelec.consolaentrada.models.entities.Llanta</class>
+    <class>com.soltelec.consolaentrada.models.entities.TipoGasolina</class>
+    <class>com.soltelec.consolaentrada.models.entities.TipoMedida</class>
+    <class>com.soltelec.consolaentrada.models.entities.Vehiculo</class>
+    <class>com.soltelec.consolaentrada.models.entities.Tipocarroceria</class>
+    <class>com.soltelec.consolaentrada.models.entities.Propietario</class>
+    <class>com.soltelec.consolaentrada.models.entities.TipoAborto</class>
+    <class>com.soltelec.consolaentrada.models.entities.Permissions</class>
+    <class>com.soltelec.consolaentrada.models.entities.Fotos</class>
+    <class>com.soltelec.consolaentrada.models.entities.Entities</class>
+    <class>com.soltelec.consolaentrada.models.entities.Defxprueba</class>
+    <class>com.soltelec.consolaentrada.models.entities.Defxplaca</class>
+    <class>com.soltelec.consolaentrada.models.entities.GruposSubGrupos</class>
+    <class>com.soltelec.consolaentrada.models.entities.Defectos</class>
+    <class>com.soltelec.consolaentrada.models.entities.AuditoriaSicov</class>
+    <class>com.soltelec.consolaentrada.models.entities.SEQUENCE</class>
+    <class>com.soltelec.consolaentrada.models.entities.EventosSicov</class>
+    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="show_sql" value="true"/>
+      <property name="eclipselink.jdbc.native-sql" value="true"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+    </properties>
+  </persistence-unit>
+</persistence>

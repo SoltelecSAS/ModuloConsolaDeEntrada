@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subreportUsuarios" language="groovy" pageWidth="524" pageHeight="752" columnWidth="524" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c0e903fa-782c-4f65-b7bc-2579524a5f17">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="id_reinspeccion" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select Nombre_usuario,Nombre_tipo_prueba from pruebas as pr
+inner join usuarios as u on pr.usuario_for = u.GEUSER
+inner join tipo_prueba as tp on pr.Tipo_prueba_for = tp.TESTTYPE
+where pr.id_pruebas in
+(select id_prueba_for from reinspxprueba where id_reinspeccion = $P{id_reinspeccion})]]>
+	</queryString>
+	<field name="Nombre_usuario" class="java.lang.String"/>
+	<field name="Nombre_tipo_prueba" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="17" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="524" height="17" uuid="1d096665-d6e6-4a6d-bb69-b5e9a37c9d3c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[H. NOMBRE DE LOS OPERARIOS QUE REALIZARON LA REVISIÓN TECNICOMECÁNICA Y DE EMISIONES CONTAMINANTES]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="60" y="0" width="124" height="15" uuid="967960d3-d80f-4432-a2d3-907aeb789bce"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre_tipo_prueba}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="249" y="0" width="202" height="15" uuid="66dc50ff-9b54-452b-a113-65252480e511"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre_usuario}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,2 @@
+[Reinspeccion]
+valida_foto: no

@@ -1,0 +1,7 @@
+2016-12-11 Version 1.9.8 released
+_______________________________________________________________________________
+- Ajuste de reporte fur, ya que estaba desajustado
+
+2016-12-12 Version 1.9.9 released
+_______________________________________________________________________________
+- Ajuste de comentarios en revision incial y reinspeccion ya que para la revision inicial no se mostraban los datos

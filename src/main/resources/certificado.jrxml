@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="certificado" language="groovy" pageWidth="612" pageHeight="792" columnWidth="576" leftMargin="19" rightMargin="17" topMargin="0" bottomMargin="0" uuid="a0cfd50f-313d-48cf-8bec-5e4812be054c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="69"/>
+	<parameter name="ID_HP" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="NombreCDA" class="java.lang.String"/>
+	<parameter name="CertificadosConformidad" class="java.lang.String"/>
+	<parameter name="AñoExpedicion" class="java.lang.String"/>
+	<parameter name="MesExpedicion" class="java.lang.String"/>
+	<parameter name="DiaExpedicion" class="java.lang.String"/>
+	<parameter name="AñoVencimiento" class="java.lang.String"/>
+	<parameter name="MesVencimiento" class="java.lang.String"/>
+	<parameter name="DiaVencimiento" class="java.lang.String"/>
+	<parameter name="NITCDA" class="java.lang.String"/>
+	<parameter name="PrefijoDoc" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ConsecutivoRUNT" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select v.CARPLATE,v.Modelo,v.Cinlindraje,v.VIN,v.Numero_motor,v.numero_chasis,m.Nombre_marca,l.CRLNAME,s.Nombre_servicio,c.Nombre_clase,cm.Nombre_gasolina,
+clr.Nombre_color,p.CAROWNER,CONCAT(p.Nombres,' ',p.Apellidos) as nombre
+from hoja_pruebas as hp inner join vehiculos  as v on hp.Vehiculo_for = v.CAR
+inner join marcas as m on v.CARMARK = m.CARMARK
+inner join lineas_vehiculos as l on v.CARLINE = l.CARLINE
+inner join servicios as s on v.SERVICE = s.SERVICE
+inner join clases_vehiculo as c on v.CLASS = c.CLASS
+inner join tipos_gasolina as cm on v.FUELTYPE = cm.FUELTYPE
+inner join colores as clr on v.Color = clr.COLOR
+inner join propietarios as p on hp.Propietario_for = p.CAROWNER
+where hp.TESTSHEET = $P{ID_HP};]]>
+	</queryString>
+	<field name="CARPLATE" class="java.lang.String"/>
+	<field name="Modelo" class="java.lang.Integer"/>
+	<field name="Cinlindraje" class="java.lang.Integer"/>
+	<field name="VIN" class="java.lang.String"/>
+	<field name="Numero_motor" class="java.lang.String"/>
+	<field name="numero_chasis" class="java.lang.String"/>
+	<field name="Nombre_marca" class="java.lang.String"/>
+	<field name="CRLNAME" class="java.lang.String"/>
+	<field name="Nombre_servicio" class="java.lang.String"/>
+	<field name="Nombre_clase" class="java.lang.String"/>
+	<field name="Nombre_gasolina" class="java.lang.String"/>
+	<field name="Nombre_color" class="java.lang.String"/>
+	<field name="CAROWNER" class="java.lang.Long"/>
+	<field name="nombre" class="java.lang.String"/>
+	<detail>
+		<band height="396" splitType="Stretch">
+			<frame>
+				<reportElement x="8" y="63" width="301" height="118" forecolor="#000000" uuid="5efe21f4-9572-4278-bcdb-5009ccd23154"/>
+				<textField>
+					<reportElement x="9" y="1" width="54" height="23" forecolor="#000000" uuid="0eb9515a-7684-4ba7-bee2-3269ec31263b"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" isStrikeThrough="false" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CARPLATE}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="23" width="79" height="23" forecolor="#000000" uuid="e76eef80-a195-4934-8356-6ac6a31573f6"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Nombre_servicio}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="47" width="57" height="23" forecolor="#000000" uuid="dec8080e-1c9a-41a9-be34-eef9f8e2c818"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Cinlindraje}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="93" width="166" height="23" forecolor="#000000" uuid="28331931-27e0-41cc-bc54-411881058848"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement textAlignment="Left" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nombre}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="77" y="1" width="110" height="23" forecolor="#000000" uuid="008389d7-d097-4a4d-9cfc-ab62dae16920"/>
+					<box bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" isStrikeThrough="false" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{Nombre_marca}.toUpperCase()).trim()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="187" y="1" width="111" height="23" forecolor="#000000" uuid="473ef35f-2b11-4cee-8b8a-11b918322efe"/>
+					<box bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" isStrikeThrough="false" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{CRLNAME}.toUpperCase()).trim()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="88" y="24" width="129" height="23" forecolor="#000000" uuid="586f5b96-af33-4c28-89d4-7448d95ccb8d"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{Nombre_color}).trim().toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="217" y="24" width="67" height="23" forecolor="#000000" uuid="eafa41db-2e34-4021-a0f0-96352c16a69d"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Modelo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="66" y="47" width="72" height="23" forecolor="#000000" uuid="10603641-00d6-43a6-9016-01ba15ed09a5"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Nombre_gasolina}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="142" y="47" width="146" height="23" forecolor="#000000" uuid="709163dc-b58d-4ab0-9cd8-0400fb6ffd27"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{VIN}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="77" y="70" width="122" height="23" forecolor="#000000" uuid="4ab93539-aedd-4126-82a6-e189c2cf97c8"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Numero_motor}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="70" width="96" height="23" forecolor="#000000" uuid="55427cc9-102d-4312-a22c-95e5c973e430"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{PrefijoDoc} + " " + $F{CAROWNER}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="175" y="93" width="109" height="23" forecolor="#000000" uuid="0846ef8c-5829-42df-98f8-86df0f27c951"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ConsecutivoRUNT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="10" y="71" width="68" height="23" forecolor="#000000" uuid="0b6d50f2-5553-4391-a749-a5fe08fcd786"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Nombre_clase}.toUpperCase()]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="309" y="64" width="280" height="118" forecolor="#000000" uuid="4320ff4e-f8eb-417a-a876-d0ac74c1f02a"/>
+				<textField>
+					<reportElement x="0" y="23" width="177" height="23" forecolor="#000000" uuid="14ccef1d-6727-4692-bab8-80ef8fa69ffc"/>
+					<box leftPadding="3" bottomPadding="3"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NombreCDA}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="47" width="36" height="23" forecolor="#000000" uuid="6c8e9eeb-95e2-4149-b973-d0270bb74b5a"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AñoExpedicion}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="70" width="36" height="23" forecolor="#000000" uuid="89fca898-f001-4ede-8053-788ddbdaddcc"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AñoVencimiento}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="93" width="142" height="23" forecolor="#000000" uuid="fa5caa18-97f6-451e-8ebb-82923a42d959"/>
+					<box leftPadding="3" bottomPadding="3"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{CertificadosConformidad}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="37" y="47" width="21" height="23" forecolor="#000000" uuid="4ca58b08-b5c4-42c0-96a0-15bb933a462c"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MesExpedicion}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="37" y="70" width="21" height="23" forecolor="#000000" uuid="7bd80314-980e-4301-a0ef-e8f5b4fc1330"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MesVencimiento}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="57" y="47" width="21" height="23" forecolor="#000000" uuid="4fc350eb-fd7e-41f2-a81f-5fa185434f8f"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DiaExpedicion}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="58" y="70" width="21" height="23" forecolor="#000000" uuid="2a7a8f47-469f-4601-a6b8-2468222ba0b0"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DiaVencimiento}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="1" width="54" height="23" forecolor="#000000" uuid="651426e4-fd85-4c3d-b44f-4423324affe9"/>
+					<box leftPadding="2" bottomPadding="5"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CARPLATE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="83" y="1" width="179" height="23" forecolor="#000000" uuid="f6ec5b28-29a6-4b72-8e77-33e87bc09612"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{numero_chasis}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="177" y="23" width="74" height="23" forecolor="#000000" uuid="a57ff057-bbbf-434d-a659-301314e079ab"/>
+					<box bottomPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NITCDA}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement x="142" y="93" width="109" height="23" forecolor="#000000" uuid="c8e4c237-5299-4365-9a3b-bb2b11ce6ff9"/>
+					<box bottomPadding="3"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ConsecutivoRUNT}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="9" y="260" width="301" height="135" forecolor="#000000" uuid="c3e79725-0f2b-4df0-b4b2-2c0e790b46e5"/>
+				<textField>
+					<reportElement x="9" y="1" width="54" height="23" forecolor="#000000" uuid="2b516c8f-7429-4163-bae5-cb08b019e4be"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" isStrikeThrough="false" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CARPLATE}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="23" width="79" height="23" forecolor="#000000" uuid="ca9ee331-6832-4c99-b6b2-10b86cf5727c"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Nombre_servicio}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="47" width="68" height="23" forecolor="#000000" uuid="377afd92-5f2c-4a59-9e5c-0f9d36529f59"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Cinlindraje}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="93" width="166" height="23" forecolor="#000000" uuid="1d11ef7b-27e7-40f8-ae71-614c9dbcc942"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement textAlignment="Left" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nombre}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="77" y="1" width="110" height="23" forecolor="#000000" uuid="9ecc0d52-1e04-440e-b65b-71ea8ab82178"/>
+					<box bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" isStrikeThrough="false" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{Nombre_marca}.toUpperCase()).trim()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="187" y="1" width="111" height="23" forecolor="#000000" uuid="c4161bd8-6d9b-40e4-9ee5-f8bc108f90c7"/>
+					<box bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" isStrikeThrough="false" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{CRLNAME}.toUpperCase()).trim()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="88" y="24" width="129" height="23" forecolor="#000000" uuid="d0bbbe97-6225-42bf-bed6-3574d9813691"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{Nombre_color}).trim().toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="217" y="24" width="67" height="23" forecolor="#000000" uuid="85816fd0-81c1-4286-a9ef-a0ab06bcc995"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Modelo}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="76" y="47" width="62" height="23" forecolor="#000000" uuid="2cc3d244-bed2-4de7-8c7c-02dd9e66048a"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Nombre_gasolina}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="142" y="47" width="146" height="23" forecolor="#000000" uuid="7ce538b9-dfe8-4e37-b6b8-c2e9753d0aff"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{VIN}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="77" y="70" width="122" height="23" forecolor="#000000" uuid="9f8b69ae-aecd-42dd-b9be-20c972a2abbf"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Numero_motor}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="70" width="96" height="23" forecolor="#000000" uuid="ff94618e-1c48-4723-a6ba-22bba9ca29d6"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{PrefijoDoc} + " " + $F{CAROWNER}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="175" y="93" width="109" height="23" forecolor="#000000" uuid="a39ad34b-0fc1-4024-a714-d28d4ee9cbf9"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ConsecutivoRUNT}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="9" y="71" width="68" height="23" forecolor="#000000" uuid="9d9047a4-9f6c-4e1e-a5e4-4c2593e1076a"/>
+					<box leftPadding="5" bottomPadding="1"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Nombre_clase}.toUpperCase()]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement x="310" y="261" width="280" height="135" forecolor="#000000" uuid="18f27dca-e536-4634-a72e-6f3d29f65931"/>
+				<textField>
+					<reportElement x="0" y="23" width="176" height="23" forecolor="#000000" uuid="f7846ca9-eb12-4847-aeed-25977e7f693b"/>
+					<box leftPadding="3" bottomPadding="3"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NombreCDA}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="47" width="36" height="23" forecolor="#000000" uuid="f2ff6ca8-a798-4c89-9947-719f294e48b0"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AñoExpedicion}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="70" width="36" height="23" forecolor="#000000" uuid="ab227dc6-641d-4738-8570-69e8f13e50f1"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{AñoVencimiento}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="93" width="142" height="23" forecolor="#000000" uuid="880e1502-8e26-46b0-a507-d4610356c32d"/>
+					<box leftPadding="3" bottomPadding="3"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{CertificadosConformidad}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="37" y="47" width="21" height="23" forecolor="#000000" uuid="d323ff47-dc3f-44f3-8176-ff7829ab9b19"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MesExpedicion}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="37" y="70" width="21" height="23" forecolor="#000000" uuid="3e8f5199-fb98-4d16-b59e-85340b37421f"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{MesVencimiento}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="57" y="47" width="21" height="23" forecolor="#000000" uuid="0a83984b-1d37-4d7d-9a23-9749d2ad43ea"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DiaExpedicion}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="58" y="70" width="21" height="23" forecolor="#000000" uuid="f546f17b-7552-4fae-9d42-81607d55a14d"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{DiaVencimiento}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="1" width="54" height="23" forecolor="#000000" uuid="5b8b7bc7-ffe8-47b3-82b8-cc5e8258bbed"/>
+					<box leftPadding="2" bottomPadding="5"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CARPLATE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="83" y="1" width="179" height="23" forecolor="#000000" uuid="cee7f150-bc75-4ed1-89c8-c8b462dd32c8"/>
+					<box bottomPadding="3"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{numero_chasis}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="176" y="23" width="75" height="23" forecolor="#000000" uuid="a01ba1a5-6e7b-4ac6-8c92-8d881159ab5d"/>
+					<box bottomPadding="3" rightPadding="3"/>
+					<textElement textAlignment="Right" verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{NITCDA}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="false">
+					<reportElement x="142" y="93" width="109" height="23" forecolor="#000000" uuid="57f6810a-3243-4dc0-beed-db33938d12f1"/>
+					<box bottomPadding="3"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Arial" size="8" isBold="true" pdfFontName="arialbd.ttf" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{ConsecutivoRUNT}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subreportUsuarios" language="groovy" pageWidth="524" pageHeight="752" columnWidth="524" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0b7d8397-962f-4822-b297-4d292ee32b3f">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="id_hoja_prueba" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="isReimpeccion" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select Nombre_usuario,Nombre_tipo_prueba from  pruebas as pr
+inner join hoja_pruebas as hp on pr.hoja_pruebas_for = hp.TESTSHEET inner join usuarios as u on pr.usuario_for = u.GEUSER inner join tipo_prueba as tp on pr.Tipo_prueba_for = tp.TESTTYPE
+where CASE WHEN $P{isReimpeccion}="NO" THEN
+     pr.id_pruebas in (select Min(id_pruebas) from pruebas as p where p.hoja_pruebas_for =$P{id_hoja_prueba}     and p.Finalizada = 'Y' group by p.Tipo_prueba_for )
+ ELSE
+      pr.id_pruebas in (select Max(id_pruebas) from pruebas as p where p.hoja_pruebas_for =$P{id_hoja_prueba}     and p.Finalizada = 'Y' group by p.Tipo_prueba_for )
+END
+    and pr.hoja_pruebas_for = $P{id_hoja_prueba}]]>
+	</queryString>
+	<field name="Nombre_usuario" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Nombre_tipo_prueba" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="21c74af2-c742-4469-ba69-76ffba84e645" x="53" y="0" width="215" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre_tipo_prueba}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="947e43e1-90a7-4159-b2c3-63349b76d449" x="285" y="0" width="202" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre_usuario}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

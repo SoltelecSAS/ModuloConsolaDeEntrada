@@ -1,0 +1,3 @@
+1 Instalación de lib para autocompletar
+
+mvn install:install-file -Dfile=lib-ext\AutoCompleter.jar -DgroupId=com.mxrck.autocompleter -DartifactId=AutoCompleter -Dversion=1.0 -Dpackaging=jar

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="subReportImagenes" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="cd5db28b-99bc-4dc5-866b-1bb2cfcb947e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="id_hoja_pruebas" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT Foto1,Foto2 FROM fotos WHERE id_hoja_pruebas_for = $P{id_hoja_pruebas}]]>
+	</queryString>
+	<field name="Foto1" class="java.awt.Image"/>
+	<field name="Foto2" class="java.awt.Image"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="185" splitType="Stretch">
+			<image scaleImage="RetainShape" onErrorType="Blank">
+				<reportElement x="0" y="0" width="279" height="185" uuid="62b0cd18-0311-4281-9fb9-9a7cc9cf9529"/>
+				<imageExpression><![CDATA[$F{Foto1}]]></imageExpression>
+			</image>
+			<image scaleImage="RetainShape" onErrorType="Blank">
+				<reportElement x="279" y="0" width="276" height="185" uuid="b81155d8-3609-4380-92f1-ee1b1c91665c"/>
+				<imageExpression><![CDATA[$F{Foto2}]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>
