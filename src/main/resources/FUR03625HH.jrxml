@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 5.5.2  -->
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FUR3625" pageWidth="612" pageHeight="934" columnWidth="592" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" whenResourceMissingType="Empty" uuid="b5a86fed-5370-40a3-b9e6-9e0394fdb44e">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="23"/>
@@ -537,7 +537,7 @@ WHERE
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="171" splitType="Stretch">
+		<band height="136" splitType="Stretch">
 			<staticText>
 				<reportElement x="9" y="4" width="228" height="10" uuid="8e0f938a-884f-4b02-8c5d-bcaca3df9967"/>
 				<textElement verticalAlignment="Middle">
@@ -589,9 +589,7 @@ WHERE
 				<text><![CDATA[MINISTERIO DE TRANSPORTE]]></text>
 			</staticText>
 			<frame>
-				<reportElement x="239" y="38" width="344" height="109" uuid="f5c48856-643d-4c19-816f-552b052eed57">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
+				<reportElement x="244" y="38" width="339" height="86" uuid="f5c48856-643d-4c19-816f-552b052eed57"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -600,53 +598,49 @@ WHERE
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<image scaleImage="FillFrame" hAlign="Center" vAlign="Middle">
-					<reportElement x="4" y="4" width="84" height="78" isPrintWhenDetailOverflows="true" uuid="254a9f3e-73c7-4d91-981e-6efb8c992cf6">
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<reportElement x="79" y="7" width="52" height="27" isPrintWhenDetailOverflows="true" uuid="254a9f3e-73c7-4d91-981e-6efb8c992cf6">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<imageExpression><![CDATA["icono.jpg"]]></imageExpression>
 				</image>
 				<textField>
-					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="162" y="1" width="173" height="21" uuid="3ae62c6c-dfc5-47c9-b15e-268b3ffc2a34">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					</reportElement>
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="134" y="1" width="203" height="21" uuid="3ae62c6c-dfc5-47c9-b15e-268b3ffc2a34"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_nombre}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="206" y="25" width="126" height="10" uuid="a65e2cb5-ba07-4c42-bcd1-588c973a4cd8"/>
+					<reportElement x="178" y="24" width="156" height="10" uuid="a65e2cb5-ba07-4c42-bcd1-588c973a4cd8"/>
 					<textElement textAlignment="Left">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_NIT}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="186" y="25" width="17" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
+					<reportElement x="135" y="24" width="18" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[NIT:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="176" y="81" width="28" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
+					<reportElement x="100" y="73" width="76" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[E-mail:]]></text>
+					<text><![CDATA[Correo electrónico:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="206" y="38" width="56" height="10" uuid="1186c93a-1fa9-4074-8c54-7c02b6758827"/>
+					<reportElement x="178" y="36" width="62" height="10" uuid="1186c93a-1fa9-4074-8c54-7c02b6758827"/>
 					<textElement>
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_telefono}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="206" y="95" width="68" height="10" uuid="049c3032-d743-4c46-b3e9-c6a97410d849"/>
+					<reportElement x="267" y="36" width="68" height="10" uuid="049c3032-d743-4c46-b3e9-c6a97410d849"/>
 					<textElement textAlignment="Left">
 						<font fontName="Arial" size="8" isBold="false"/>
 					</textElement>
@@ -654,93 +648,88 @@ WHERE
 				</textField>
 				<elementGroup/>
 				<staticText>
-					<reportElement x="166" y="38" width="37" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
+					<reportElement x="135" y="36" width="39" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Teléfono:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="163" y="52" width="41" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					</reportElement>
+					<reportElement x="135" y="49" width="41" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Dirección:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="173" y="66" width="31" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
+					<reportElement x="135" y="61" width="34" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Ciudad:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="188" y="95" width="18" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
+					<reportElement x="250" y="36" width="18" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Cel:]]></text>
 				</staticText>
 				<image>
-					<reportElement x="92" y="4" width="59" height="78" isPrintWhenDetailOverflows="true" uuid="c16cfde7-4447-480a-a505-8513faa0170f">
+					<reportElement x="7" y="7" width="65" height="27" isPrintWhenDetailOverflows="true" uuid="c16cfde7-4447-480a-a505-8513faa0170f">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
 					</reportElement>
 					<imageExpression><![CDATA["onac.jpeg"]]></imageExpression>
 				</image>
 				<staticText>
-					<reportElement x="92" y="86" width="59" height="9" uuid="3e806f8f-a3fa-4bf2-93e0-33d5976a5678">
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<reportElement x="7" y="41" width="65" height="12" uuid="3e806f8f-a3fa-4bf2-93e0-33d5976a5678">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Trebuchet MS" size="5" isBold="true"/>
+						<font fontName="Century Gothic" size="5" isBold="true"/>
 					</textElement>
 					<text><![CDATA[ISO/IEC 17020:2012]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="92" y="96" width="59" height="9" uuid="1ec578a9-f1ee-4e26-8a9f-a17428faa7e5">
+					<reportElement x="7" y="53" width="65" height="10" uuid="1ec578a9-f1ee-4e26-8a9f-a17428faa7e5">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center">
-						<font fontName="Trebuchet MS" size="5" isBold="true"/>
+						<font fontName="Century Gothic" size="5" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_Certificado_conformidad}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<image scaleImage="FillFrame" onErrorType="Blank">
-				<reportElement x="43" y="81" width="169" height="49" uuid="733b02a7-06e3-4a4e-ae81-c18be2cbd74b"/>
+				<reportElement x="68" y="71" width="103" height="38" uuid="733b02a7-06e3-4a4e-ae81-c18be2cbd74b"/>
 				<imageExpression><![CDATA["super.png"]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="0" y="160" width="128" height="11" uuid="140cc7f8-3e44-4b8d-924f-a47684eee68b"/>
+				<reportElement x="5" y="124" width="128" height="11" uuid="140cc7f8-3e44-4b8d-924f-a47684eee68b"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[A. INFORMACIÓN GENERAL]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="445" y="90" width="124" height="10" uuid="e28e2f16-1314-469c-b6fe-3f8ee28bab32"/>
+				<reportElement x="422" y="87" width="157" height="10" uuid="e28e2f16-1314-469c-b6fe-3f8ee28bab32"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cda_direccion}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="445" y="104" width="124" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
+				<reportElement x="422" y="99" width="157" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cda_ciudad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="445" y="119" width="124" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
+				<reportElement x="422" y="111" width="156" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -5548,6 +5537,13 @@ WHERE
 						</textElement>
 						<textFieldExpression><![CDATA[$P{GobCic1}]]></textFieldExpression>
 					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="52" y="13" width="42" height="11" uuid="83166a24-4f44-4cd5-aa43-dbc699c16feb"/>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$P{unidadCiclo1}]]></textFieldExpression>
+					</textField>
 					<staticText>
 						<reportElement x="56" y="25" width="32" height="12" uuid="91e03a74-d570-4921-a4da-e2e10db2ca65"/>
 						<textElement textAlignment="Center">
@@ -5620,6 +5616,13 @@ WHERE
 							<font fontName="Arial" size="8"/>
 						</textElement>
 						<textFieldExpression><![CDATA[$P{GobCic2}]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="51" y="14" width="42" height="11" uuid="83166a24-4f44-4cd5-aa43-dbc699c16feb"/>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$P{unidadCiclo2}]]></textFieldExpression>
 					</textField>
 					<staticText>
 						<reportElement x="56" y="25" width="32" height="12" uuid="91e03a74-d570-4921-a4da-e2e10db2ca65"/>
@@ -5694,6 +5697,13 @@ WHERE
 						</textElement>
 						<textFieldExpression><![CDATA[$P{GobCic3}]]></textFieldExpression>
 					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="55" y="14" width="38" height="11" uuid="83166a24-4f44-4cd5-aa43-dbc699c16feb"/>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$P{unidadCiclo3}]]></textFieldExpression>
+					</textField>
 					<staticText>
 						<reportElement x="57" y="24" width="32" height="12" uuid="91e03a74-d570-4921-a4da-e2e10db2ca65"/>
 						<textElement textAlignment="Center">
@@ -5752,6 +5762,13 @@ WHERE
 							<font fontName="Arial" size="8"/>
 						</textElement>
 						<textFieldExpression><![CDATA[$P{GobCic4}]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement x="54" y="14" width="38" height="11" uuid="83166a24-4f44-4cd5-aa43-dbc699c16feb"/>
+						<textElement textAlignment="Center">
+							<font fontName="Arial" size="8"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$P{unidadCiclo4}]]></textFieldExpression>
 					</textField>
 					<staticText>
 						<reportElement x="56" y="24" width="32" height="12" uuid="91e03a74-d570-4921-a4da-e2e10db2ca65"/>
@@ -5817,35 +5834,7 @@ WHERE
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="8"/>
 						</textElement>
-						<text><![CDATA[m^-1]]></text>
-					</staticText>
-					<staticText>
-						<reportElement x="-35" y="7" width="27" height="22" uuid="821e8f62-de17-4365-8c86-dbf3d669b480"/>
-						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font fontName="Arial" size="8"/>
-						</textElement>
-						<text><![CDATA[m^-1]]></text>
-					</staticText>
-					<staticText>
-						<reportElement x="-128" y="7" width="27" height="22" uuid="cb56dac5-ad2a-4f34-a287-b6d25514b6a3"/>
-						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font fontName="Arial" size="8"/>
-						</textElement>
-						<text><![CDATA[m^-1]]></text>
-					</staticText>
-					<staticText>
-						<reportElement x="-223" y="7" width="27" height="22" uuid="0b249a58-9175-4e1c-b329-d52b4642c429"/>
-						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font fontName="Arial" size="8"/>
-						</textElement>
-						<text><![CDATA[m^-1]]></text>
-					</staticText>
-					<staticText>
-						<reportElement x="-316" y="7" width="27" height="22" uuid="8ab3a0cd-365f-452e-93c9-0ca2fc5281ba"/>
-						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font fontName="Arial" size="8"/>
-						</textElement>
-						<text><![CDATA[m^-1]]></text>
+						<text><![CDATA[%]]></text>
 					</staticText>
 				</frame>
 				<frame>
@@ -6214,7 +6203,7 @@ WHERE
 				<subreportExpression><![CDATA["reporteDefectosEnse3625.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="127">
+		<band height="70">
 			<staticText>
 				<reportElement x="29" y="0" width="558" height="13" uuid="8cd9b534-344f-402a-b6bb-17e2b461a78c"/>
 				<textElement textAlignment="Left">
@@ -6897,47 +6886,20 @@ WHERE
 					<textFieldExpression><![CDATA[$P{PresDer2Eje5}]]></textFieldExpression>
 				</textField>
 			</frame>
-			<staticText>
-				<reportElement x="10" y="69" width="29" height="11" uuid="12fc5ab9-6b03-458c-93a5-a23abb72d4b3"/>
-				<textElement>
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Nota:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="47" y="69" width="68" height="11" uuid="45ccb32b-0fb7-44a2-9068-71ac8ffd0b75"/>
-				<textElement>
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Defectos Tipo A:  ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="122" y="68" width="465" height="24" uuid="9f3b750b-23d7-4178-8dd7-d40bef0d6f22"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Son aquellos defectos graves que implican un peligro inminente para la seguridad del vehículo, la de otros vehículos, la
-de sus ocupantes, la de los usuarios de la vía pública o el ambiente.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="47" y="96" width="68" height="11" uuid="5fa0b1e8-dd96-47b6-bb48-7dbfce7df05b"/>
-				<textElement>
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Defectos Tipo B:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="122" y="96" width="466" height="24" uuid="a3d21768-e511-4dde-9494-8eac9fceb4ef"/>
-				<textElement verticalAlignment="Top">
-					<font fontName="Arial" size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[ Son aquellos defectos que implican un peligro potencial para la seguridad del vehículo, la de otros vehículos, la de sus
-ocupantes, la de los usuarios de la vía pública.]]></text>
-			</staticText>
 		</band>
-		<band height="243">
+		<band height="580">
+			<staticText>
+				<reportElement x="9" y="283" width="303" height="11" uuid="984bc481-1b7f-449d-aa03-aaaf2c46057c"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F. COMENTARIOS U OBSERVACIONES ADICIONALES]]></text>
+			</staticText>
 			<frame>
-				<reportElement x="10" y="200" width="522" height="30" uuid="37d212f6-ab55-48dd-b5bd-b875f8396c78"/>
+				<reportElement x="10" y="250" width="522" height="30" uuid="37d212f6-ab55-48dd-b5bd-b875f8396c78"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
 				</box>
@@ -6963,63 +6925,63 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textField>
 			</frame>
 			<staticText>
-				<reportElement x="39" y="151" width="493" height="10" uuid="d00105ad-8bb6-427f-8fe4-9a1e17a7bbee"/>
+				<reportElement x="39" y="201" width="493" height="10" uuid="d00105ad-8bb6-427f-8fe4-9a1e17a7bbee"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Igual o superior a 5 para vehículos Livianos públicos, Pesados públicos, Motocicleta, Ciclomotor y Tricimoto]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="39" y="161" width="493" height="10" uuid="55198231-e1db-44d8-856b-cc8dae58aae3"/>
+				<reportElement x="39" y="211" width="493" height="10" uuid="55198231-e1db-44d8-856b-cc8dae58aae3"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Igual o superior a 5 para vehículos de enseñanza automovilística.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="10" y="89" width="129" height="14" uuid="e0e85120-e991-44d2-a8a3-12765d02f4f9"/>
+				<reportElement x="10" y="139" width="129" height="14" uuid="e0e85120-e991-44d2-a8a3-12765d02f4f9"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nota: Causal de Rechazo]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="39" y="141" width="493" height="10" uuid="817b3069-c8e7-4a87-b0f0-e853aa9e9864"/>
+				<reportElement x="39" y="191" width="493" height="10" uuid="817b3069-c8e7-4a87-b0f0-e853aa9e9864"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Igual o superior a 7 para vehículos Motocarros, Cuatrimotos, Mototriciclos y Cuadriciclos]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="10" y="117" width="193" height="14" uuid="75682cb3-6c9f-4739-af50-11abade63bcd"/>
+				<reportElement x="10" y="167" width="193" height="14" uuid="75682cb3-6c9f-4739-af50-11abade63bcd"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[b)          La cantida total de defectos tipo B sea]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="39" y="131" width="493" height="10" uuid="1c62098b-f958-4a67-979c-9705ce8a950c"/>
+				<reportElement x="39" y="181" width="493" height="10" uuid="1c62098b-f958-4a67-979c-9705ce8a950c"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Igual o superior a 10 para vehículos Livianos Particulares y Pesados Particulares]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="39" y="181" width="493" height="10" uuid="ce2ec76b-aa02-4bb8-8115-78db5983cb8f"/>
+				<reportElement x="39" y="231" width="493" height="10" uuid="ce2ec76b-aa02-4bb8-8115-78db5983cb8f"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Cuando se presente al menos un defecto tipo A para vehículos tipo Remolque o similares]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="39" y="171" width="493" height="10" uuid="80e28063-94ea-4672-92b9-30ed57f022a2"/>
+				<reportElement x="39" y="221" width="493" height="10" uuid="80e28063-94ea-4672-92b9-30ed57f022a2"/>
 				<textElement verticalAlignment="Top">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Igual o superior a 1 para vehículos de enseñanza automovilística tipo Cuatrimotos, Mototriciclos, Cuadriciclos, Ciclomotor, Tricimoto]]></text>
 			</staticText>
 			<frame>
-				<reportElement x="10" y="52" width="578" height="37" uuid="ea6e20f2-da23-401f-be36-7bd36f3ebcda"/>
+				<reportElement x="10" y="102" width="578" height="37" uuid="ea6e20f2-da23-401f-be36-7bd36f3ebcda"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7070,14 +7032,14 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textField>
 			</frame>
 			<staticText>
-				<reportElement x="10" y="103" width="193" height="14" uuid="c11d50a7-7fc1-4a68-ae03-0431d7317e39"/>
+				<reportElement x="10" y="153" width="193" height="14" uuid="c11d50a7-7fc1-4a68-ae03-0431d7317e39"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[a)          Se encuentra al menos un defecto Tipo A]]></text>
 			</staticText>
 			<frame>
-				<reportElement x="312" y="22" width="276" height="30" uuid="1dd0b399-6129-4d37-befe-ddc630534367"/>
+				<reportElement x="312" y="72" width="276" height="30" uuid="1dd0b399-6129-4d37-befe-ddc630534367"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7104,7 +7066,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textField>
 			</frame>
 			<frame>
-				<reportElement x="10" y="22" width="301" height="30" uuid="97bf712d-330a-4186-b847-e52ff4f9d1f7"/>
+				<reportElement x="10" y="72" width="301" height="30" uuid="97bf712d-330a-4186-b847-e52ff4f9d1f7"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7148,39 +7110,70 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textField>
 			</frame>
 			<staticText>
-				<reportElement x="10" y="8" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
+				<reportElement x="122" y="24" width="466" height="24" uuid="4da358df-3564-4c4e-8386-8f326a946ca5"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ Son aquellos defectos que implican un peligro potencial para la seguridad del vehículo, la de otros vehículos, la de sus
+ocupantes, la de los usuarios de la vía pública.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="47" y="24" width="68" height="11" uuid="55c49f08-746c-49d6-bed5-e8ba12423db7"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Defectos Tipo B:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="0" width="29" height="11" uuid="99e68927-7ecb-43e5-af5d-a138683787a8"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nota:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="122" y="0" width="465" height="24" uuid="b3aa776d-d6a5-4fc0-944b-9c4231fde139"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Son aquellos defectos graves que implican un peligro inminente para la seguridad del vehículo, la de otros vehículos, la
+de sus ocupantes, la de los usuarios de la vía pública o el ambiente.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="58" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
 				<textElement>
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[E. CONFORMIDAD DE LAS NORMAS NTC 5375, NTC 6218, NTC 6282, NTC 4983, NTC 4231 Y NTC 5365 (según corresponda).]]></text>
 			</staticText>
-		</band>
-		<band height="106">
 			<staticText>
-				<reportElement x="9" y="10" width="303" height="11" uuid="c0d3a24f-8b67-4db5-a10d-1a708975ccde"/>
-				<box>
-					<bottomPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Top">
+				<reportElement x="47" y="0" width="68" height="11" uuid="d730ad47-927b-4a6d-a2e3-a571118dea0a"/>
+				<textElement>
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[F. COMENTARIOS U OBSERVACIONES ADICIONALES]]></text>
+				<text><![CDATA[Defectos Tipo A:  ]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="10" y="25" width="577" height="16" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="1f5c8218-e6ee-4c0e-bf12-7bf03f6b2b1e"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="10" y="314" width="579" height="13" uuid="261d379b-d59c-40be-954b-d49d0bed9d1f"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ComentDefectos}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="10" y="298" width="577" height="16" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="a3e61d43-9fdb-4e5d-9c57-829a86bd1fa5"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{Comentarios}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="10" y="46" width="579" height="13" uuid="231d987f-c3a1-4197-a894-6b0b6c42480d"/>
-				<textElement>
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{ComentDefectos}]]></textFieldExpression>
-			</textField>
+			<image>
+				<reportElement x="9" y="499" width="361" height="80" uuid="2d9d323a-eb68-4ad6-8caf-4758d74708b0">
+					<printWhenExpression><![CDATA[$F{FUELTYPE} == 3]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA["tablaMedidas.png"]]></imageExpression>
+			</image>
 		</band>
 		<band height="280">
 			<staticText>
@@ -7236,7 +7229,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</image>
 			</frame>
 		</band>
-		<band height="162">
+		<band height="308">
 			<staticText>
 				<reportElement x="10" y="5" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
 				<box>
@@ -7246,6 +7239,54 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[H. RELACION DE EQUIPOS Y PERIFERICOS UTILIZADOS EN LA REVISIÓN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="175" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[I. SOFTWARE Y/O APLICATIVOS CON LA VERSIÓN UTILIZADA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="58" y="193" width="39" height="10" uuid="329044b5-c1e1-4454-8caa-a0141176c454"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[ Nombre:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="102" y="193" width="100" height="10" uuid="c9e487f6-cd9f-490a-bd6b-123fef69cad4"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{software_nombre}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="266" y="193" width="100" height="10" uuid="403fe40f-9d83-4d67-93bc-8751625cc7bd"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[ Versión:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="365" y="193" width="100" height="10" uuid="e4a193ac-e2a8-453f-86e2-6461b5a1cc9a"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{software_version}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="210" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[J. NOMBRE DE LOS INSPECTORES QUE REALIZARON LA REVISIÓN TÉCNICO-MECÁNICA Y DE EMISIONES CONTAMINANTES]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="280" y="25" width="211" height="13" uuid="d31ed15f-c609-415f-9b66-e62bfba1125e"/>
@@ -7346,7 +7387,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[ Sonometro]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="10" y="25" width="142" height="13" uuid="d31ed15f-c609-415f-9b66-e62bfba1125e"/>
+				<reportElement x="9" y="25" width="142" height="13" uuid="d31ed15f-c609-415f-9b66-e62bfba1125e"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7757,6 +7798,17 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<rightPen lineWidth="0.5"/>
 				</box>
 			</frame>
+			<subreport>
+				<reportElement x="10" y="232" width="200" height="62" uuid="ff1cf3c3-a871-4360-8ed2-d48bf1554a45"/>
+				<subreportParameter name="isReimpeccion">
+					<subreportParameterExpression><![CDATA[$P{isReinspeccion}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_hoja_prueba">
+					<subreportParameterExpression><![CDATA[$P{ID_HP}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["FUR03625_UsuariosInspec.jasper"]]></subreportExpression>
+			</subreport>
 			<frame>
 				<reportElement x="151" y="98" width="129" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
@@ -7906,70 +7958,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{InstRpm}]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="48">
-			<staticText>
-				<reportElement x="9" y="9" width="578" height="14" uuid="b81b9e80-d788-4c63-a887-4a5c5186533c"/>
-				<box>
-					<bottomPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[I. SOFTWARE Y/O APLICATIVOS CON LA VERSIÓN UTILIZADA]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="58" y="30" width="39" height="10" uuid="328c1dd2-e0d7-47c5-b595-23c4cac05935"/>
-				<textElement>
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<text><![CDATA[ Nombre:]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="102" y="30" width="100" height="10" uuid="aaa04cac-a617-4eea-a888-613f2d1ee545"/>
-				<textElement>
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{software_nombre}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="266" y="30" width="100" height="10" uuid="1d0f1339-5e8c-4de8-b8b5-c0e669ba6bf9"/>
-				<textElement>
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<text><![CDATA[ Versión:]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="365" y="30" width="100" height="10" uuid="303dd81c-1122-4a26-a42d-aa78f39e3f20"/>
-				<textElement>
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{software_version}]]></textFieldExpression>
-			</textField>
-		</band>
-		<band height="105">
-			<staticText>
-				<reportElement x="10" y="7" width="578" height="14" uuid="6c419b1c-fc48-4c04-bd3a-b8a8159bcbf3"/>
-				<box>
-					<bottomPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[J. NOMBRE DE LOS INSPECTORES QUE REALIZARON LA REVISIÓN TÉCNICO-MECÁNICA Y DE EMISIONES CONTAMINANTES]]></text>
-			</staticText>
-			<subreport>
-				<reportElement x="10" y="29" width="200" height="62" uuid="70e6b22c-8b4b-4148-a86e-a10132b0982b"/>
-				<subreportParameter name="isReimpeccion">
-					<subreportParameterExpression><![CDATA[$P{isReinspeccion}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="id_hoja_prueba">
-					<subreportParameterExpression><![CDATA[$P{ID_HP}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["FUR03625_UsuariosInspec.jasper"]]></subreportExpression>
-			</subreport>
-		</band>
-		<band height="207">
+		<band height="72">
 			<staticText>
 				<reportElement x="11" y="0" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
 				<box>
@@ -7991,18 +7980,10 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{nombreResp}]]></textFieldExpression>
 			</textField>
+		</band>
+		<band height="125">
 			<staticText>
-				<reportElement x="10" y="80" width="33" height="11" uuid="e0151548-2672-44df-b2d3-68d3c3786ff1"/>
-				<box>
-					<bottomPen lineWidth="0.0"/>
-				</box>
-				<textElement verticalAlignment="Top">
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Nota:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="18" y="93" width="570" height="11" uuid="34d6e7f7-a1c4-4beb-8756-7ca2b28e5769"/>
+				<reportElement x="18" y="11" width="570" height="11" uuid="655f7cbc-5925-413f-9298-1dd844e7568a"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
 				</box>
@@ -8012,7 +7993,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[1) El campo del resultado de la prueba de Óxido Nitroso (NO) en el formato, se aplicará cuando quede regulado por la entidad competente.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="18" y="106" width="570" height="29" uuid="c9a35151-eac9-4d4f-918d-49526935adec"/>
+				<reportElement x="18" y="22" width="570" height="29" uuid="bc166ca8-96b4-4df6-bb92-51a7026fbbee"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
 				</box>
@@ -8022,7 +8003,17 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[2) Los resultados aquí consignados corresponden al momento de la revisión técnico-mecánica y de emisiones contaminantes, y por ende es responsabilidad del poseedor o tenedor del vehículo mantener las condiciones técnico-mecánicas y de emisiones contaminantes que indican artículos 50- 51 de la ley 769 de 2002 o la que modifique o sustituya.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="135" width="569" height="54" uuid="e7f6e67e-1c5c-483c-8735-a65b26554f4b"/>
+				<reportElement x="10" y="1" width="33" height="11" uuid="8385eed2-8280-4a3c-89a6-f98fce662528"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nota:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="51" width="569" height="54" uuid="d67839f1-43ae-4678-bea4-a81b1fbe6504"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
 				</box>
@@ -8032,7 +8023,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[3) En caso de rechazo, el propietario, poseedor o tenedor del vehículo automotor objeto de revisión, deberá efectuar las reparaciones pertinentes y subsanar los aspectos defectuosos dentro de los quince (15) días calendario contados a partir de la fecha en que fue reprobado. Una vez realizadas las reparaciones, el propietario, poseedor o tenedor del vehículo automotor, podrá volver por una sola vez sin costo alguno al mismo Centro de Diagnóstico Automotor para someter el vehículo a la revisión de los aspectos reprobados en la visita inicial, conforme a lo indicado en el artículo 28 de la Resolución 3768 de 2013, o la que la modifique, adicione o sustituya.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="15" y="189" width="574" height="11" uuid="27e86861-cfca-4db4-be7a-22fe0aeb5fe7"/>
+				<reportElement x="15" y="105" width="574" height="11" uuid="c9bef213-2b1a-41fe-96dd-207ce76fae12"/>
 				<box>
 					<bottomPen lineWidth="0.0"/>
 				</box>
