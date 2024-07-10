@@ -740,7 +740,7 @@ WHERE
 				<textFieldExpression><![CDATA[$F{cda_ciudad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="445" y="119" width="124" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
+				<reportElement x="445" y="119" width="136" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
