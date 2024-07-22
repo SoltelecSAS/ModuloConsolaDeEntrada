@@ -5,10 +5,11 @@
  */
 package com.soltelec.consolaentrada.models.controllers.conexion;
 
-import com.soltelec.consolaentrada.configuration.Conexion;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+
+import com.soltelec.consolaentrada.configuration.Conexion;
+
 import java.util.HashMap;
 
 /**

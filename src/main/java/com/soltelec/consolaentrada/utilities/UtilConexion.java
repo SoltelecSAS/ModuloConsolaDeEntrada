@@ -4,11 +4,11 @@
  */
 package com.soltelec.consolaentrada.utilities;
 
-import com.soltelec.consolaentrada.configuration.Conexion;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import com.soltelec.consolaentrada.configuration.Conexion;
 
 /**
  *
