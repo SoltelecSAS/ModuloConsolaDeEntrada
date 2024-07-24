@@ -92,6 +92,8 @@ public class LlamarReporte {
     private String OpCiclo3Value;
     private String OpCiclo4Value;
 
+    private double permisibleRalenti;
+
     public LlamarReporte() {
         try {
             consultasCertificados = new ConsultasCertificados();
@@ -157,7 +159,7 @@ public class LlamarReporte {
             if (this.ctxHojaPrueba.getIntentos() > 1) {
                 parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(this.ctxHojaPrueba.getFechaIngreso()));
             }
-
+            configurarPermisibles();
             reinspeccion = this.ctxHojaPrueba.getReinspeccionList().size() > 0;  //consultas.isReinspeccion(this.ctxHojaPrueba.getId() , cn);            
             if (reinspeccion) {
                 parametros.put("codigoPrueba", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 2");
@@ -187,7 +189,7 @@ public class LlamarReporte {
                 parametros.put("Comentarios", cargarObservacionesDB(this.ctxHojaPrueba, ctxIndPruebas));
             }
 
-            configurarPermisibles();
+            
             try {
                 cargarImagen(reinspeccion, parametros, reinspeccion ? 1 : 0, false);
             } catch (Exception ex) {
@@ -1224,10 +1226,11 @@ public class LlamarReporte {
                         // df.applyPattern("#0.0");
                         String HCRalenti = String.valueOf(m.getValor());
                         if (cero200) {
-                            HCRalenti = m.getValor() <=200 ? HCRalenti : String.valueOf(m.getValor())+" *";
-                            parametros.put("HCRalenti", ajustarValorMedida(HCRalenti));
+                            HCRalenti = m.getValor() <=permisibleRalenti ? ajustarValorMedida(HCRalenti) : ajustarValorMedida(HCRalenti)+"*";
+                            parametros.put("HCRalenti", HCRalenti);
                         }else{
-                            parametros.put("HCRalenti", ajustarValorMedida(HCRalenti) + m.getCondicion());//Esta no se da nunca con decimales garantizado desde prueba
+                            HCRalenti = m.getValor() <=permisibleRalenti ? ajustarValorMedida(HCRalenti) : ajustarValorMedida(HCRalenti)+"*";
+                            parametros.put("HCRalenti", HCRalenti);//Esta no se da nunca con decimales garantizado desde prueba
                             break;
                         }
                         
@@ -1346,7 +1349,8 @@ public class LlamarReporte {
                     case 8018://medida de HC Ralenti Dos tiempos
                         df.applyPattern("#0.0");
                         String HCRalenti2T = String.valueOf(m.getValor());
-                        parametros.put("HCRalenti", ajustarValorMedida(HCRalenti2T) + m.getCondicion());
+                        HCRalenti2T = m.getValor() <=permisibleRalenti ? ajustarValorMedida(HCRalenti2T) : ajustarValorMedida(HCRalenti2T)+"*";
+                        parametros.put("HCRalenti", HCRalenti2T + m.getCondicion());
                         break;
 
                     //----------------------------------------------------------
@@ -2261,20 +2265,25 @@ public class LlamarReporte {
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2) {
                 if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 2009) {
                     parametros.put("PerHCRal", "[0-10000]");
+                    permisibleRalenti = 10000;
                     parametros.put("PerCORal", "[0-4.5]");
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-8000]");
+                        permisibleRalenti = 8000;
                         parametros.put("PerCORal", "[0-3.5]");
                     }
                 } else {
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
+                        permisibleRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.6]");
                     } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
+                        permisibleRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.5]");
                     } else {
                         parametros.put("PerHCRal", "[0-2000]");
+                        permisibleRalenti = 2000;
                         parametros.put("PerCORal", "[0-4.5]");
                     }
                 }
@@ -2283,12 +2292,15 @@ public class LlamarReporte {
                 //caso para motos cuatro tiempos
                 if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1600]");
+                    permisibleRalenti = 1600;
                     parametros.put("PerCORal", "[0-3.6]");
                 } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1300]");
+                    permisibleRalenti = 1300;
                     parametros.put("PerCORal", "[0-3.5]");
                 } else {
                     parametros.put("PerHCRal", "[0-2000]");
+                    permisibleRalenti = 2000;
                     parametros.put("PerCORal", "[0-4.5]");
                     System.out.println("aqui estoy--------------------------------------------");
                 }
@@ -2333,20 +2345,25 @@ public class LlamarReporte {
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2) {
                 if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 2009) {
                     parametros.put("PerHCRal", "[0-10000]");
+                    permisibleRalenti = 10000;
                     parametros.put("PerCORal", "[0-4.5]");
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-8000]");
+                        permisibleRalenti = 8000;
                         parametros.put("PerCORal", "[0-3.5]");
                     }
                 } else {
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
+                        permisibleRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.6]");
                     } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
+                        permisibleRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.5]");
                     } else {
                         parametros.put("PerHCRal", "[0-2000]");
+                        permisibleRalenti = 2000;
                         parametros.put("PerCORal", "[0-4.5]");
                     }
                 }
@@ -2355,12 +2372,15 @@ public class LlamarReporte {
                 //caso para motos cuatro tiempos
                 if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1600]");
+                    permisibleRalenti = 1600;
                     parametros.put("PerCORal", "[0-3.6]");
                 } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1300]");
+                    permisibleRalenti = 1300;
                     parametros.put("PerCORal", "[0-3.5]");
                 } else {
                     parametros.put("PerHCRal", "[0-2000]");
+                    permisibleRalenti = 2000;
                     parametros.put("PerCORal", "[0-4.5]");
                     System.out.println("aqui estoy--------------------------------------------");
                 }
@@ -2412,21 +2432,25 @@ public class LlamarReporte {
                 if (fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                     if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 1970) {
                         parametros.put("PerHCRal", "[0-800]");
+                        permisibleRalenti = 800;
                         parametros.put("PerCORal", "[0-5.0]");
                         parametros.put("PerHCCruc", "[0-800]");
                         parametros.put("PerCOCruc", "[0-5.0]");
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1970 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1984) {
                         parametros.put("PerHCRal", "[0-650]");
+                        permisibleRalenti = 650;
                         parametros.put("PerCORal", "[0-4.0]");
                         parametros.put("PerHCCruc", "[0-650]");
                         parametros.put("PerCOCruc", "[0-4.0]");
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1984 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1997) {
                         parametros.put("PerHCRal", "[0-400]");
+                        permisibleRalenti = 400;
                         parametros.put("PerCORal", "[0-3.0]");
                         parametros.put("PerHCCruc", "[0-400]");
                         parametros.put("PerCOCruc", "[0-3.0]");
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1997) {
                         parametros.put("PerHCRal", "[0-200]");
+                        permisibleRalenti = 200;
                         parametros.put("PerCORal", "[0-1.0]");
                         parametros.put("PerHCCruc", "[0-200]");
                         parametros.put("PerCOCruc", "[0-1.0]");
@@ -2437,22 +2461,26 @@ public class LlamarReporte {
                     int modelo = this.ctxHojaPrueba.getVehiculo().getModelo();
                     if (modelo <= 1984) {
                         parametros.put("PerHCRal", "[0-650]");
+                        permisibleRalenti = 650;
                         parametros.put("PerCORal", "[0-4.0]");
                         parametros.put("PerHCCruc", "[0-650]");
                         parametros.put("PerCOCruc", "[0-4.0]");
                     } else if (modelo >= 1985 && modelo <= 1997) {
                         parametros.put("PerHCRal", "[0-400]");
+                        permisibleRalenti = 400;
                         parametros.put("PerCORal", "[0-3.0]");
                         parametros.put("PerHCCruc", "[0-400]");
                         parametros.put("PerCOCruc", "[0-3.0]");
                     } else if (modelo >= 1998 && modelo <= 2009) {
                         parametros.put("PerHCRal", "[0-200]");
+                        permisibleRalenti = 200;
                         parametros.put("PerCORal", "[0-1.0]");
                         parametros.put("PerHCCruc", "[0-200]");
                         parametros.put("PerCOCruc", "[0-1.0]");
                         cero200 = true;
                     } else {//modelo >= 2010
                         parametros.put("PerHCRal", "[0-160]");
+                        permisibleRalenti = 160;
                         parametros.put("PerCORal", "[0-0.8]");
                         parametros.put("PerHCCruc", "[0-160]");
                         parametros.put("PerCOCruc", "[0-0.8]");
@@ -2472,21 +2500,25 @@ public class LlamarReporte {
                     if (fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                         if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 1970) {
                             parametros.put("PerHCRal", "[0-800]");
+                            permisibleRalenti = 800;
                             parametros.put("PerCORal", "[0-5.0]");
                             parametros.put("PerHCCruc", "[0-800]");
                             parametros.put("PerCOCruc", "[0-5.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1970 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1984) {
                             parametros.put("PerHCRal", "[0-650]");
+                            permisibleRalenti = 650;
                             parametros.put("PerCORal", "[0-4.0]");
                             parametros.put("PerHCCruc", "[0-650]");
                             parametros.put("PerCOCruc", "[0-4.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1984 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1997) {
                             parametros.put("PerHCRal", "[0-400]");
+                            permisibleRalenti = 400;
                             parametros.put("PerCORal", "[0-3.0]");
                             parametros.put("PerHCCruc", "[0-400]");
                             parametros.put("PerCOCruc", "[0-3.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1997) {
                             parametros.put("PerHCRal", "[0-200]");
+                            permisibleRalenti = 200;
                             parametros.put("PerCORal", "[0-1.0]");
                             parametros.put("PerHCCruc", "[0-200]");
                             parametros.put("PerCOCruc", "[0-1.0]");
@@ -2496,22 +2528,26 @@ public class LlamarReporte {
                         int modelo = this.ctxHojaPrueba.getVehiculo().getModelo();
                         if (modelo <= 1984) {
                             parametros.put("PerHCRal", "[0-650]");
+                            permisibleRalenti = 650;
                             parametros.put("PerCORal", "[0-4.0]");
                             parametros.put("PerHCCruc", "[0-650]");
                             parametros.put("PerCOCruc", "[0-4.0]");
                         } else if (modelo >= 1985 && modelo <= 1997) {
                             parametros.put("PerHCRal", "[0-400]");
+                            permisibleRalenti = 400;
                             parametros.put("PerCORal", "[0-3.0]");
                             parametros.put("PerHCCruc", "[0-400]");
                             parametros.put("PerCOCruc", "[0-3.0]");
                         } else if (modelo >= 1998 && modelo <= 2009) {
                             parametros.put("PerHCRal", "[0-200]");
+                            permisibleRalenti = 200;
                             parametros.put("PerCORal", "[0-1.0]");
                             parametros.put("PerHCCruc", "[0-200]");
                             parametros.put("PerCOCruc", "[0-1.0]");
                             cero200 = true;
                         } else {//modelo >= 2010
                             parametros.put("PerHCRal", "[0-160]");
+                            permisibleRalenti = 160;
                             parametros.put("PerCORal", "[0-0.8]");
                             parametros.put("PerHCCruc", "[0-160]");
                             parametros.put("PerCOCruc", "[0-0.8]");
