@@ -51,6 +51,7 @@ public class Conexion implements Serializable {
     private static final String CARPETA = "./configuracion/";
     private static final String EXTENSION = ".soltelec";
     private static final String NOMBRE_ARCHIVO = "Conexion";
+    private static boolean licencia = false;
 
     public static void setConexionFromFile() {
         try {
@@ -83,28 +84,28 @@ public class Conexion implements Serializable {
             String consulta = "SELECT NIT FROM cda WHERE id_cda = 1";
             String url = "jdbc:mysql://" + datos.get(1) + ":" + datos.get(3) + "/" + datos.get(0) + "?zeroDateTimeBehavior=convertToNull";
             
+            if (!licencia){
+                try (Connection conexion = DriverManager.getConnection(url, datos.get(2), datos.get(4));
+                    PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
 
-            boolean license = false;
-            try (Connection conexion = DriverManager.getConnection(url, datos.get(2), datos.get(4));
-                PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
+                    //rc representa el resultado de la consulta
+                    try (ResultSet rc = consultaDagma.executeQuery()) {
+                        while (rc.next()) {
+                            String nit = rc.getString("NIT");
+                            String urlPeticion = "http://api.soltelec.com:8087/api/public/"+nit;
+                            response = sendGet(urlPeticion);
 
-                //rc representa el resultado de la consulta
-                try (ResultSet rc = consultaDagma.executeQuery()) {
-                    while (rc.next()) {
-                        String nit = rc.getString("NIT");
-                        String urlPeticion = "http://api.soltelec.com:8087/api/public/"+nit;
-                        response = sendGet(urlPeticion);
-
-                        if (response.equalsIgnoreCase("true")) license = true;
+                            if (response.equalsIgnoreCase("true")) licencia = true;
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
 
-            if (!license){
+            if (!licencia){
                 bufferedReader.close();
-                CMensajes.mensajeError("Su licencia ha expirado, contactese con Soltelec");
+                CMensajes.mensajeError("Su licencia ha expirado o no tiene conexion a internet, contactese con Soltelec");
                 throw new RuntimeException("respuesta del servidor licencia: \n"+ response);
             } 
 

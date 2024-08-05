@@ -54,6 +54,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -66,10 +67,11 @@ public class LlamarReporte {
 
     Map parametros = null;
     private boolean imprimirPdf;
-    JasperReport report, report2, report3;
+    JasperReport report, report2, report3, reportSuper;
     public int dve;
     final String rutaReporte = "FUR03625.jasper";
     final String rutaReporteNuevo = "FUR03625.jasper";
+    final String logoViejoSuper = "super.jasper";
     final String rutaReporte2 = "preventiva.jasper";
     ConsultasCertificados consultasCertificados;
     Consultas consultas;
@@ -101,6 +103,7 @@ public class LlamarReporte {
             report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte));
             report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte2));
             report3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporteNuevo));
+            reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(logoViejoSuper));
             consultas = new Consultas();
         } catch (Throwable ex) {
             int even = 0;
@@ -114,6 +117,7 @@ public class LlamarReporte {
             consultasCertificados = new ConsultasCertificados();
             report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte));
             report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte2));
+            reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(logoViejoSuper));
             consultas = new Consultas();
         } catch (Throwable ex) {
             int even = 0;
@@ -223,11 +227,21 @@ public class LlamarReporte {
             }
             JasperPrint fillReport;
 
+            LocalDate date1 = LocalDate.of(2024, 7, 1);
+            LocalDate fechaIngreso = this.ctxHojaPrueba.getFechaIngreso().toInstant()
+                                  .atZone(ZoneId.systemDefault())
+                                  .toLocalDate();
+
             preventiva = consultas.isRevisionPreventiva(this.ctxHojaPrueba);
             if (preventiva) {
-
+                System.out.println("preventiva");
                 fillReport = JasperFillManager.fillReport(report2, parametros, cn);
-            } else {
+            } else if(fechaIngreso.isBefore(date1)){
+                System.out.println("Logo viejo");
+                fillReport = JasperFillManager.fillReport(reportSuper, parametros, cn);
+            }
+            else {
+                System.out.println("Logo nuevo");
                 fillReport = JasperFillManager.fillReport(report, parametros, cn);
             }
 
