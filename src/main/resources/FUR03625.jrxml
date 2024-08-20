@@ -589,7 +589,7 @@ WHERE
 				<text><![CDATA[MINISTERIO DE TRANSPORTE]]></text>
 			</staticText>
 			<frame>
-				<reportElement x="239" y="38" width="344" height="109" uuid="f5c48856-643d-4c19-816f-552b052eed57">
+				<reportElement x="239" y="38" width="344" height="122" uuid="f5c48856-643d-4c19-816f-552b052eed57">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -600,7 +600,7 @@ WHERE
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<image scaleImage="FillFrame" hAlign="Center" vAlign="Middle">
-					<reportElement x="4" y="4" width="84" height="78" isPrintWhenDetailOverflows="true" uuid="254a9f3e-73c7-4d91-981e-6efb8c992cf6">
+					<reportElement x="3" y="9" width="84" height="78" isPrintWhenDetailOverflows="true" uuid="254a9f3e-73c7-4d91-981e-6efb8c992cf6">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -609,7 +609,7 @@ WHERE
 					<imageExpression><![CDATA["icono.jpg"]]></imageExpression>
 				</image>
 				<textField>
-					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="162" y="1" width="173" height="21" uuid="3ae62c6c-dfc5-47c9-b15e-268b3ffc2a34">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="164" y="1" width="173" height="21" uuid="3ae62c6c-dfc5-47c9-b15e-268b3ffc2a34">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -684,7 +684,7 @@ WHERE
 					<text><![CDATA[Cel:]]></text>
 				</staticText>
 				<image>
-					<reportElement x="92" y="4" width="59" height="78" isPrintWhenDetailOverflows="true" uuid="c16cfde7-4447-480a-a505-8513faa0170f">
+					<reportElement x="96" y="9" width="59" height="78" isPrintWhenDetailOverflows="true" uuid="c16cfde7-4447-480a-a505-8513faa0170f">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -693,7 +693,7 @@ WHERE
 					<imageExpression><![CDATA["onac.jpeg"]]></imageExpression>
 				</image>
 				<staticText>
-					<reportElement x="92" y="86" width="59" height="9" uuid="3e806f8f-a3fa-4bf2-93e0-33d5976a5678">
+					<reportElement x="96" y="96" width="59" height="9" uuid="3e806f8f-a3fa-4bf2-93e0-33d5976a5678">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
@@ -704,7 +704,7 @@ WHERE
 					<text><![CDATA[ISO/IEC 17020:2012]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="92" y="96" width="59" height="9" uuid="1ec578a9-f1ee-4e26-8a9f-a17428faa7e5">
+					<reportElement x="96" y="105" width="59" height="9" uuid="1ec578a9-f1ee-4e26-8a9f-a17428faa7e5">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>

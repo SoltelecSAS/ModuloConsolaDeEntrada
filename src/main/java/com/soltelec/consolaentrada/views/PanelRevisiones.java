@@ -542,8 +542,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
         if (ctxCda.getClaseCda().equalsIgnoreCase("B")) {
             Integer pesoBruto = Integer.parseInt(txtPesoBruto.getText());
             if (pesoBruto >= 3500) {
-                Mensajes.mensajeCorrecto("Disculpe La Categoria de este CDA es B, por lo tanto no puede Ingresar Vehiculo Mayores 3500 Kg.");
-                return;
+                Mensajes.mensajeAdvertencia("La Categoria de este CDA es B, segun la ley no puede Ingresar Vehiculo Mayores 3500 Kg.\n Cualquier medida de este vehiculo sera asumido bajo la responsabilidad del CDA");
             }
         }
         fillPropietario();
