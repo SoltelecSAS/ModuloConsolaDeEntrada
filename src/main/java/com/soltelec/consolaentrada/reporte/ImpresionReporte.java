@@ -598,6 +598,7 @@ public class ImpresionReporte {
                     llamarReporte.cargarReporte(this.ctxHojaPrueba, this.ctxCDA, 0, this.ctxHojaPrueba.getVehiculo().getPlaca());//mostrar el reporte                        
                 } else {//cuando la hoja de prueba no esta aprobada ni reprobada no no Finalizada
                     JOptionPane.showMessageDialog(null, "Estado Indeterminado de la RevisionTecnoMecanica");
+                    llamarReporte.cargarReporte(this.ctxHojaPrueba, this.ctxCDA, 0, this.ctxHojaPrueba.getVehiculo().getPlaca());//mostrar el reporte  
                 }
             }//final de cuando la revision es nueva RevGasoCruco no se ha dado por terminada y/o aprobada
             else if (estadoHojaPrueba.equalsIgnoreCase("FinalizadaAprobada") || estadoHojaPrueba.equalsIgnoreCase("FinalizadaReprobada")) {

@@ -10,35 +10,21 @@
 	<parameter name="isReimpeccion" class="java.lang.String"/>
 	<parameter name="idReinspeccion" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[select DISTINCT Nombre_problema,d.Tipo_defecto,Nombre_grupo,d.codigo_super as CARDEFAULT,    
-d.⁠ codigo_Resolucion ⁠ AS d_codigo_Resolucion
-FROM            pruebas pr
-INNER JOIN      defxprueba dp ON pr.id_pruebas = dp.id_prueba
-AND             IFNULL(dp.tercer_estado, '') NOT IN ('na')
-INNER JOIN      defectos AS d ON dp.id_defecto = d.cardefault
-INNER JOIN      defectos_grupos_sub_grupos gsg ON gsg.id_sub_grupo = d.defgroupssub
-INNER JOIN      grupos AS g ON gsg.id_grupo = g.defgroup
-WHERE           CASE
-                WHEN $P{isreimpeccion} = 'NO' THEN pr.id_pruebas IN (
-                        SELECT MIN(id_pruebas)
-                        FROM   pruebas AS p
-                        WHERE  p.hoja_pruebas_for = $P{id_hojaprueba}
-                        AND    p.tipo_prueba_for = 1
-                        AND    p.finalizada = 'Y'
-                        AND    p.abortada = 'N'
-                        AND    gsg.id_grupo != 21
-                        GROUP BY p.tipo_prueba_for )
-                ELSE pr.id_pruebas IN (
-                        SELECT MAX(id_pruebas)
-                        FROM   pruebas AS p
-                        WHERE  p.hoja_pruebas_for = $P{id_hojaprueba}
-                        AND    p.tipo_prueba_for = 1
-                        AND    p.finalizada = 'Y'
-                        AND    p.abortada = 'N'
-                        AND    gsg.id_grupo != 21
-                        GROUP BY p.tipo_prueba_for)
-                END
-AND             pr.hoja_pruebas_for = $P{id_hojaprueba}]]>
+		<![CDATA[select DISTINCT Nombre_problema,d.Tipo_defecto,Nombre_grupo,d.codigo_super as CARDEFAULT,     d.`codigo_Resolucion` AS d_codigo_Resolucion from pruebas as pr
+inner join defxprueba as dp on pr.id_pruebas=dp.id_prueba and IFNULL(dp.tercer_estado, '') NOT IN ('na')
+inner join defectos as d on dp.id_defecto = d.CARDEFAULT
+INNER JOIN grupos_sub_grupos gsg on gsg.SCDEFGROUPSUB = d.DEFGROUPSSUB
+inner join grupos as g on gsg.DEFGROUP = g.DEFGROUP
+where
+CASE WHEN $P{isReimpeccion}="NO" THEN
+ pr.id_pruebas in (
+ select min(id_pruebas) from pruebas as p where p.hoja_pruebas_for =  $P{id_hojaprueba}  and      p.Tipo_prueba_for =1 and p.Finalizada = 'Y'  and p.Abortada = 'N' and gsg.DEFGROUP != 21  group by p.Tipo_prueba_for )
+ELSE
+ pr.id_pruebas in(
+select max(id_pruebas) from pruebas as p where p.hoja_pruebas_for = $P{id_hojaprueba}  and p.Tipo_prueba_for = 1  and p.Finalizada = 'Y'  and p.Abortada = 'N'  and gsg.DEFGROUP != 21  group by p.Tipo_prueba_for)
+ END
+and pr.hoja_pruebas_for = $P{id_hojaprueba}
+/*and d.CARDEFAULT not in (84000,84001,84002,84003,84010,84011,84012,84009) */]]>
 	</queryString>
 	<field name="Nombre_problema" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>

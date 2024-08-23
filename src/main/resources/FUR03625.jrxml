@@ -589,7 +589,7 @@ WHERE
 				<text><![CDATA[MINISTERIO DE TRANSPORTE]]></text>
 			</staticText>
 			<frame>
-				<reportElement x="239" y="38" width="344" height="122" uuid="f5c48856-643d-4c19-816f-552b052eed57">
+				<reportElement x="239" y="38" width="344" height="104" uuid="f5c48856-643d-4c19-816f-552b052eed57">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -600,7 +600,7 @@ WHERE
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<image scaleImage="FillFrame" hAlign="Center" vAlign="Middle">
-					<reportElement x="3" y="9" width="84" height="78" isPrintWhenDetailOverflows="true" uuid="254a9f3e-73c7-4d91-981e-6efb8c992cf6">
+					<reportElement x="3" y="8" width="84" height="76" isPrintWhenDetailOverflows="true" uuid="254a9f3e-73c7-4d91-981e-6efb8c992cf6">
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -609,7 +609,7 @@ WHERE
 					<imageExpression><![CDATA["icono.jpg"]]></imageExpression>
 				</image>
 				<textField>
-					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="164" y="1" width="173" height="21" uuid="3ae62c6c-dfc5-47c9-b15e-268b3ffc2a34">
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="164" y="1" width="177" height="21" uuid="3ae62c6c-dfc5-47c9-b15e-268b3ffc2a34">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
@@ -618,35 +618,35 @@ WHERE
 					<textFieldExpression><![CDATA[$F{cda_nombre}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="206" y="25" width="126" height="10" uuid="a65e2cb5-ba07-4c42-bcd1-588c973a4cd8"/>
+					<reportElement x="206" y="24" width="136" height="10" uuid="a65e2cb5-ba07-4c42-bcd1-588c973a4cd8"/>
 					<textElement textAlignment="Left">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_NIT}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="186" y="25" width="17" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
+					<reportElement x="186" y="24" width="17" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[NIT:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="176" y="81" width="28" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
+					<reportElement x="176" y="72" width="28" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[E-mail:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="206" y="38" width="56" height="10" uuid="1186c93a-1fa9-4074-8c54-7c02b6758827"/>
+					<reportElement x="206" y="36" width="136" height="10" uuid="1186c93a-1fa9-4074-8c54-7c02b6758827"/>
 					<textElement>
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_telefono}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="206" y="95" width="68" height="10" uuid="049c3032-d743-4c46-b3e9-c6a97410d849"/>
+					<reportElement x="206" y="84" width="136" height="10" uuid="049c3032-d743-4c46-b3e9-c6a97410d849"/>
 					<textElement textAlignment="Left">
 						<font fontName="Arial" size="8" isBold="false"/>
 					</textElement>
@@ -654,14 +654,14 @@ WHERE
 				</textField>
 				<elementGroup/>
 				<staticText>
-					<reportElement x="166" y="38" width="37" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
+					<reportElement x="166" y="36" width="37" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Teléfono:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="163" y="52" width="41" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd">
+					<reportElement x="163" y="48" width="41" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement>
@@ -670,21 +670,21 @@ WHERE
 					<text><![CDATA[Dirección:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="173" y="66" width="31" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
+					<reportElement x="173" y="60" width="31" height="10" uuid="14f82293-bbde-4107-95e3-6c3a190dafdd"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Ciudad:]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="188" y="95" width="18" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
+					<reportElement x="188" y="84" width="18" height="10" uuid="385b876d-44b2-4a7b-a67d-fdc9618ec3a5"/>
 					<textElement>
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
 					<text><![CDATA[Cel:]]></text>
 				</staticText>
 				<image>
-					<reportElement x="96" y="9" width="59" height="78" isPrintWhenDetailOverflows="true" uuid="c16cfde7-4447-480a-a505-8513faa0170f">
+					<reportElement x="96" y="8" width="59" height="76" isPrintWhenDetailOverflows="true" uuid="c16cfde7-4447-480a-a505-8513faa0170f">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -693,23 +693,24 @@ WHERE
 					<imageExpression><![CDATA["onac.jpeg"]]></imageExpression>
 				</image>
 				<staticText>
-					<reportElement x="96" y="96" width="59" height="9" uuid="3e806f8f-a3fa-4bf2-93e0-33d5976a5678">
+					<reportElement x="96" y="92" width="59" height="6" uuid="3e806f8f-a3fa-4bf2-93e0-33d5976a5678">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Trebuchet MS" size="5" isBold="true"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="Trebuchet MS" size="5" isBold="false"/>
 					</textElement>
 					<text><![CDATA[ISO/IEC 17020:2012]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="96" y="105" width="59" height="9" uuid="1ec578a9-f1ee-4e26-8a9f-a17428faa7e5">
+					<reportElement x="96" y="98" width="59" height="6" uuid="1ec578a9-f1ee-4e26-8a9f-a17428faa7e5">
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<textElement textAlignment="Center">
-						<font fontName="Trebuchet MS" size="5" isBold="true"/>
+						<font fontName="Trebuchet MS" size="5" isBold="false"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{cda_Certificado_conformidad}]]></textFieldExpression>
 				</textField>
@@ -726,21 +727,21 @@ WHERE
 				<text><![CDATA[A. INFORMACIÓN GENERAL]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="445" y="90" width="124" height="10" uuid="e28e2f16-1314-469c-b6fe-3f8ee28bab32"/>
+				<reportElement x="445" y="86" width="136" height="10" uuid="e28e2f16-1314-469c-b6fe-3f8ee28bab32"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cda_direccion}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="445" y="104" width="124" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
+				<reportElement x="445" y="98" width="136" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cda_ciudad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="445" y="119" width="136" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
+				<reportElement x="445" y="110" width="136" height="10" uuid="81610c66-d635-44ec-905e-9fcf5b08b3d3"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
