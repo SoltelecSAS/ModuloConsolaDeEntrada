@@ -158,7 +158,7 @@ public class TipoVehiculoJpaController {
     }
     public List<TipoVehiculo> findAllAutorizados() {
         EntityManager em = getEntityManager();
-        String quer = "SELECT t FROM TipoVehiculo t  WHERE t.id in( 1,2,3,4,5,7,109,110) ";
+        String quer = "SELECT t FROM TipoVehiculo t  WHERE t.id in( 1,2,3,4,5,7,109,110,121,122) ";
         System.out.println(quer);
         TypedQuery<TipoVehiculo> query = em.createQuery(quer, TipoVehiculo.class);        
         System.out.println(query);

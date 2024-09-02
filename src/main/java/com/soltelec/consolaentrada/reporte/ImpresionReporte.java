@@ -434,6 +434,16 @@ public class ImpresionReporte {
                     enviarRuntSicov.setNombreEmpleado(this.ctxHojaPrueba.getResponsable().getNombre());
                     enviarRuntSicov.setNumeroIdentificacion(this.ctxHojaPrueba.getResponsable().getCedula());
 
+                    System.out.println("--------------------------------------------------------------");
+                    System.out.println("Placa: "+ enviarRuntSicov.getPlaca());
+                    System.out.println("Consecutivo: "+ enviarRuntSicov.getConsecutivoRUNT());
+                    System.out.println("DireccionIdEquipo: "+ enviarRuntSicov.getDireccionIpEquipo());
+                    System.out.println("Extrangero: "+ enviarRuntSicov.getExtranjero());
+                    System.out.println("idRunt: "+ enviarRuntSicov.getIdRunt());
+                    System.out.println("nombreEmpleado: "+ enviarRuntSicov.getNombreEmpleado());
+                    System.out.println("numeroIdentificacion: "+ enviarRuntSicov.getNumeroIdentificacion());
+                    System.out.println("--------------------------------------------------------------");
+
                     ClienteIndra envStub = new ClienteIndra();
                     envStub.setUrlSicov(ctxCDA.getUrlServicioSicov());
                     envStub.setUrlSicov2(ctxCDA.getUrlServicioSicov2());

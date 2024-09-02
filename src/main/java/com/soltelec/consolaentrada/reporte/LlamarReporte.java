@@ -2327,7 +2327,12 @@ public class LlamarReporte {
             parametros.put("PerOpac", "---");
         }
 
-        if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 4) {//Motocicletas
+        String tipoVehiculo = this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getNombre();
+
+        if (
+            tipoVehiculo.equalsIgnoreCase("Moto") 
+            || tipoVehiculo.equalsIgnoreCase("CICLOMOTOR")
+        ) {//Motocicletas
             //parametros.put("PerO2","[0-11]");
             parametros.put("PerCO2", "---");
             //Desviacion
@@ -2337,7 +2342,7 @@ public class LlamarReporte {
             //Suspension
             parametros.put("PerSusp", "---");
             //Frenos
-            parametros.put("PerEficTotal", "30");//30%
+            parametros.put("PerEficTotal", tipoVehiculo.equalsIgnoreCase("Moto") ? "30" : "40");//30%
             parametros.put("PerEficAux", "---");//no hay desequilibrio
             parametros.put("PerDeseq", "---");
             parametros.put("PerDeseqB", "---");
