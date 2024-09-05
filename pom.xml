@@ -16,12 +16,14 @@
             <artifactId>resteasy-jaxrs</artifactId>
             <version>2.3.2.Final</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.soltelec</groupId>
             <artifactId>appEncript</artifactId>
             <version>1.0-SNAPSHOT</version>
             <type>jar</type>
-        </dependency>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib-ext/appEncript1.0.jar</systemPath>
+        </dependency> -->
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
@@ -115,7 +117,9 @@
             <artifactId>AutoCompleter</artifactId>
             <version>1.0</version>
             <type>jar</type>
-        </dependency>        
+            <scope>system</scope>
+            <systemPath>${basedir}/lib-ext/AutoCompleter.jar</systemPath>
+        </dependency>   
         <dependency> 
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -161,12 +165,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>5.4.12.Final</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.appEncript</groupId>
-            <artifactId>appEncript</artifactId>
-            <version>1.0</version>
             <type>jar</type>
         </dependency>
     </dependencies> 

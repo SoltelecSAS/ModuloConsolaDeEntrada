@@ -4,6 +4,7 @@
  */
 package com.soltelec.consolaentrada.reporte;
 
+import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.indra.dto.DatosFur;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
 import com.soltelec.consolaentrada.models.controllers.CertificadoJpaController;
@@ -30,6 +31,9 @@ import com.soltelec.consolaentrada.utilities.UtilConexion;
 
 import javax.swing.*;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -618,7 +622,9 @@ public class ImpresionReporte {
 
         } catch (Exception ex) {
             System.err.println("Error en el metodo : cargarReporte() " + ex.getMessage() + "---" + ex.getLocalizedMessage());
-            JOptionPane.showMessageDialog(null, "Presento Problemas al Cargar el FUR debido a " + ex.getMessage());
+
+            corregirErrorColumnaFaltante(ex.getMessage());
+
             System.out.println("------------------------------------------Error");
             System.out.println(ex.toString());
             System.out.println(ex.getCause());
@@ -635,6 +641,42 @@ public class ImpresionReporte {
 
         }
 
+    }
+
+    private void corregirErrorColumnaFaltante(String errorMessage) {
+        String verificarSiExisteLaColumnaSql = 
+                "SELECT COUNT(*) AS column_exists FROM information_schema.columns " +
+                "WHERE table_schema = ? AND table_name = 'defectos' AND column_name = 'grupo'";
+    
+        String updateTablaDefectosSql = "ALTER TABLE defectos ADD COLUMN grupo VARCHAR(100) DEFAULT 'En la tabla defectos puede actualizar el nombre del grupo para este defecto solamente'";
+        
+        System.out.println("----------------------------------------------------------------------");
+        System.out.println("-----------Insertando variable para eliminar el error----------------");
+        System.out.println("----------------------------------------------------------------------");
+        
+        Conexion.setConexionFromFile();
+        
+        try (java.sql.Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement existeLaColumna = conexion.prepareStatement(verificarSiExisteLaColumnaSql);
+             PreparedStatement updateTabla = conexion.prepareStatement(updateTablaDefectosSql)) {
+    
+            // Pasar el nombre de la base de datos como parámetro
+            existeLaColumna.setString(1, Conexion.getBaseDatos());
+    
+            try (ResultSet rc = existeLaColumna.executeQuery()) {
+                if (rc.next() && rc.getInt("column_exists") == 0) {
+                    // Ejecutar la actualización
+                    updateTabla.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Por favor intente nuevamente", "Información", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Se presentó un problema: " + errorMessage + ". Por favor contacte con soporte Soltelec", "Información", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+            
+        } catch (SQLException ex) { 
+            ex.printStackTrace();
+            System.out.println("Error al tratar de corregir la tabla: " + ex.getMessage());
+        }
     }
 
     public long getNumeroHojaPrueba() {

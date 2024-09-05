@@ -17,8 +17,8 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.soltelec.appencript.Utilidades;
 import com.soltelec.consolaentrada.utilities.CMensajes;
+import com.soltelec.consolaentrada.utilities.CifraDesifra;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -70,7 +70,7 @@ public class Conexion implements Serializable {
                 String dato = "";
                 
                 if(numLinea !=2 && numLinea !=4){
-                    linea = Utilidades.deCifrar(linea);
+                    linea = CifraDesifra.deCifrar(linea);
                     int indice = linea.indexOf(":");
                     dato = linea.substring(indice +1, linea.length());
                 }else{
@@ -99,7 +99,12 @@ public class Conexion implements Serializable {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    CMensajes.mensajeError(
+                        "Hubo un error al tratar de conectarse a la base de datos, contactese con Soltelec.\n"+
+                        "Revise por favor el archivo "+CARPETA + NOMBRE_ARCHIVO + EXTENSION+"\n"+
+                        "Si este mismo error se repite en todos los computadores del CDA revise el servidor"
+                    );
+                    throw new RuntimeException("Error al tratar de conectarse con el base de datos: \n"+ e.getMessage());
                 }
             }
 
