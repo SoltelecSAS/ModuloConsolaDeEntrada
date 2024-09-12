@@ -88,15 +88,20 @@ public class Conexion implements Serializable {
                 try (Connection conexion = DriverManager.getConnection(url, datos.get(2), datos.get(4));
                     PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
 
+                    String nit = "";
                     //rc representa el resultado de la consulta
                     try (ResultSet rc = consultaDagma.executeQuery()) {
                         while (rc.next()) {
-                            String nit = rc.getString("NIT");
+                            nit = rc.getString("NIT");
                             String urlPeticion = "http://api.soltelec.com:8087/api/public/"+nit;
                             response = sendGet(urlPeticion);
 
                             if (response.equalsIgnoreCase("true")) licencia = true;
                         }
+                    }
+                    if (nit.equals("")) {
+                        CMensajes.mensajeError("La columna 'id_cda' de la tabla 'cda' de la base de datos debe ser 1 \no el cda no cuenta con NIT registrado en esa misma tabla\n Contactese con Soltelec.\n");
+                        throw new RuntimeException("Error porque no logro encontrar los datos de la tabla cda para id_cda = 1 o el campo NIT de esa misma tabla esta vacio\n");
                     }
                 } catch (Exception e) {
                     CMensajes.mensajeError(
@@ -110,8 +115,12 @@ public class Conexion implements Serializable {
 
             if (!licencia){
                 bufferedReader.close();
-                CMensajes.mensajeError("Su licencia ha expirado o no tiene conexion a internet, contactese con Soltelec");
-                throw new RuntimeException("respuesta del servidor licencia: \n"+ response);
+                CMensajes.mensajeError(
+                    "Su licencia ha expirado o no tiene conexion a internet, contactese con Soltelec\n"
+                );
+                String mensajeRespuesta = response.equalsIgnoreCase("false") ? "Licencia expirada" : response;
+                System.out.println("Respuesta del VPS ante la expiracion de licencia: "+mensajeRespuesta);
+                throw new RuntimeException("respuesta del VPS: \n"+ mensajeRespuesta);
             } 
 
             baseDatos = datos.get(0);
@@ -128,7 +137,6 @@ public class Conexion implements Serializable {
         }
     }
 
-    // Método para enviar una solicitud GET
     private static String sendGet(String url) {
         HttpURLConnection con = null;
         try {
@@ -152,15 +160,19 @@ public class Conexion implements Serializable {
 
                 return response.toString();
             } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) { // código 404
-                return "true";
+                return "404 Not Found";
             }else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) { // código 500
-                return "No encontro el nit en la base de datos de licencia: 500 Internal Server Error";
+                return "El CDA no se encuentra inscrito en la base de datos del VPS";
             }else {
                 return "Unexpected Response Code: " + responseCode;
             }
-        } catch (java.net.UnknownHostException | java.net.ConnectException | java.net.SocketTimeoutException e) {
+        } catch (java.net.UnknownHostException e) {
+            return "Unknown Host Exception: " + e.getMessage();
+        } catch (java.net.ConnectException e) {
             return "true";
-        }   catch (Exception e) {
+        } catch (java.net.SocketTimeoutException e) {
+            return "Socket Timeout Exception: " + e.getMessage();
+        } catch (Exception e) {
             return "Exception: " + e.getMessage();
         } finally {
             if (con != null) {

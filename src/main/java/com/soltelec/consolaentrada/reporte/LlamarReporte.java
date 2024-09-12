@@ -4053,65 +4053,84 @@ public class LlamarReporte {
         parametros.put("MarcaRuido", marca);
     }
 
-    /**
-     *
-     * @param marca
-     * @param pefD
-     * @param serialEquipo
-     * @param pef
-     */
     private void cargandoSerialEquipoGases(String marca, String pefD, String serialEquipo, String pef) {
 
-        boolean flag;
-        System.out.println("Cargando datos equipo de Gases : Searial: " + serialEquipo + " Marca : " + marca);
-        try {
+        if (serialEquipo.startsWith("otto")) {
+            String marcas = serialEquipo.split("~")[1];
+            String seriales = serialEquipo.split("~")[2];
 
-            EquiposJpaController1 controller1 = new EquiposJpaController1();
-            String[] data = serialEquipo.split(";");
-            pef = pef.replace("0.", "");
-            pefD = pefD.substring(0, pefD.length() - 1);//quitar el cero que aparece al final del pef cuando el vehiculo no es diesel
-            //colocar lo de la moto scooter y el catalizador, solo se debe mostrar el termohigrometro.
-            if (data.length == 3) {
+            String serialesAnalizador = seriales.split(";")[0];
+            String valorPef = serialesAnalizador.split("-")[0];
 
-                if (this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 3) {//Diesel
-                    System.out.println("PefGases: " + pef);
-                    parametros.put("PefGases", pef);
-                } else {//si no es diesel
-                    System.out.println("PefGases2: " + pefD);
+            String serialesKitRpm = seriales.split(";")[1];
+            String serialTermohigrometro = seriales.split(";")[2];
 
-                    parametros.put("PefGases", pefD);
+            parametros.put("PefGases", valorPef);
+            parametros.put("InstGases", serialesAnalizador);
+            parametros.put("MarcaGases", marcas.split(";")[0]);
+
+            String nombreRpm = 
+                serialesKitRpm.split("/").length > 2 ? 
+                    "Captador RPM y temperatura" : "Captador RPM";
+
+            parametros.put("RpmSondaTemp", nombreRpm);
+            parametros.put("MarcaRpm", marcas.split(";")[1]);
+            parametros.put("InstRpm", serialesKitRpm);
+
+            parametros.put("InstTermo", serialTermohigrometro);
+            parametros.put("MarcaTermo", marcas.split(";")[2]);
+            
+        } else {
+            boolean flag;
+            System.out.println("Cargando datos equipo de Gases : Searial: " + serialEquipo + " Marca : " + marca);
+            try {
+
+                EquiposJpaController1 controller1 = new EquiposJpaController1();
+                String[] data = serialEquipo.split(";");
+                pef = pef.replace("0.", "");
+                pefD = pefD.substring(0, pefD.length() - 1);//quitar el cero que aparece al final del pef cuando el vehiculo no es diesel
+                //colocar lo de la moto scooter y el catalizador, solo se debe mostrar el termohigrometro.
+                if (data.length == 3) {
+
+                    if (this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 3) {//Diesel
+                        System.out.println("PefGases: " + pef);
+                        parametros.put("PefGases", pef);
+                    } else {//si no es diesel
+                        System.out.println("PefGases2: " + pefD);
+
+                        parametros.put("PefGases", pefD);
+                    }
+                    parametros.put("InstGases", data[0]);
+                    parametros.put("MarcaGases", marca);
+
+                    Equipo CaptadorRpm = controller1.buscarSerialResolucionAmbental(data[1]);
+
+                    if (CaptadorRpm != null) {
+                        parametros.put("RpmSondaTemp", CaptadorRpm.getNomEquipo());
+                        parametros.put("MarcaRpm", CaptadorRpm.getMarca());
+                        parametros.put("InstRpm", CaptadorRpm.getResolucionambiental());
+                    }
+
+                    Equipo termoHigrometro = controller1.buscarSerialResolucionAmbental(data[2]);
+                    if (termoHigrometro != null) {
+                        parametros.put("InstTermo", termoHigrometro.getResolucionambiental());
+                        parametros.put("MarcaTermo", termoHigrometro.getMarca());
+                    }
+
+                } else {
+                    Mensajes.mensajeError("Se esperaban 3 datos en el campos \n"
+                            + "serialResolucion\n "
+                            + " No se cargaran los datos de gases en \n  "
+                            + " el FUR : Corregir en la db :  estrutura (xx;xxx;xxx).");
+                    System.out.println("Se esperaban 3 datos en el campos serialResolucion(2355;44444;4444)");
                 }
-                parametros.put("InstGases", data[0]);
-                parametros.put("MarcaGases", marca);
 
-                Equipo CaptadorRpm = controller1.buscarSerialResolucionAmbental(data[1]);
-
-                if (CaptadorRpm != null) {
-                    parametros.put("RpmSondaTemp", CaptadorRpm.getNomEquipo());
-                    parametros.put("MarcaRpm", CaptadorRpm.getMarca());
-                    parametros.put("InstRpm", CaptadorRpm.getResolucionambiental());
-                }
-
-                Equipo termoHigrometro = controller1.buscarSerialResolucionAmbental(data[2]);
-                if (termoHigrometro != null) {
-                    parametros.put("InstTermo", termoHigrometro.getResolucionambiental());
-                    parametros.put("MarcaTermo", termoHigrometro.getMarca());
-                }
-
-            } else {
-                Mensajes.mensajeError("Se esperaban 3 datos en el campos \n"
-                        + "serialResolucion\n "
-                        + " No se cargaran los datos de gases en \n  "
-                        + " el FUR : Corregir en la db :  estrutura (xx;xxx;xxx).");
-                System.out.println("Se esperaban 3 datos en el campos serialResolucion(2355;44444;4444)");
+            } catch (Exception e) {
+                System.err.println("Error en el metodo : cargandoSerialEquipoGases()" + e.getMessage());
+                System.err.println("Datos recibido en este metodo que arroja Error: "
+                        + "Marca " + marca + "pefD " + pefD + "serialEquipo " + serialEquipo + "pef " + pef);
             }
-
-        } catch (Exception e) {
-            System.err.println("Error en el metodo : cargandoSerialEquipoGases()" + e.getMessage());
-            System.err.println("Datos recibido en este metodo que arroja Error: "
-                    + "Marca " + marca + "pefD " + pefD + "serialEquipo " + serialEquipo + "pef " + pef);
         }
-
     }
 
     /**
