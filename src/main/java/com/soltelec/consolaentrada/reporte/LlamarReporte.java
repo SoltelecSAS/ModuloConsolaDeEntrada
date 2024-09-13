@@ -3946,10 +3946,22 @@ public class LlamarReporte {
                     + "WHERE hoja_pruebas.TESTSHEET=?\n"
                     + "ORDER BY pruebas.Tipo_prueba_for ASC";*/
 
-            String strConsulta = "SELECT DISTINCT p.Tipo_prueba_for, e.marca, e.pef/1000, p.serialEquipo, e.pef\n"
-                    + "FROM hoja_pruebas hp INNER JOIN pruebas p ON p.hoja_pruebas_for = hp.TESTSHEET\n"
-                    + "INNER JOIN equipos e ON e.serialresolucion = p.serialEquipo\n"
-                    + "WHERE hp.TESTSHEET = ?   ORDER BY p.Tipo_prueba_for ASC;";
+            String strConsulta = "SELECT DISTINCT \n" + //
+                                "    p.Tipo_prueba_for, \n" + //
+                                "    e.marca, \n" + //
+                                "    e.pef / 1000, \n" + //
+                                "    p.serialEquipo, \n" + //
+                                "    e.pef\n" + //
+                                "FROM \n" + //
+                                "    hoja_pruebas hp\n" + //
+                                "INNER JOIN \n" + //
+                                "    pruebas p ON p.hoja_pruebas_for = hp.TESTSHEET\n" + //
+                                "LEFT JOIN \n" + //
+                                "    equipos e ON e.serialresolucion = p.serialEquipo\n" + //
+                                "WHERE \n" + //
+                                "    hp.TESTSHEET = ?\n" + //
+                                "ORDER BY \n" + //
+                                "    p.Tipo_prueba_for ASC;";
 
             PreparedStatement ps = cn.prepareStatement(strConsulta);
             ps.setInt(1, hojaPrueba);
@@ -4056,17 +4068,21 @@ public class LlamarReporte {
     private void cargandoSerialEquipoGases(String marca, String pefD, String serialEquipo, String pef) {
 
         if (serialEquipo.startsWith("otto")) {
+
+            System.out.println("texto serial gases completo: "+serialEquipo);
+
             String marcas = serialEquipo.split("~")[1];
             String seriales = serialEquipo.split("~")[2];
 
             String serialesAnalizador = seriales.split(";")[0];
             String valorPef = serialesAnalizador.split("-")[0];
+            String serialAnalizadorBanco = serialesAnalizador.replace(valorPef+"-", "");
 
             String serialesKitRpm = seriales.split(";")[1];
             String serialTermohigrometro = seriales.split(";")[2];
 
             parametros.put("PefGases", valorPef);
-            parametros.put("InstGases", serialesAnalizador);
+            parametros.put("InstGases", serialAnalizadorBanco);
             parametros.put("MarcaGases", marcas.split(";")[0]);
 
             String nombreRpm = 
@@ -4079,7 +4095,7 @@ public class LlamarReporte {
 
             parametros.put("InstTermo", serialTermohigrometro);
             parametros.put("MarcaTermo", marcas.split(";")[2]);
-            
+
         } else {
             boolean flag;
             System.out.println("Cargando datos equipo de Gases : Searial: " + serialEquipo + " Marca : " + marca);
@@ -4131,6 +4147,9 @@ public class LlamarReporte {
                         + "Marca " + marca + "pefD " + pefD + "serialEquipo " + serialEquipo + "pef " + pef);
             }
         }
+        System.out.println("-----------------------------------------------------------");
+            System.out.println("---------------------SERIALES GASES END--------------------------------------");
+            System.out.println("-----------------------------------------------------------");
     }
 
     /**
