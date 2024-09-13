@@ -4096,7 +4096,32 @@ public class LlamarReporte {
             parametros.put("InstTermo", serialTermohigrometro);
             parametros.put("MarcaTermo", marcas.split(";")[2]);
 
-        } else {
+        } else if(serialEquipo.startsWith("diesel")){
+            System.out.println("texto serial gases completo: "+serialEquipo);
+
+            String marcas = serialEquipo.split("~")[1];
+            String seriales = serialEquipo.split("~")[2];
+
+            String serialesAnalizador = seriales.split(";")[0];
+            String valorLtoe = serialesAnalizador.split("-")[0];
+            String serialAnalizadorBanco = serialesAnalizador.replace(valorLtoe+"-", "");
+
+            String serialesKitRpm = seriales.split(";")[1];
+            String serialTermohigrometro = seriales.split(";")[2];
+
+            parametros.put("PefGases", valorLtoe);
+            parametros.put("InstGases", serialAnalizadorBanco);
+            parametros.put("MarcaGases", marcas.split(";")[0]);
+
+            String nombreRpm =  "Captador RPM y temperatura";
+
+            parametros.put("RpmSondaTemp", nombreRpm);
+            parametros.put("MarcaRpm", marcas.split(";")[1]);
+            parametros.put("InstRpm", serialesKitRpm);
+
+            parametros.put("InstTermo", serialTermohigrometro);
+            parametros.put("MarcaTermo", marcas.split(";")[2]);
+        }else {
             boolean flag;
             System.out.println("Cargando datos equipo de Gases : Searial: " + serialEquipo + " Marca : " + marca);
             try {
