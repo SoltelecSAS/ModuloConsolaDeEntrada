@@ -1490,7 +1490,10 @@ public class PruebaJpaController {
                 } else {
                     if (prueba.getSerialEquipo() == null) {
                         audi.setSerialEquipoMedicion("SERIAL NO ENCONTRADO");
-                    } else {
+                    } else if(prueba.getSerialEquipo().split("~").length>2){
+                        audi.setSerialEquipoMedicion(prueba.getSerialEquipo().split("~")[2]);
+                    }
+                    else {
                         audi.setSerialEquipoMedicion(prueba.getSerialEquipo());
                     }
 

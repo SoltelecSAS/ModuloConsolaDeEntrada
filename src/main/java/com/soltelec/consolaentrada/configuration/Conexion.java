@@ -33,7 +33,7 @@ import java.sql.ResultSet;
 public class Conexion implements Serializable {
 
     public static final String ARCHIVO = "Conexion.stlc"; 
-    private String driver = "com.mysql.jdbc.Driver";      
+    private String driver = "com.mysql.cj.jdbc.Driver";   
     protected static String baseDatos;
     protected static String ipServidor;
     protected static String usuario;
@@ -82,10 +82,18 @@ public class Conexion implements Serializable {
             }
 
             String consulta = "SELECT NIT FROM cda WHERE id_cda = 1";
-            String url = "jdbc:mysql://" + datos.get(1) + ":" + datos.get(3) + "/" + datos.get(0) + "?zeroDateTimeBehavior=convertToNull";
+            String url = "jdbc:mysql://" + datos.get(1) + ":" + datos.get(3) + "/" + datos.get(0) + "?zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false";
+            System.out.println("URL: "+url);
+
+            String user = datos.get(2);
+            String password = datos.get(4);
             
             if (!licencia){
-                try (Connection conexion = DriverManager.getConnection(url, datos.get(2), datos.get(4));
+                try (Connection conexion = DriverManager.getConnection(
+                    url, 
+                    user, 
+                    password
+                ); 
                     PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
 
                     String nit = "";
@@ -109,6 +117,7 @@ public class Conexion implements Serializable {
                         "Revise por favor el archivo "+CARPETA + NOMBRE_ARCHIVO + EXTENSION+"\n"+
                         "Si este mismo error se repite en todos los computadores del CDA revise el servidor"
                     );
+                    e.printStackTrace();
                     throw new RuntimeException("Error al tratar de conectarse con el base de datos: \n"+ e.getMessage());
                 }
             }

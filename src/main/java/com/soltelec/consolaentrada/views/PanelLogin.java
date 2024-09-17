@@ -16,6 +16,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -232,28 +234,31 @@ public class PanelLogin extends javax.swing.JFrame {
             if (user.getContrasena() == null ? pass == null : user.getContrasena().equals(pass)) {
                 passCorrecto = true;
                 //02 12 2011 Verificacion de la fecha de validación de la contrasena
-                Date fechaValidacion = user.getFechaValidacion();
-                Query queryFechaHoy = em.createNativeQuery("SELECT NOW()");//traer la fecha desde el servidor
-                Date fechaHoy = (Date) queryFechaHoy.getSingleResult();
-                //Validar la Fecha
+                LocalDateTime fechaValidacion = user.getFechaValidacion().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                Query queryFechaHoy = em.createNativeQuery("SELECT NOW()");
+                LocalDateTime fechaHoy = (LocalDateTime) queryFechaHoy.getSingleResult(); // Línea corregida
+
+                // Validar la Fecha
                 if (contrasenaExpirada(fechaValidacion, fechaHoy)) {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                    JOptionPane.showMessageDialog(null, "Debe Cambiar su contrasena:"
-                        + "\n Fecha Expiracion : " + sdf.format(fechaValidacion));
+                    JOptionPane.showMessageDialog(null, "Debe Cambiar su contrasena:" +
+                        "\n Fecha Expiracion : " + sdf.format(Date.from(fechaValidacion.atZone(ZoneId.systemDefault()).toInstant())));
                     return;
                 }
+
                 String nomTemp;
-                boolean pos= user.getNick().startsWith(".");
-                if (pos==true) {
+                boolean pos = user.getNick().startsWith(".");
+                if (pos) {
                     nomTemp = user.getNick().substring(3, user.getNick().length());
                 } else {
                     nomTemp = user.getNick();
                 }
-                System.out.println(nombeUsuario +"---"+ nomTemp);
+
+                System.out.println(nombeUsuario + "---" + nomTemp);
                 if (nombeUsuario.equalsIgnoreCase(nomTemp)) {
                     nombreCorrecto = true;
-                }else{
-                    JOptionPane.showMessageDialog(null, "Disculpe Su Nombre de usuario  es INCORRECTO, por Favor vuelva a ingresarlo", "ERROR", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Disculpe Su Nombre de usuario es INCORRECTO, por Favor vuelva a ingresarlo", "ERROR", JOptionPane.ERROR_MESSAGE);
                     nombreCorrecto = false;
                     camUsuario.setText("");
                 }
@@ -332,16 +337,9 @@ public class PanelLogin extends javax.swing.JFrame {
      * @param fechaHoy fecha de hoy desde el servidor
      * @return
      */
-    private boolean contrasenaExpirada(Date fechaValidacion, Date fechaHoy) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-       // System.out.println("Fecha de validacion: " + sdf.format(fechaValidacion));
-       // System.out.println("Fecha de Hoy: " + sdf.format(fechaHoy));
-        Calendar calendarValidacion = Calendar.getInstance();
-        calendarValidacion.setTime(fechaValidacion);
-        Calendar calendarHoy = Calendar.getInstance();
-        calendarHoy.setTime(fechaHoy);
-        return calendarValidacion.before(calendarHoy);
-
+    private boolean contrasenaExpirada(LocalDateTime fechaValidacion, LocalDateTime fechaHoy) {
+        // Validar si la fecha de validación es anterior a la fecha de hoy
+        return fechaValidacion.isBefore(fechaHoy);
     }
 
     private boolean validarUsuarioContrasena(String nombeUsuario, String pass, UsuarioJpaController ujc) {

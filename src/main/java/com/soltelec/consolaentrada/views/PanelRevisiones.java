@@ -3270,17 +3270,17 @@ public class PanelRevisiones extends javax.swing.JPanel {
         }
         List<Prueba> pruebas = pruebasJPA.findUltimasPruebasByHoja(hojaPruebasActual.getId());
         boolean encontre = false;
-        for (Prueba prueba : pruebas) {
-            if (prueba.getTipoPrueba().getId() == 5) {
-                encontre = true;
-            }
-        }
-        if (encontre == false) {
+        
+        boolean frenosAsignados = pruebas.stream()
+            .anyMatch(prueba -> prueba.getTipoPrueba().getId() == 5 && prueba.getAbortado().equalsIgnoreCase("N"));
+
+        if (!frenosAsignados) {
             addPrueba(5, true);
             btnFrenos.setEnabled(false);
         } else {
             JOptionPane.showMessageDialog(null, "Disculpe; la PRUEBA de FRENOS ya se encuentra ASIGNADA a esta Hoja de Prueba ..!");
         }
+
     }//GEN-LAST:event_btnFrenosActionPerformed
 
     private void btnSuspensionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuspensionActionPerformed
@@ -3293,7 +3293,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
             List<Prueba> pruebas = pruebasJPA.findUltimasPruebasByHoja(hojaPruebasActual.getId());
             boolean encontre = false;
             for (Prueba prueba : pruebas) {
-                if (prueba.getTipoPrueba().getId() == 6) {
+                if (prueba.getTipoPrueba().getId() == 6 && prueba.getAbortado().equalsIgnoreCase("N")) {
                     encontre = true;
                 }
             }
@@ -3320,7 +3320,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
         List<Prueba> pruebas = pruebasJPA.findUltimasPruebasByHoja(hojaPruebasActual.getId());
         boolean encontre = false;
         for (Prueba prueba : pruebas) {
-            if (prueba.getTipoPrueba().getId() == 8) {
+            if (prueba.getTipoPrueba().getId() == 8 && prueba.getAbortado().equalsIgnoreCase("N")) {
                 encontre = true;
             }
         }
@@ -3346,7 +3346,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
             List<Prueba> pruebas = pruebasJPA.findUltimasPruebasByHoja(hojaPruebasActual.getId());
             boolean encontre = false;
             for (Prueba prueba : pruebas) {
-                if (prueba.getTipoPrueba().getId() == 2) {
+                if (prueba.getTipoPrueba().getId() == 2 && prueba.getAbortado().equalsIgnoreCase("N")) {
                     encontre = true;
                 }
             }

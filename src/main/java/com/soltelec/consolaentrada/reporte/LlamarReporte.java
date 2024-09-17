@@ -4067,7 +4067,7 @@ public class LlamarReporte {
 
     private void cargandoSerialEquipoGases(String marca, String pefD, String serialEquipo, String pef) {
 
-        if (serialEquipo.startsWith("otto")) {
+        if (serialEquipo != null && serialEquipo.startsWith("otto")) {
 
             System.out.println("texto serial gases completo: "+serialEquipo);
 
@@ -4096,7 +4096,7 @@ public class LlamarReporte {
             parametros.put("InstTermo", serialTermohigrometro);
             parametros.put("MarcaTermo", marcas.split(";")[2]);
 
-        } else if(serialEquipo.startsWith("diesel")){
+        } else if(serialEquipo != null && serialEquipo.startsWith("diesel")){
             System.out.println("texto serial gases completo: "+serialEquipo);
 
             String marcas = serialEquipo.split("~")[1];
