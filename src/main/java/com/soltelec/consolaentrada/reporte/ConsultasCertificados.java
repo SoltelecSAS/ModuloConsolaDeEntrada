@@ -50,27 +50,24 @@ public class ConsultasCertificados {
     }
     
     
-    /**
-     * Consultar un certificado usando la hoja de prueba
-     * @param idHojaPrueba
-     * @param cn
-     * @return 
-     * @throws java.sql.SQLException 
-     */
-    public Certificado obtenerCertificadoPorHojaPrueba(int idHojaPrueba, Connection cn) throws SQLException{
-        
+    public Certificado obtenerCertificadoPorHojaPrueba(int idHojaPrueba, Connection cn) throws SQLException {
+    
         Certificado certificado = null;
-        String verNoImpreso = "SELECT CERTIFICATE,CONSECUTIVE,consecutivo_runt,EXPDATE,PRINTDATE FROM certificados where TESTSHEET = ? AND ANULED = 'N' AND PRINTED='Y'";//no anulado y no impreso entonces imprimirlo
+        String verNoImpreso = "SELECT CERTIFICATE, CONSECUTIVE, consecutivo_runt, EXPDATE, PRINTDATE FROM certificados " +
+                              "WHERE TESTSHEET = ? AND ANULED = 'N' AND PRINTED = 'Y'";
+        
         PreparedStatement psNoImpreso = cn.prepareStatement(verNoImpreso);
         psNoImpreso.setLong(1, idHojaPrueba);
         ResultSet rsNoImpreso = psNoImpreso.executeQuery();
-
-        if(rsNoImpreso.first()){
+    
+        // Reemplazar por rsNoImpreso.next()
+        if (rsNoImpreso.next()) {
             int idCertificado = rsNoImpreso.getInt(1);
             int consecutivo = rsNoImpreso.getInt(2);
             String consecutivoRUNT = String.valueOf(rsNoImpreso.getLong(3));
             Timestamp timestampFechaVencimiento = rsNoImpreso.getTimestamp("EXPDATE");
-            Timestamp timestamp1FechaExpedicion = rsNoImpreso.getTimestamp("PRINTDATE");                
+            Timestamp timestamp1FechaExpedicion = rsNoImpreso.getTimestamp("PRINTDATE");
+    
             certificado = new Certificado();
             certificado.setId(idCertificado);
             certificado.setConsecutivo(consecutivo);

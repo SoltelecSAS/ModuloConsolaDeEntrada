@@ -1203,20 +1203,24 @@ public class ClienteCi2Servicio {
     }
 
     private String consultarFechaIngresoVehiculo(int idPrueba) {
-        String statement = "SELECT hp.Fecha_ingreso_vehiculo FROM pruebas as p INNER JOIN hoja_pruebas as hp ON p.hoja_pruebas_for = hp.TESTSHEET INNER JOIN vehiculos as v ON hp.Vehiculo_for = v.CAR WHERE hp.TESTSHEET = ?";
+        String statement = "SELECT hp.Fecha_ingreso_vehiculo FROM pruebas as p " +
+                           "INNER JOIN hoja_pruebas as hp ON p.hoja_pruebas_for = hp.TESTSHEET " +
+                           "INNER JOIN vehiculos as v ON hp.Vehiculo_for = v.CAR " +
+                           "WHERE hp.TESTSHEET = ?";
         try {
             Connection cn = cargarConexion();
             PreparedStatement consultaFechaIngreso = cn.prepareStatement(statement);
             consultaFechaIngreso.setInt(1, idPrueba);
             ResultSet rs = consultaFechaIngreso.executeQuery();
-            while (rs.first()) {
-                System.out.println("-------sin parsear" + rs.getDate("Fecha_ingreso_vehiculo"));
-                System.out.println("-------to string" + rs.getDate("Fecha_ingreso_vehiculo").toString());
+    
+            // Reemplazar por rs.next()
+            while (rs.next()) {
+                System.out.println("-------sin parsear " + rs.getDate("Fecha_ingreso_vehiculo"));
+                System.out.println("-------to string " + rs.getDate("Fecha_ingreso_vehiculo").toString());
                 return rs.getDate("Fecha_ingreso_vehiculo").toString();
-
             }
         } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Error en el metodo : consultarObservacionesFrenos()" + e.getMessage() + e.getLocalizedMessage());
+            System.err.println("Error en el método: consultarObservacionesFrenos() " + e.getMessage() + e.getLocalizedMessage());
         }
         return null;
     }

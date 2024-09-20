@@ -1378,11 +1378,11 @@ public class LlamarReporte {
                             //TIPO DE GASOLINA 3 DIESEL--SI ES DIESEL MJESTRA VALOR 0 EN EL 
 
                             if (idTipoGasolina == 3 && tipoVehiculo != 4) {
-                                parametros.put("TempGasoRal", ajustarValorMedida(TempGasoRal));
+                                parametros.put("TempGasoRal", m.getValor() == 0 ? "" : ajustarValorMedida(TempGasoRal));
                                 parametros.put("Catalizador", "SI");
 
                             } else if (tipoVehiculo == 4 && disenoVehiculo.equalsIgnoreCase("Convencional")) {
-                                parametros.put("TempGasoRal", ajustarValorMedida(TempGasoRal));
+                                parametros.put("TempGasoRal", m.getValor() == 0 ? "" : ajustarValorMedida(TempGasoRal));
                                 parametros.put("Catalizador", ctxHojaPrueba.getVehiculo().getCatalizador().toUpperCase().contains("N") ? "NO" : "SI");
 
                             } else // SI ES DIFERENTE DE DIESEL Y TIENE CATALIZADOR MUESTRA EN BLANCO EN EL FUR
@@ -1395,7 +1395,7 @@ public class LlamarReporte {
                         } else {
                             if (temp == 'B' || temp == 'A') {
                                 String TempGasoRal = String.valueOf(m.getValor());
-                                parametros.put("TempGasoRal", ajustarValorMedida(TempGasoRal));
+                                parametros.put("TempGasoRal", m.getValor() == 0 ? "" : ajustarValorMedida(TempGasoRal));
                                 parametros.put("Catalizador", "NO");
                             } else {
                                 String TempGasoRal = String.valueOf(m.getValor());
@@ -1407,7 +1407,7 @@ public class LlamarReporte {
                                         parametros.put("TempGasoRal", TempGasoRal);
                                     }
                                 } else {
-                                    parametros.put("TempGasoRal", ajustarValorMedida(TempGasoRal));
+                                    parametros.put("TempGasoRal", m.getValor() == 0 ? "" : ajustarValorMedida(TempGasoRal));
                                 }
 
                                 //parametros.put("Catalizador", "NA");
@@ -1419,7 +1419,7 @@ public class LlamarReporte {
                     //---------------VEHICULOS CICLO OTTO(TEMPERATURA) ---------
                     //----------------------------------------------------------     
                     case 8022://medida de O2 Ralenti dos tiempos
-                        String TempGasoRal = m.getValor().equals("0") ? "" : String.valueOf(m.getValor());
+                        String TempGasoRal = m.getValor() == 0 ? "" : String.valueOf(m.getValor());
                         if (disenoVehiculo.equalsIgnoreCase("scooter")) {
                             parametros.put("TempGasoRal", "''0''");
                         } else {
@@ -2245,7 +2245,7 @@ public class LlamarReporte {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date fechaInicioResolucion = sdf.parse("2022-08-18 00:00:00");
         Date fechaInicioResolucion0762Tabla27 = sdf.parse("2023-02-07 23:59:59");
-        Date fechaIngresoVehiculo = sdf.parse(sdf.format(consultarFechaIngresoVehiculo(idHojaPrueba)));
+        Date fechaIngresoVehiculo = sdf.parse(sdf.format(consultarFechaIngresoVehiculo(idHojaPrueba))); //linea 2248
 
         parametros.put("diametro", "");
         if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 5) {//Motocarro
@@ -2639,31 +2639,49 @@ public class LlamarReporte {
 
         PreparedStatement consultaTotal = cn.prepareStatement(strTotal);
 
-        //CUENTA LOS TIPOS DE DEFECTOS TIPO A
+        // CUENTA LOS TIPOS DE DEFECTOS TIPO A
         consultaTotal.setLong(1, hojaPruebas);
         consultaTotal.setString(2, "A");
         consultaTotal.setLong(3, hojaPruebas);
+        
+        // Ejecuta la consulta
         rs = consultaTotal.executeQuery();
-        rs.first();
-        int totalDefA = rs.getInt(1);
-        parametros.put("TotalDefA", String.valueOf(totalDefA));
+        
+        // Avanza al primer resultado con rs.next()
+        int totalDefA = 0;
+        if (rs.next()) {
+            totalDefA = rs.getInt(1);  // Obtiene el valor de la primera columna
+            parametros.put("TotalDefA", String.valueOf(totalDefA));
+        }
+        
         consultaTotal.clearParameters();
-
-        //CUENTA LOS TIPOS DE DEFECTOS TIPO B
+        
+        // CUENTA LOS TIPOS DE DEFECTOS TIPO B
         consultaTotal.setLong(1, hojaPruebas);
         consultaTotal.setString(2, "B");
         consultaTotal.setLong(3, hojaPruebas);
+        
+        // Ejecuta nuevamente la consulta
         rs = consultaTotal.executeQuery();
-        rs.first();
-        int totalDefB = rs.getInt(1);
-        parametros.put("TotalDefB", String.valueOf(totalDefB));
-
-        String ensenanza = "select count(*)  FROM vehiculos as v WHERE v.esEnsenaza=1  AND v.CARPLATE= ?";
+        
+        // Avanza al primer resultado con rs.next()
+        int totalDefB = 0;
+        if (rs.next()) {
+            totalDefB = rs.getInt(1);  // Obtiene el valor de la primera columna
+            parametros.put("TotalDefB", String.valueOf(totalDefB));
+        }
+        
+        // Verificación del tipo de vehículo de enseñanza
+        String ensenanza = "SELECT count(*) FROM vehiculos AS v WHERE v.esEnsenaza = 1 AND v.CARPLATE = ?";
         PreparedStatement validaTipo = cn.prepareStatement(ensenanza);
         validaTipo.setString(1, placa);
         rs = validaTipo.executeQuery();
-        rs.next();
-        int valida = rs.getInt(1);
+        
+        // Avanza al primer resultado con rs.next()
+        int valida = 0;
+        if (rs.next()) {
+            valida = rs.getInt(1);  // Obtiene el resultado de la consulta
+        }
 
         //CUENTA LOS DEFECTOS PARA ENSENANZA
         String strTotalDefEnsenanza = "SELECT COUNT(*)\n"
@@ -3567,7 +3585,7 @@ public class LlamarReporte {
      */
     private String consultarObservaciones(int idPrueba, int TipoPrueba) {
 
-        String sql = "SELECT  p.observaciones FROM pruebas p WHERE p.Tipo_prueba_for=? AND p.Id_Pruebas=?";
+        String sql = "SELECT  p.observaciones FROM pruebas p WHERE p.Tipo_prueba_for=? AND p.Id_Pruebas=? AND p.Abortada = 'N' AND p.Finalizada = 'Y'";
         try {
             Connection cn = cargarConexion();
             PreparedStatement consultaTotal = cn.prepareStatement(sql);
@@ -3584,22 +3602,30 @@ public class LlamarReporte {
     }
 
     private Date consultarFechaIngresoVehiculo(int idPrueba) {
-        String statement = "SELECT hp.Fecha_ingreso_vehiculo FROM pruebas as p INNER JOIN hoja_pruebas as hp ON p.hoja_pruebas_for = hp.TESTSHEET INNER JOIN vehiculos as v ON hp.Vehiculo_for = v.CAR WHERE hp.TESTSHEET = ?";
-        try {
-            Connection cn = cargarConexion();
-            PreparedStatement consultaFechaIngreso = cn.prepareStatement(statement);
+        String statement = "SELECT hp.Fecha_ingreso_vehiculo " +
+                           "FROM pruebas AS p " +
+                           "INNER JOIN hoja_pruebas AS hp ON p.hoja_pruebas_for = hp.TESTSHEET " +
+                           "INNER JOIN vehiculos AS v ON hp.Vehiculo_for = v.CAR " +
+                           "WHERE hp.TESTSHEET = ?";
+    
+        try (Connection cn = cargarConexion();
+             PreparedStatement consultaFechaIngreso = cn.prepareStatement(statement)) {
+    
             consultaFechaIngreso.setInt(1, idPrueba);
-            ResultSet rs = consultaFechaIngreso.executeQuery();
-            while (rs.first()) {
-                System.out.println("-------sin parsear" + rs.getDate("Fecha_ingreso_vehiculo"));
-                System.out.println("-------to string" + rs.getDate("Fecha_ingreso_vehiculo").toString());
-                return rs.getDate("Fecha_ingreso_vehiculo");
-
+    
+            // Ejecuta la consulta y usa rs.next() para avanzar en el ResultSet
+            try (ResultSet rs = consultaFechaIngreso.executeQuery()) {
+                if (rs.next()) {  // Avanza al primer (y posiblemente único) registro si existe
+                    Date fechaIngreso = rs.getDate("Fecha_ingreso_vehiculo");
+                    System.out.println("Fecha ingresada: " + fechaIngreso);
+                    return fechaIngreso;  // Retorna la fecha encontrada
+                }
             }
         } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Error en el metodo : consultarObservacionesFrenos()" + e.getMessage() + e.getLocalizedMessage());
+            System.err.println("Error en el método consultarFechaIngresoVehiculo: " + e.getMessage());
         }
-        return null;
+    
+        return null;  // Retorna null si no se encuentra la fecha o si ocurre un error
     }
 
     private int preguntarAnularCertificado(Certificado certificado) throws HeadlessException {

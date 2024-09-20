@@ -55,7 +55,7 @@ public class ListenerEnvioFUR implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) 
     {
-        String kilometraje="0";
+        String kilometrajeVariable="0";
         Connection cn = null;
         HojaPruebasJpaController controller = new HojaPruebasJpaController();
         ctxHojaPrueba = controller.find(idHojaPrueba.intValue());
@@ -91,7 +91,7 @@ public class ListenerEnvioFUR implements ActionListener {
                         {
                             if (p.getTipoPrueba().getId() == 1) 
                             {
-                                kilometraje=LlamarReporte.cargarKilometraje(p.getId());
+                                kilometrajeVariable=LlamarReporte.cargarKilometraje(p.getId());
                             }
                             if (p.getAbortado().equalsIgnoreCase("A") || p.getAbortado().equalsIgnoreCase("Y") || p.getFinalizada().equalsIgnoreCase("N")) {
                                 app.setVisible(false);
@@ -178,7 +178,7 @@ public class ListenerEnvioFUR implements ActionListener {
                             ClienteCi2Servicio clienteSincoFur = new ClienteCi2Servicio(ctxHojaPrueba, ctxCDA);
                             clienteSincoFur.cargarInformacionBasica();
                             clienteSincoFur.cargarInformacionPropietario();
-                            clienteSincoFur.cargarInformacionVehiculo(kilometraje);
+                            clienteSincoFur.cargarInformacionVehiculo(kilometrajeVariable);
                             clienteSincoFur.otrosDatos();
                             clienteSincoFur.datosPresionLabrado();
                             clienteSincoFur.cargarInformacionEmisionesAudible();
@@ -237,7 +237,7 @@ public class ListenerEnvioFUR implements ActionListener {
                                 estructuraEquipos.setEquipos(clienteIndra.getEquipos());
                                 String equipo = estructuraEquipos.toString();
                                 clienteIndra.datosPropietario();
-                                clienteIndra.datosVehiculo(kilometraje);
+                                clienteIndra.datosVehiculo(kilometrajeVariable);
                                 clienteIndra.datosFotos();
                                 System.out.println("Voy a Cargar Luces");
                                 clienteIndra.datosLuces();

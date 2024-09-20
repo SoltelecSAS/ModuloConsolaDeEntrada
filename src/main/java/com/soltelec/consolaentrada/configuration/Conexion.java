@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 /**
  *
@@ -88,37 +89,47 @@ public class Conexion implements Serializable {
             String user = datos.get(2);
             String password = datos.get(4);
             
-            if (!licencia){
-                try (Connection conexion = DriverManager.getConnection(
-                    url, 
-                    user, 
-                    password
-                ); 
-                    PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
-
-                    String nit = "";
-                    //rc representa el resultado de la consulta
-                    try (ResultSet rc = consultaDagma.executeQuery()) {
-                        while (rc.next()) {
-                            nit = rc.getString("NIT");
-                            String urlPeticion = "http://api.soltelec.com:8087/api/public/"+nit;
-                            response = sendGet(urlPeticion);
-
-                            if (response.equalsIgnoreCase("true")) licencia = true;
+            if (!licencia) {
+                try (Connection conexion = DriverManager.getConnection(url, user, password)) {
+            
+                    // Ejecutar el comando para desactivar ONLY_FULL_GROUP_BY
+                    try (Statement statement = conexion.createStatement()) {
+                        String sql = "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))";
+                        statement.execute(sql);
+                        System.out.println("Modo ONLY_FULL_GROUP_BY desactivado correctamente.");
+                    }
+            
+                    // Preparar y ejecutar la consulta SQL después de modificar el modo SQL
+                    try (PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
+            
+                        String nit = "";
+                        // Ejecutar la consulta
+                        try (ResultSet rc = consultaDagma.executeQuery()) {
+                            while (rc.next()) {
+                                nit = rc.getString("NIT");
+                                String urlPeticion = "http://api.soltelec.com:8087/api/public/" + nit;
+                                response = sendGet(urlPeticion);
+            
+                                if (response.equalsIgnoreCase("true")) licencia = true;
+                            }
                         }
+            
+                        // Si no se encuentra el NIT
+                        if (nit.equals("")) {
+                            CMensajes.mensajeError("La columna 'id_cda' de la tabla 'cda' de la base de datos debe ser 1 \no el cda no cuenta con NIT registrado en esa misma tabla\n Contactese con Soltelec.\n");
+                            throw new RuntimeException("Error porque no logro encontrar los datos de la tabla cda para id_cda = 1 o el campo NIT de esa misma tabla esta vacio\n");
+                        }
+                        
                     }
-                    if (nit.equals("")) {
-                        CMensajes.mensajeError("La columna 'id_cda' de la tabla 'cda' de la base de datos debe ser 1 \no el cda no cuenta con NIT registrado en esa misma tabla\n Contactese con Soltelec.\n");
-                        throw new RuntimeException("Error porque no logro encontrar los datos de la tabla cda para id_cda = 1 o el campo NIT de esa misma tabla esta vacio\n");
-                    }
+            
                 } catch (Exception e) {
                     CMensajes.mensajeError(
-                        "Hubo un error al tratar de conectarse a la base de datos, contactese con Soltelec.\n"+
-                        "Revise por favor el archivo "+CARPETA + NOMBRE_ARCHIVO + EXTENSION+"\n"+
+                        "Hubo un error al tratar de conectarse a la base de datos, contactese con Soltelec.\n" +
+                        "Revise por favor el archivo " + CARPETA + NOMBRE_ARCHIVO + EXTENSION + "\n" +
                         "Si este mismo error se repite en todos los computadores del CDA revise el servidor"
                     );
                     e.printStackTrace();
-                    throw new RuntimeException("Error al tratar de conectarse con el base de datos: \n"+ e.getMessage());
+                    throw new RuntimeException("Error al tratar de conectarse con el base de datos: \n" + e.getMessage());
                 }
             }
 

@@ -99,16 +99,23 @@ public class Consultas {
         consultaTotal.setString(2, "A");
         consultaTotal.setLong(3, idHojaPrueba);
         rs = consultaTotal.executeQuery();
-        rs.first();
-        int totalDefA = rs.getInt(1);
-        //parametros.put("TotalDefA", String.valueOf(totalDefA));
+        
+        int totalDefA =0;
+        if (rs.next()) {
+            totalDefA = rs.getInt(1);
+            //parametros.put("TotalDefA", String.valueOf(totalDefA));
+        }
+        
         consultaTotal.clearParameters();
         consultaTotal.setLong(1, idHojaPrueba);
         consultaTotal.setString(2, "B");
         consultaTotal.setLong(3, idHojaPrueba);
         rs = consultaTotal.executeQuery();
-        rs.first();
-        int totalDefB = rs.getInt(1);
+        
+        int totalDefB =0;
+        if (rs.next()) {
+            totalDefB = rs.getInt(1);
+        }
 
         String sqlPruebasFinalizadas = "select count(*) from pruebas as pr where pr.Id_pruebas in ("
                 + "select max(id_pruebas) from pruebas as p inner join hoja_pruebas as hp on p.hoja_pruebas_for = hp.TESTSHEET "

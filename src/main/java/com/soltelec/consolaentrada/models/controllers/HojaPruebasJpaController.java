@@ -384,15 +384,19 @@ public class HojaPruebasJpaController {
         System.out.println("----------------------------------");
         try 
         {
-            String consulta = "SELECT max(m.Valor_medida) AS kilome FROM medidas m WHERE m.TEST=? AND m.MEASURETYPE=1006";
+            String consulta = 
+            "SELECT v.kilometraje FROM pruebas p\n" + //
+            "INNER JOIN hoja_pruebas hp ON hp.TESTSHEET = p.hoja_pruebas_for\n" + //
+            "INNER JOIN vehiculos v ON v.CAR = hp.Vehiculo_for\n" + //
+            "WHERE p.Id_Pruebas = ?;";
             PreparedStatement sentencia = cn.prepareStatement(consulta);
             sentencia.setInt(1, idPrueba);
             ResultSet rs = sentencia.executeQuery();
             while (rs.next()) 
             {
-                if (rs.getString("kilome")!=null)
+                if (rs.getString("kilometraje")!=null)
                 {
-                    return rs.getString("kilome");
+                    return rs.getString("kilometraje");
                 }
             }
         } catch (Exception e) 

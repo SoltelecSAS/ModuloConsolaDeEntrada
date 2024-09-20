@@ -423,7 +423,7 @@ public class LlamarReporte3625 {
                                 if (temp == 'C') {
                                     parametros.put("TempGasoRal", "");
                                 } else {
-                                    parametros.put("TempGasoRal", df.format(m.getValor()));
+                                    parametros.put("TempGasoRal", m.getValor() == 0 ? "" : df.format(m.getValor()));
                                 }
                                 break;
                             case 8011://Revoluciones
@@ -470,7 +470,7 @@ public class LlamarReporte3625 {
                                 df.applyPattern("##");
 //                                parametros.put("TempGasoRal", df.format(m.getValor()) + m.getCondicion()); SART-26 Ajustes varios solicitados por auditorias punto 3
 
-                                parametros.put("TempGasoRal", df.format(m.getValor()).equals("0") ? "" : df.format(m.getValor()));//Dos decimales
+                                parametros.put("TempGasoRal", m.getValor() == 0 ? "" : df.format(m.getValor()));//Dos decimales
 
                                 break;
                             case 8028://medida de O2 Ralenti dos tiempos
@@ -1150,22 +1150,32 @@ public class LlamarReporte3625 {
                 + "FROM pruebas AS p\n"
                 + "WHERE p.hoja_pruebas_for = ? AND p.Finalizada = 'Y' AND p.abortada='N'\n"
                 + "GROUP BY p.Tipo_prueba_for) AND d.Tipo_defecto=? AND pr.hoja_pruebas_for = ? AND pr.Finalizada = 'Y' AND pr.abortada='N'";
+        
         PreparedStatement consultaTotal = cn.prepareStatement(strTotal);
         consultaTotal.setLong(1, hojaPruebas);
         consultaTotal.setString(2, "A");
         consultaTotal.setLong(3, hojaPruebas);
         rs = consultaTotal.executeQuery();
-        rs.first();
-        int totalDefA = rs.getInt(1);
-        parametros.put("TotalDefA", String.valueOf(totalDefA));
+        
+        // Reemplazar por rs.next()
+        int totalDefA = 0;
+        if (rs.next()) {
+            totalDefA = rs.getInt(1);
+            parametros.put("TotalDefA", String.valueOf(totalDefA));
+        }
+        
         consultaTotal.clearParameters();
         consultaTotal.setLong(1, hojaPruebas);
         consultaTotal.setString(2, "B");
         consultaTotal.setLong(3, hojaPruebas);
         rs = consultaTotal.executeQuery();
-        rs.first();
-        int totalDefB = rs.getInt(1);
-        parametros.put("TotalDefB", String.valueOf(totalDefB));
+        
+        // Reemplazar por rs.next()
+        int totalDefB = 0;
+        if (rs.next()) {
+            totalDefB = rs.getInt(1);
+            parametros.put("TotalDefB", String.valueOf(totalDefB));
+        }
 
         ///***********//EVALUACION TIPO SERVICION ENSEÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¹Ã…â€œANZA//////////****************************///////////*********
         String ensenanza = "select count(*)  FROM vehiculos as v "
