@@ -57,12 +57,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Esta clase se encarga de llenar el reporte en la base de datos. En esta clase
- * esta la logica de la evaluacion de la prueba
- *
- * @author Gerencia TIC
- */
 public class LlamarReporte {
 
     Map parametros = null;
@@ -124,19 +118,6 @@ public class LlamarReporte {
         }
     }
 
-    /**
-     * Metodo de entrada o de inicio a partir de este se llaman todos los demas
-     * metodos de la clase se abre solamente una conexion
-     *
-     * Se modifica para hacerlo mas legible y que no cargue tanta informacion
-     * que no ira a utilizar.
-     *
-     * @param hojaPruebas
-     * @param consecutivoRUNT
-     * @throws JRException
-     * @throws SQLException
-     * @throws ClassNotFoundException
-     */
     public void cargarReporte(HojaPruebas ctxHojaPrueba, Cda ctxCDA, long consecutivoRUNT, String txtPlaca) throws JRException, SQLException, ClassNotFoundException, ParseException {
         this.ctxHojaPrueba = ctxHojaPrueba;
         this.ctxCDA = ctxCDA;
@@ -204,10 +185,10 @@ public class LlamarReporte {
             String edoHP = (hpContJpa.verificarHojaFinalizada(ctxHojaPrueba));
             parametros.put("Aprobado", "");
             parametros.put("Reprobado", "");
-            if (edoHP.equalsIgnoreCase("APROBADA")) {
+            if (getAprobadoReprobado().equalsIgnoreCase("APROBADA") ) {
                 parametros.put("Aprobado", "X");
             }
-            if (edoHP.equalsIgnoreCase("REPROBADA")) {
+            if (getAprobadoReprobado().equalsIgnoreCase("REPROBADA")) {
                 parametros.put("Reprobado", "X");
                 if (ctxHojaPrueba.getIntentos() == 1) {
                     Calendar calDias = Calendar.getInstance();
@@ -291,12 +272,58 @@ public class LlamarReporte {
         }
     }
 
-    private boolean esScooter = false;
+    public String getAprobadoReprobado() {
+        String consulta =   "SELECT p.* FROM pruebas p \n" +
+                            "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for\n" +
+                            "WHERE hp.TESTSHEET = ?\n" +
+                            "ORDER BY p.Fecha_prueba DESC;";
+    
+        Conexion.setConexionFromFile();
+    
+        boolean[] pruebasVistas = {false, false, false, false, false, false, false, false};
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement consultaPruebas = conexion.prepareStatement(consulta)) {
+    
+            // Añadir parámetros de la consulta (los que aparecen como ? en la consulta)
+            consultaPruebas.setInt(1, idHojaPrueba);
+    
+            // rc representa el resultado de la consulta
+            try (ResultSet rc = consultaPruebas.executeQuery()) {
+                while (rc.next()) {
+    
+                    int tipoPrueba = rc.getInt("Tipo_prueba_for");
+    
+                    if (!pruebasVistas[tipoPrueba - 1]) {
+                        pruebasVistas[tipoPrueba - 1] = true;
+    
+                        String finalizada = rc.getString("Finalizada");
+                        String abortada = rc.getString("Abortada");
+                        String aprobada = rc.getString("Aprobada");
+    
+                        // Verifica si la prueba está pendiente
+                        if ("N".equals(finalizada) || !"N".equals(abortada)) {
+                            return "PENDIENTE";
+                        }
+    
+                        // Verifica si la prueba está reprobada
+                        if ("Y".equals(finalizada) && !"Y".equals(aprobada)) {
+                            return "REPROBADA";
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        // Si todas las pruebas han sido vistas y aprobadas
+        return "APROBADA";
+    }
+
     private void changeFormaMedirTemperaturaScooter(String disenoVehiclo) {
-        String disenio = "scooter";
-        if (disenoVehiclo.equalsIgnoreCase(disenio)) {
+        if (disenoVehiclo.equalsIgnoreCase("scooter")) {
             this.ctxHojaPrueba.setFormaMedTemperatura('I');
-            esScooter=true;
         }
     }
 
