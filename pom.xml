@@ -112,14 +112,14 @@
             <artifactId>jasperreports</artifactId>
             <version>6.21.3</version>
         </dependency>      
-        <dependency>
+        <!-- <dependency>
             <groupId>com.mxrck.autocompleter</groupId>
             <artifactId>AutoCompleter</artifactId>
             <version>1.0</version>
             <type>jar</type>
             <scope>system</scope>
-            <systemPath>${basedir}/lib-ext/AutoCompleter.jar</systemPath>
-        </dependency>   
+            <systemPath>${project.basedir}/lib-ext/AutoCompleter.jar</systemPath>
+        </dependency>  -->
         <dependency> 
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -167,8 +167,22 @@
             <version>5.4.12.Final</version>
             <type>jar</type>
         </dependency>
+        <!-- <dependency>
+            <groupId>com.mxrck.autocompleter</groupId>
+            <artifactId>AutoCompleter</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency> -->
+        <dependency>
+            <groupId>com.mxrck.autocompleter</groupId>
+            <artifactId>AutoCompleter</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies> 
     <properties>
+        <!--Aqui es inportante colocar la ruta ${ruta-consola-entrada}/lib-ext-->
+        <libExt.dir>${project.basedir}/lib-ext</libExt.dir>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -266,6 +280,11 @@
             <id>unknown-jars-temp-repo</id>
             <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
             <url>file:${project.basedir}/lib</url>
+        </repository>
+        <repository>
+            <id>local-repo</id>
+            <name>Local repository for manual jars</name>
+            <url>file://${project.basedir}/lib-ext</url>
         </repository>
     </repositories>
 </project>

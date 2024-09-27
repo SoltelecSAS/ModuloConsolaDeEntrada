@@ -345,8 +345,8 @@ public class HojaPruebasJpaController {
         try {
             Connection cn = UtilConexion.obtenerConexion();
             int idprueba = HojaPruebasJpaController.obtenerIdPruebaVisual(idHojaPrueba, cn);
-            String kilometrajeConsultado=consultarMedida(idprueba, cn);
-            if (kilometrajeConsultado.equalsIgnoreCase("0")) 
+            int kilometrajeConsultado=consultarMedida(idprueba, cn);
+            if (kilometrajeConsultado == 0) 
             {
                 HojaPruebasJpaController.insertarKilometraje(idprueba, cn,Float.parseFloat(kilometraje));
             }else{
@@ -377,7 +377,7 @@ public class HojaPruebasJpaController {
         }
     }
     
-    public static String consultarMedida(int idPrueba,Connection cn)
+    public static int consultarMedida(int idPrueba,Connection cn)
     {
         System.out.println("----------------------------------");
         System.out.println("--        consultarMedida     ----");
@@ -396,14 +396,14 @@ public class HojaPruebasJpaController {
             {
                 if (rs.getString("kilometraje")!=null)
                 {
-                    return rs.getString("kilometraje");
+                    return rs.getInt("kilometraje");
                 }
             }
         } catch (Exception e) 
         {
             System.out.println("Error en le metodo:consultarMedida()" + e);
         }
-        return "0";
+        return 0;
     }
 
     public List<AuditoriaSicov> recogerTramasExist(HojaPruebas ctxHojaPrueba) {

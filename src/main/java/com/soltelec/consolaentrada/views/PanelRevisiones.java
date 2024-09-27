@@ -31,6 +31,7 @@ import com.soltelec.consolaentrada.models.controllers.TipoVehiculoJpaController;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
 import com.soltelec.consolaentrada.models.controllers.PruebaJpaController;
 import com.soltelec.consolaentrada.models.controllers.TipoPruebaJpaController;
+import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.custom.ModeloTablaHojasVer;
 import com.soltelec.consolaentrada.custom.ModeloTablaPrueba;
 import com.soltelec.consolaentrada.custom.MyOwnComboBoxModel;
@@ -57,6 +58,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -234,7 +238,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
         try {
             Connection cn = UtilConexion.obtenerConexion();
             int idprueba = HojaPruebasJpaController.obtenerIdPruebaVisual(idHojaPrueba, cn);
-            return HojaPruebasJpaController.consultarMedida(idprueba, cn);
+            return HojaPruebasJpaController.consultarMedida(idprueba, cn) != 0 ? String.valueOf(HojaPruebasJpaController.consultarMedida(idprueba, cn)) : "NO FUNCIONAL";
         } catch (Exception e) {
             System.out.println("Error en el metod:cargarKilometraje()" + e);
         }
@@ -3741,6 +3745,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
                 }
             }
             btnSugerir.setEnabled(true);
+            addPruebas();
             int idPruVis = 0;
             for (Prueba prueba : pruebas) {
                 if (prueba.getTipoPrueba().getId() == 1 && prueba.getFinalizada().equals("Y")) {
@@ -3748,8 +3753,6 @@ public class PanelRevisiones extends javax.swing.JPanel {
                     break;
                 }
             }
-            // int nroTest = 0;
-            int nroPrueba = 0;
 
             for (Prueba prueba : pruebas) {
                 if (prueba.getTipoPrueba().getId() == 5 && prueba.getAprobado().equals("Y")) {
@@ -3762,46 +3765,6 @@ public class PanelRevisiones extends javax.swing.JPanel {
                             addPrueba(5, true);
                             profLabFren = true;
                         }
-                    }
-                }
-
-                if (prueba.getFinalizada().equals("Y") && prueba.getAprobado().equals("N") && prueba.getAbortado().equals("N")) {
-                    switch (prueba.getTipoPrueba().getId()) {
-                        case 2:
-                            btnLuces.setEnabled(false);
-                            addPrueba(2, true);
-                            nroPrueba++;
-                            break;
-                        case 4:
-                            btnDesviacion.setEnabled(false);
-                            addPrueba(4, true);
-                            nroPrueba++;
-                            break;
-                        case 5:
-                            btnFrenos.setEnabled(false);
-                            addPrueba(5, true);
-                            nroPrueba++;
-                            break;
-                        case 6:
-                            btnSuspension.setEnabled(false);
-                            addPrueba(6, true);
-                            nroPrueba++;
-                            break;
-                        case 7:
-                            btnRuido.setEnabled(false);
-                            addPrueba(7, true);
-                            nroPrueba++;
-                            break;
-                        case 8:
-                            btnGases.setEnabled(false);
-                            addPrueba(8, true);
-                            nroPrueba++;
-                            break;
-                        case 9:
-                            btnTaximetro.setEnabled(false);
-                            addPrueba(9, true);
-                            nroPrueba++;
-                            break;
                     }
                 }
             }
@@ -3834,6 +3797,92 @@ public class PanelRevisiones extends javax.swing.JPanel {
         pnlRevisiones.remove(pnlRegistroPropietario);
         pnlRevisiones.remove(pnlRegistroPruebas);
     }//GEN-LAST:event_btnReinspeccionActionPerformed
+
+    public void addPruebas() {
+        final String CONSULTA_PRUEBAS = 
+            "SELECT p.* FROM pruebas p " +
+            "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for " +
+            "WHERE hp.TESTSHEET = ? " +
+            "ORDER BY p.Fecha_prueba DESC";
+    
+        final String MENSAJE_ERROR = "No se puede implementar una reinspección si tiene pruebas Pendientes o Abortadas";
+    
+        Conexion.setConexionFromFile();
+        
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement consultaPruebas = conexion.prepareStatement(CONSULTA_PRUEBAS)) {
+    
+            consultaPruebas.setInt(1, idHojaPrueba);
+            
+            List<Integer> pruebasRechazadas = new ArrayList<>();
+            boolean[] pruebasVistas = new boolean[9]; // Se inicializa en false por defecto
+            
+            try (ResultSet rc = consultaPruebas.executeQuery()) {
+                while (rc.next()) {
+                    procesarPrueba(rc, pruebasVistas, pruebasRechazadas, MENSAJE_ERROR);
+                }
+            }
+            
+            pruebasRechazadas.forEach(p -> addPrueba(p, true));
+    
+        } catch (SQLException e) {
+            e.printStackTrace();  // Se puede reemplazar con un logger para un mejor manejo de errores
+        }
+    }
+    
+    private void procesarPrueba(ResultSet rc, boolean[] pruebasVistas, List<Integer> pruebasRechazadas, String mensajeError) throws SQLException {
+        int tipoPrueba = rc.getInt("Tipo_prueba_for");
+    
+        if (!pruebasVistas[tipoPrueba - 1]) {
+            pruebasVistas[tipoPrueba - 1] = true;
+    
+            String finalizada = rc.getString("Finalizada");
+            String abortada = rc.getString("Abortada");
+            String aprobada = rc.getString("Aprobada");
+    
+            if (!"N".equalsIgnoreCase(abortada)) {
+                JOptionPane.showMessageDialog(null, mensajeError);
+                throw new RuntimeException("Existen pruebas no terminadas y/o abortadas");
+            }
+    
+            if ("Y".equalsIgnoreCase(finalizada) && "N".equalsIgnoreCase(aprobada)) {
+                deshabilitarBoton(tipoPrueba, pruebasRechazadas);
+            }
+        }
+    }
+    
+    private void deshabilitarBoton(int tipoPrueba, List<Integer> pruebasRechazadas) {
+        switch (tipoPrueba) {
+            case 2:
+                btnLuces.setEnabled(false);
+                pruebasRechazadas.add(2);
+                break;
+            case 4:
+                btnDesviacion.setEnabled(false);
+                pruebasRechazadas.add(4);
+                break;
+            case 5:
+                btnFrenos.setEnabled(false);
+                pruebasRechazadas.add(5);
+                break;
+            case 6:
+                btnSuspension.setEnabled(false);
+                pruebasRechazadas.add(6);
+                break;
+            case 7:
+                btnRuido.setEnabled(false);
+                pruebasRechazadas.add(7);
+                break;
+            case 8:
+                btnGases.setEnabled(false);
+                pruebasRechazadas.add(8);
+                break;
+            case 9:
+                btnTaximetro.setEnabled(false);
+                pruebasRechazadas.add(9);
+                break;
+        }
+    }
 
     private void tblHojaPruebasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHojaPruebasMouseClicked
         if (!pruebasTemp.isEmpty() || (hojaPruebasActual != null && hojaPruebasActual.getId() == null && tblHojaPruebas.getSelectedRow() != tblHojaPruebas.getRowCount() - 1)) {

@@ -280,7 +280,7 @@ public class LlamarReporte {
     
         Conexion.setConexionFromFile();
     
-        boolean[] pruebasVistas = {false, false, false, false, false, false, false, false};
+        boolean[] pruebasVistas = {false, false, false, false, false, false, false, false, false};
     
         try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
              PreparedStatement consultaPruebas = conexion.prepareStatement(consulta)) {
@@ -860,14 +860,11 @@ public class LlamarReporte {
      * @param idprueba
      * @return
      */
-    public static String cargarKilometraje(int idprueba) {
-        String kilometraje = "-1";
+    public static int cargarKilometraje(int idprueba) {
+        int kilometraje = -1;
         try {
             Connection cn = UtilConexion.obtenerConexion();
             kilometraje = HojaPruebasJpaController.consultarMedida(idprueba, cn);
-            if (kilometraje.equalsIgnoreCase("0")) {
-                kilometraje = "NO FUNCIONAL";
-            }
 
         } catch (Exception e) {
             System.out.println("Error en el metod:cargarKilometraje()" + e);
@@ -897,8 +894,9 @@ public class LlamarReporte {
                     //----------------------------------------------------------   
                     case 2014://INTESIDAD BAJA  DERECHA 
                         df.applyPattern("#0.0");//ESTO DA PROBLEMAS AL AJUSTAR EL DATO, SE DEBE 
-                        String IntBajaDerechaMotos = String.valueOf(m.getValor());
-                        parametros.put("IntBajaDerecha", ajustarValorMedida(IntBajaDerechaMotos) + m.getCondicion());
+                        String intBajaDerechaMotos = String.valueOf(m.getValor());
+                        String condicion = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntBajaDerecha", ajustarValorMedida(intBajaDerechaMotos) + condicion);
                         break;
 
                     case 2013://INCLINACION BAJA  DERECHA
@@ -910,11 +908,15 @@ public class LlamarReporte {
 
                     case 2015://INTESIDAD BAJA FAROLA IZQUIERDA
                         String IntBajaDerecha2 = String.valueOf(m.getValor());
-                        parametros.put("IntencidadBajaIzquierdaF1", ajustarValorMedida(IntBajaDerecha2) + m.getCondicion());
+                        String condicionIzq1 = m.getValor() < 2.5 ? "*": "";
+                        parametros.put("IntencidadBajaIzquierdaF1", ajustarValorMedida(IntBajaDerecha2) + condicionIzq1);
                         break;
 
                     case 2000://INTESIDAD BAJA PARA MOTO
-                        parametros.put("IntBajaDerecha2", ajustarValorMedida(String.valueOf(m.getValor())));
+                        //parametros.put("IntBajaDerecha2", ajustarValorMedida(String.valueOf(m.getValor())));
+
+                        String condicion2 = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntBajaDerecha2", ajustarValorMedida(String.valueOf(m.getValor())) + condicion2);
                         break;
 
                     case 2001://INTESIDADA BAJA PARA MOTO FAROLA 4
@@ -1000,8 +1002,9 @@ public class LlamarReporte {
 
                     //----------------------------------------------------------VALOR 1 
                     case 2024: //INTENSIDAD BAJA DERECHA FAROLA 1                        
-                        String IntBajaDerechaVehiculo = String.valueOf(m.getValor());
-                        parametros.put("IntBajaDerecha", ajustarValorMedida(IntBajaDerechaVehiculo) + m.getCondicion());
+                        String intBajaDerechaVehiculo = String.valueOf(m.getValor());
+                        String condicion = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntBajaDerecha", ajustarValorMedida(intBajaDerechaVehiculo) + condicion);
                         break;
 
                     case 2040://INCLINACION DERECHA FAROLA 1                        
@@ -1011,7 +1014,8 @@ public class LlamarReporte {
 
                     case 2031://INTENSIDAD BAJA IZQUIERDA FAROLA 1                       
                         String IntencidadBajaIzquierdaF1 = String.valueOf(m.getValor());
-                        parametros.put("IntencidadBajaIzquierdaF1", ajustarValorMedida(IntencidadBajaIzquierdaF1.trim()) + m.getCondicion());
+                        String condicionIzq1 = m.getValor() < 2.5 ? "*": "";
+                        parametros.put("IntencidadBajaIzquierdaF1", ajustarValorMedida(IntencidadBajaIzquierdaF1.trim()) + condicionIzq1);
                         break; // nueva     
 
                     case 2044://INCLINACION IZQUIERDA FAROLA 1                        
@@ -1041,8 +1045,8 @@ public class LlamarReporte {
 
                     //----------------------------------------------------------  VALOR 2 
                     case 2025://INTESIDAD BAJA DERECHA FAROLA 2                        
-                        String IntBajaDerecha = String.valueOf(m.getValor());
-                        parametros.put("IntBajaDerecha2", ajustarValorMedida(IntBajaDerecha.trim()) + m.getCondicion());
+                        String condicion2 = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntBajaDerecha2", ajustarValorMedida(String.valueOf(m.getValor())) + condicion2);
                         break;
 
                     case 2041://INCLINACION DERECHA FAROLA 2                        
@@ -1052,7 +1056,8 @@ public class LlamarReporte {
 
                     case 2030://INTENSIDAD BAJA IZQUIERDA FAROLA 2                        
                         String IntencidadBajaIzquierdaF2 = String.valueOf(m.getValor());
-                        parametros.put("IntencidadBajaIzquierdaF2", ajustarValorMedida(IntencidadBajaIzquierdaF2.trim()) + m.getCondicion());
+                        String condicionIzq2 = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntencidadBajaIzquierdaF2", ajustarValorMedida(IntencidadBajaIzquierdaF2.trim()) + condicionIzq2);
                         break; // nueva 
 
                     case 2045://INCLINACION IZQUIERDA FAROLA 2                        
@@ -1082,8 +1087,9 @@ public class LlamarReporte {
 
                     //----------------------------------------------------------VALOR 3 
                     case 2026://INTENSIDAD BAJA DERECHA FAROLA 3                        
-                        String IntBajaDerecha3 = String.valueOf(m.getValor());
-                        parametros.put("IntBajaDerecha3", ajustarValorMedida(IntBajaDerecha3.trim()) + m.getCondicion());
+                        String intBajaDerecha3 = String.valueOf(m.getValor());
+                        String condicion3 = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntBajaDerecha3", ajustarValorMedida(intBajaDerecha3.trim()) + condicion3);
                         break;
 
                     case 2042://INCLINACION DERECHA FAROLA 3                        
@@ -1093,7 +1099,8 @@ public class LlamarReporte {
 
                     case 2029://INTENSIDAD BAJA IZQUIERDA FAROLA 2                        
                         String IntencidadBajaIzquierdaF3 = String.valueOf(m.getValor());
-                        parametros.put("IntencidadBajaIzquierdaF3", ajustarValorMedida(IntencidadBajaIzquierdaF3.trim()) + m.getCondicion());
+                        String condicionIzq3 = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntencidadBajaIzquierdaF3", ajustarValorMedida(IntencidadBajaIzquierdaF3.trim()) + condicionIzq3);
                         break; // nueva 
 
                     case 2046://INCLINACION IZQUIERDA FAROLA 3                        
@@ -1143,7 +1150,8 @@ public class LlamarReporte {
                     //----------------------------------------------------------       
                     case 2018://intensidad baja derecha motocarro                        
                         String IntBajaDerechaMotocarro = String.valueOf(m.getValor());
-                        parametros.put("IntBajaDerecha", ajustarValorMedida(IntBajaDerechaMotocarro.trim()) + m.getCondicion());
+                        String condicionAstetisco = m.getValor() < 2.5 ? "*" : "";
+                        parametros.put("IntBajaDerecha", ajustarValorMedida(IntBajaDerechaMotocarro) + condicionAstetisco);
                         break;
 
                     case 2019://intensidad baja izquierda en motocarro

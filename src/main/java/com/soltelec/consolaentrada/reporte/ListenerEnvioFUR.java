@@ -91,7 +91,7 @@ public class ListenerEnvioFUR implements ActionListener {
                         {
                             if (p.getTipoPrueba().getId() == 1) 
                             {
-                                kilometrajeVariable=LlamarReporte.cargarKilometraje(p.getId());
+                                kilometrajeVariable= LlamarReporte.cargarKilometraje(p.getId())!=0 ? String.valueOf(LlamarReporte.cargarKilometraje(p.getId())) : "NO FUNCIONAL";
                             }
                             if (p.getAbortado().equalsIgnoreCase("A") || p.getAbortado().equalsIgnoreCase("Y") || p.getFinalizada().equalsIgnoreCase("N")) {
                                 app.setVisible(false);
@@ -214,6 +214,7 @@ public class ListenerEnvioFUR implements ActionListener {
                             } else {
                                 JOptionPane.showMessageDialog(null, "No pude Enviar 1er. FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + respServidor.getMensajeRespuesta() + "..!");
                                 System.out.println("Fallo por " + respServidor.getMensajeRespuesta());
+                                System.out.println("Kilometraje 2: "+kilometrajeVariable);
                             }
                             try {
                                 controller.edit(this.ctxHojaPrueba);
@@ -351,6 +352,7 @@ public class ListenerEnvioFUR implements ActionListener {
                                 } else {
                                     JOptionPane.showMessageDialog(null, "No pude Enviar 1er. FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + responseDTO.getMensajeRespuesta() + "..!");
                                     System.out.println("Fallo por " + responseDTO.getMensajeRespuesta());
+                                    System.out.println("Kilometraje 1: "+kilometrajeVariable);
                                 }
                             }
                         }// fin de Logica de Envio del Primer FUR

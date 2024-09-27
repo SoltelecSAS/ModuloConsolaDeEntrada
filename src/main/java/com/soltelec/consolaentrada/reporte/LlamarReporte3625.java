@@ -612,7 +612,12 @@ public class LlamarReporte3625 {
                                 break;
                             case 2006://intensidad luz baja derecha para vehiculos
                                 df.applyPattern("#0.0");
-                                parametros.put("IntBajaDerecha", df.format(m.getValor()) + m.getCondicion());
+                                //parametros.put("IntBajaDerecha", df.format(m.getValor()) + m.getCondicion());
+
+
+                                String condicionAstetisco = m.getValor() < 2.5 ? "*" : "";
+                                parametros.put("IntBajaDerecha", df.format(m.getValor()) + condicionAstetisco);
+
 //                                Intv = m.getValor();
 //                                if (angv == 0 && Intv == 0) {
 //                                    parametros.put("IntBajaDerecha", 0);
@@ -662,7 +667,10 @@ public class LlamarReporte3625 {
                                 break;
                             case 2014://luz baja derecha Motos
                                 df.applyPattern("#0.0");
-                                parametros.put("IntBajaDerecha", df.format(m.getValor()) + m.getCondicion());
+                                //parametros.put("IntBajaDerecha", df.format(m.getValor()) + m.getCondicion());
+
+                                String condicionAstetisc = m.getValor() < 2.5 ? "*" : "";
+                                parametros.put("IntBajaDerecha", df.format(m.getValor()) + condicionAstetisc);
 //                                Int = m.getValor();
 //                                //Cambio solo para Popayan, por problema en Luxometro
 //                                System.out.println("Angulo:" + ang + "Intensidad:" + Int);
@@ -692,7 +700,11 @@ public class LlamarReporte3625 {
                                 parametros.put("IntBajaDerecha", df.format(m.getValor()) + m.getCondicion());
                                 break;
                             case 2019://intensidad baja izquierda en motocarro
-                                parametros.put("IntBajaIzq", df.format(m.getValor()) + m.getCondicion());
+                                //parametros.put("IntBajaIzq", df.format(m.getValor()) + m.getCondicion());
+
+                                String condicionAstetis = m.getValor() < 2.5 ? "*" : "";
+                                parametros.put("IntBajaDerecha", df.format(m.getValor()) + condicionAstetis);
+
                                 break;
                             case 2020://
                                 df.applyPattern("#0.0");
