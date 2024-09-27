@@ -860,16 +860,20 @@ public class LlamarReporte {
      * @param idprueba
      * @return
      */
-    public static int cargarKilometraje(int idprueba) {
+    public static String cargarKilometraje(int idprueba) {
         int kilometraje = -1;
         try {
             Connection cn = UtilConexion.obtenerConexion();
             kilometraje = HojaPruebasJpaController.consultarMedida(idprueba, cn);
 
+            if (kilometraje == 0) {
+                return "NO FUNCIONAL";
+            }
+
         } catch (Exception e) {
             System.out.println("Error en el metod:cargarKilometraje()" + e);
         }
-        return kilometraje;
+        return String.valueOf(kilometraje);
     }
 
     /**

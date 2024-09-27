@@ -1408,7 +1408,7 @@ WHERE
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$P{kilometrajeMedida} == "0" ? "NO FUNCIONAL" : $P{kilometrajeMedida}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{kilometrajeMedida}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>

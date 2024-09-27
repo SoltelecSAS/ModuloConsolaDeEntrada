@@ -91,7 +91,7 @@ public class ListenerEnvioFUR implements ActionListener {
                         {
                             if (p.getTipoPrueba().getId() == 1) 
                             {
-                                kilometrajeVariable= LlamarReporte.cargarKilometraje(p.getId())!=0 ? String.valueOf(LlamarReporte.cargarKilometraje(p.getId())) : "NO FUNCIONAL";
+                                kilometrajeVariable= LlamarReporte.cargarKilometraje(p.getId());
                             }
                             if (p.getAbortado().equalsIgnoreCase("A") || p.getAbortado().equalsIgnoreCase("Y") || p.getFinalizada().equalsIgnoreCase("N")) {
                                 app.setVisible(false);
