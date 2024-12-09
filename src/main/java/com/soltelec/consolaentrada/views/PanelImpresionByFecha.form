@@ -257,11 +257,6 @@
                   <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                 </Property>
               </Properties>
-              <BindingProperties>
-                <BindingProperty name="selectedElement" source="btnAtras" sourcePath="${foreground.green}" target="tblPruebas" targetPath="selectedElement" updateStrategy="0" immediately="false">
-                  <BindingParameter name="IGNORE_ADJUSTING" value="N"/>
-                </BindingProperty>
-              </BindingProperties>
               <Events>
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblPruebasMouseClicked"/>
                 <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblPruebasMouseEntered"/>
@@ -284,6 +279,9 @@
               </StringArray>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CmbBusquedaActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>

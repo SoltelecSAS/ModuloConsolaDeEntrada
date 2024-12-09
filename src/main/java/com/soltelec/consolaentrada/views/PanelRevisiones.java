@@ -40,6 +40,7 @@ import com.soltelec.consolaentrada.models.controllers.HojaPruebasJpaController;
 import com.soltelec.consolaentrada.models.entities.Cda;
 import com.soltelec.consolaentrada.models.entities.Color;
 import com.soltelec.consolaentrada.models.statics.LoggedUser;
+import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.Validaciones;
 import com.soltelec.consolaentrada.models.controllers.AseguradoraJpaController;
@@ -50,6 +51,8 @@ import com.soltelec.consolaentrada.models.entities.Tipocarroceria;
 import com.soltelec.consolaentrada.sicov.ci2.ClienteCi2;
 import com.soltelec.consolaentrada.sicov.ci2.Pin;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
+import com.soltelec.consolaentrada.utilities.Utils;
+
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -64,6 +67,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -3562,6 +3566,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
                                 }
                             }
                         });
+                        btnCancelar.doClick();
                     } else {
                         if (prueba.getAbortado().equalsIgnoreCase("A")) {
                             JOptionPane.showMessageDialog(null, "Disculpe; No se Puede Repetir un Prueba si su CONDICION ya es ANULADA ");
@@ -3609,6 +3614,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
                                     }
                                 }
                             });
+                            btnCancelar.doClick();
                         } else {
                             JOptionPane.showMessageDialog(null, "Disculpe; No se Puede Repetir un Prueba si su CONDICION es PENDIENTE ");
                         }
@@ -3670,6 +3676,62 @@ public class PanelRevisiones extends javax.swing.JPanel {
          Mensajes.mensajeAdvertencia("Disculpe, solo las Reinspecciones Aplican a una Revision TecnoMecanica");
          return;
          }*/
+        //Utils.desactivarIndiceSiExisten();
+
+        HojaPruebas hojaPruebasReinspeccion = new HojaPruebas();
+        hojaPruebasReinspeccion.setId(null);
+        Prueba copiaPruebas = new Prueba();
+
+        hojaPruebasReinspeccion.setVehiculo(hojaPruebasActual.getVehiculo());
+        hojaPruebasReinspeccion.setPropietario(hojaPruebasActual.getPropietario());
+        hojaPruebasReinspeccion.setUsuario(hojaPruebasActual.getUsuario());
+        hojaPruebasReinspeccion.setPropietario(hojaPruebasActual.getPropietario());
+        hojaPruebasReinspeccion.setActiva(hojaPruebasActual.getActiva());
+        hojaPruebasReinspeccion.setFinalizada(hojaPruebasActual.getFinalizada());
+        hojaPruebasReinspeccion.setEstado(hojaPruebasActual.getEstado());
+        hojaPruebasReinspeccion.setImpreso(hojaPruebasActual.getImpreso());
+
+        Date fechaIngreso = hojaPruebasActual.getFechaIngreso();
+        Instant instant = fechaIngreso.toInstant().plusSeconds(1); // Añadir 1 segundo
+        //fechaIngreso = Date.from(instant);
+
+        /* if (fechaIngreso != null) {
+            System.out.println(Date.from(instant));
+            return;
+        } */
+
+        
+        
+        hojaPruebasReinspeccion.setFechaIngreso(Date.from(instant));
+
+        hojaPruebasReinspeccion.setAnulado(hojaPruebasActual.getAnulado());
+        hojaPruebasReinspeccion.setAprobado(hojaPruebasActual.getAprobado());
+        hojaPruebasReinspeccion.setFechaExpiracion(hojaPruebasActual.getFechaExpiracion());
+        hojaPruebasReinspeccion.setConductor(hojaPruebasActual.getConductor());
+        hojaPruebasReinspeccion.setConsecutivo(hojaPruebasActual.getConsecutivo());
+        hojaPruebasReinspeccion.setCerrada(hojaPruebasActual.getCerrada());
+        hojaPruebasReinspeccion.setFechaExpedicion(hojaPruebasActual.getFechaExpedicion());
+        hojaPruebasReinspeccion.setComentario(hojaPruebasActual.getComentario());
+        hojaPruebasReinspeccion.setIntentos(hojaPruebasActual.getIntentos());
+        hojaPruebasReinspeccion.setNroPruebasRegistradas(hojaPruebasActual.getNroPruebasRegistradas());
+        hojaPruebasReinspeccion.setConsecutivoRunt(hojaPruebasActual.getConsecutivoRunt());
+        hojaPruebasReinspeccion.setNumeroSolicitud(hojaPruebasActual.getNumeroSolicitud());
+        hojaPruebasReinspeccion.setResponsable(hojaPruebasActual.getResponsable());
+        hojaPruebasReinspeccion.setPreventiva("N");
+        hojaPruebasReinspeccion.setCon_hoja_prueba(hojaPruebasActual.getCon_hoja_prueba());
+        hojaPruebasReinspeccion.setPin(hojaPruebasActual.getPin());
+        hojaPruebasReinspeccion.setEstadoSICOV(hojaPruebasActual.getEstadoSICOV());
+        
+        hojaPruebasReinspeccion.setFormaMedTemperatura(hojaPruebasActual.getFormaMedTemperatura());
+        hojaPruebasReinspeccion.setAseguradora(hojaPruebasActual.getAseguradora());
+        hojaPruebasReinspeccion.setFechaExpSoat(hojaPruebasActual.getFechaExpSoat());
+        hojaPruebasReinspeccion.setFechaVencSoat(hojaPruebasActual.getFechaVencSoat());
+        hojaPruebasReinspeccion.setNroIdentificacionSoat(hojaPruebasActual.getNroIdentificacionSoat());
+        hojaPruebasReinspeccion.setUbicacionMunicipio(hojaPruebasActual.getUbicacionMunicipio());
+        hojaPruebasReinspeccion.setKilometraje(hojaPruebasActual.getKilometraje());
+        hojaPruebasReinspeccion.setFechaVencimientoGnv(hojaPruebasActual.getFechaVencimientoGnv());
+
+
         String msgUser = "";
         int Res = JOptionPane.showConfirmDialog(this, "¿Esta seguro que desea crear la reinspeccion para el vehiculo: " + hojaPruebasActual.getVehiculo().getPlaca() + " ?", "", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (Res == JOptionPane.NO_OPTION) {
@@ -3686,7 +3748,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
         calendar.setTime(hojaPruebasActual.getFechaIngreso());
         calendar.add(Calendar.DAY_OF_YEAR, 15);
         java.util.Date fecha = new Date();
-        if (calendar.getTime().before(fecha)) {
+        if (calendar.getTime().before(fecha) && !this.ctxCda.getProveedorSicov().equals("NO_APLICA")) {
             JOptionPane.showMessageDialog(null, "Disculpe;  Ha caducado el plazo de 15 dias para la Ejecucion Prueba de Reinspeccion ..¡");
             return;
         }
@@ -3736,8 +3798,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
             } else {
                 hojaPruebasActual.setEstadoSICOV("INICIADO");
             }
-            btnFotoActionPerformed(evt);
-            btnVisualActionPerformed(evt);
+            
             reinspeccionActual = new Reinspeccion();
             for (Component boton : pnlPruebas.getComponents()) {
                 if (boton instanceof JButton) {
@@ -3745,7 +3806,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
                 }
             }
             btnSugerir.setEnabled(true);
-            addPruebas();
+            
             int idPruVis = 0;
             for (Prueba prueba : pruebas) {
                 if (prueba.getTipoPrueba().getId() == 1 && prueba.getFinalizada().equals("Y")) {
@@ -3770,13 +3831,60 @@ public class PanelRevisiones extends javax.swing.JPanel {
             }
             this.pulsoTrans = true;
             JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            msgUser = "No se pudo crear la reinspeccion correctamente";
             try {
-                guardarReinspeccion();
-                msgUser = "Se ha creado la reinspeccion para el vehiculo con placas :" + hojaPruebasActual.getVehiculo().getPlaca() + " correctamente  ";
+                
+                
+                
+                Integer idHojaPruebasReinspeccion = Utils.guardarHojaPruebas(hojaPruebasReinspeccion);
+                System.out.println("Id de la hoja de pruebas original: "+hojaPruebasActual.getId());
+                System.out.println("Id de la hoja de pruebas COPIA: "+idHojaPruebasReinspeccion);
+
+                
+                boolean replicoMedidas = false;
+                boolean replicoDefectos = false;
+                Integer idPrueba = -1;
+
+                for (Prueba p : pruebas) {
+                        
+                    copiaPruebas.setFecha(p.getFecha());
+                    copiaPruebas.setTipoPrueba(p.getTipoPrueba());
+                    copiaPruebas.setFechaFinal(p.getFechaFinal());
+                    copiaPruebas.setHojaPruebas(hojaPruebasReinspeccion);
+                    copiaPruebas.setUsuarioFor(p.getUsuarioFor());
+                    copiaPruebas.setIdTipoAborto(p.getIdTipoAborto());
+                    copiaPruebas.setAutorizada(p.getAutorizada());
+                    copiaPruebas.setAprobado(p.getAprobado());
+                    copiaPruebas.setFinalizada(p.getFinalizada());
+                    copiaPruebas.setAbortado(p.getAbortado());
+                    copiaPruebas.setFechaAborto(p.getFechaAborto());
+                    copiaPruebas.setComentario(p.getComentario());
+                    copiaPruebas.setSerialEquipo(p.getSerialEquipo());
+                    copiaPruebas.setObservaciones(p.getObservaciones());
+                    copiaPruebas.setPista(p.getPista());
+
+                    idPrueba = Utils.guardarPrueba(copiaPruebas, idHojaPruebasReinspeccion);
+
+                    replicoMedidas = Utils.replicarMedidas(p.getId(), idPrueba);
+                    replicoDefectos = Utils.guardarDefxPrueba(p.getId(), idPrueba);
+                }
+                Utils.actualizarFotoPorHojaPruebas(hojaPruebasActual.getId(), idHojaPruebasReinspeccion);
+
+                if (replicoMedidas && replicoDefectos && idPrueba != -1){
+                    msgUser = "Se ha creado la reinspeccion para el vehiculo con placas :" + hojaPruebasActual.getVehiculo().getPlaca() + " correctamente  ";
+                    
+                    btnFotoActionPerformed(evt);
+                    btnVisualActionPerformed(evt);
+                    addPruebas();
+                    guardarReinspeccion();
+                    Utils.actualizarFechaIngresoVehiculo(hojaPruebasActual.getId());
+                } 
+                
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error al crear la reinspeccion", "ERROR", JOptionPane.ERROR_MESSAGE);
                 System.out.println("error al crear la reinspeccion: " + ex.getMessage());
                 System.out.println(ex);
+                ex.printStackTrace();
             }
             parentFrame.addWindowListener(new WindowAdapter() {
                 @Override
@@ -3789,6 +3897,8 @@ public class PanelRevisiones extends javax.swing.JPanel {
             });
 
             btnSugerir.doClick();
+            btnCancelar.doClick();
+            
         } else {
             JOptionPane.showMessageDialog(null, "Disculpe; No se Puede IMPLEMENTAR una Reinspeccion si LA Hoja de Prueba Ya POSEE UNA REINSPECCION ");
         }
@@ -3796,6 +3906,7 @@ public class PanelRevisiones extends javax.swing.JPanel {
         Mensajes.mensajeCorrecto(msgUser);
         pnlRevisiones.remove(pnlRegistroPropietario);
         pnlRevisiones.remove(pnlRegistroPruebas);
+        
     }//GEN-LAST:event_btnReinspeccionActionPerformed
 
     public void addPruebas() {

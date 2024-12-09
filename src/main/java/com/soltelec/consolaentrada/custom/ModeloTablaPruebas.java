@@ -64,15 +64,18 @@ public class ModeloTablaPruebas extends AbstractTableModel {
             case 0:
                 return prueba.getTipoPrueba().getNombre();
             case 1:
-                EstadoPrueba estado;
-                if (prueba.getAbortado().equals("Y")) {
+                EstadoPrueba estado = EstadoPrueba.INDEFINIDA;
+                if (prueba.getAbortado().equals("Y") && prueba.getTipoPrueba().getId() == 8) {
                     estado = EstadoPrueba.ABORTADA;
-                    return estado;
+                }
+                if (prueba.getAbortado().equals("Y") && prueba.getTipoPrueba().getId() != 8) {
+                    estado = EstadoPrueba.CANCELADA;
                 }
                 if (prueba.getFinalizada().equals("Y") || prueba.getFinalizada().equalsIgnoreCase("A")) {
                     if (prueba.getAprobado().equals("Y")) {
                         estado = EstadoPrueba.APROBADA;
-                    } else {
+                    } 
+                    if (prueba.getAprobado().equals("N") && !prueba.getAbortado().equals("Y")) {
                         estado = EstadoPrueba.RECHAZADA;
                     }
                     if (prueba.getAbortado().equals("A")) {

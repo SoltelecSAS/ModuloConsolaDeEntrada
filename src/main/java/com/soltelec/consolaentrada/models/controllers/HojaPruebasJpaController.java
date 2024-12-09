@@ -44,14 +44,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -472,6 +468,146 @@ public class HojaPruebasJpaController {
         }
     }
 
+    /* public String verificarHojaFinalizada(HojaPruebas ctxHojaPrueba) {
+        List<Prueba> ctxListPrueba = new ArrayList();
+        Integer ctxIdPruebaVis=0;
+        if (ctxHojaPrueba.getReinspeccionList().size() == 0) {
+            List<Prueba> tempListPrueba = ctxHojaPrueba.getListPruebas();
+            for (Prueba ctxpru : tempListPrueba) {
+                if (ctxpru.getAbortado().equalsIgnoreCase("N")) {
+                    ctxListPrueba.add(ctxpru);
+                    if(ctxpru.getTipoPrueba().getId()==1){
+                       ctxIdPruebaVis = ctxpru.getId();
+                    }
+                }
+            }
+        } else {
+            Reinspeccion r = ctxHojaPrueba.getReinspeccionList().get(0);
+            List<Prueba> tempListPrueba = ctxHojaPrueba.getListPruebas();
+            Boolean encontrado = false;
+            for (Prueba ctxpru : tempListPrueba) {
+                for (Prueba prReins : r.getPruebaList()) {
+                    if (ctxpru.getTipoPrueba().getId() == prReins.getTipoPrueba().getId()) {
+                        encontrado = true;
+                        break;
+                    }
+                }
+                if (encontrado == false) {
+                    if (ctxpru.getAbortado().equalsIgnoreCase("N")) {
+                        ctxListPrueba.add(ctxpru);
+                    }
+                }
+                encontrado = false;
+            }
+            for (Prueba prReins : r.getPruebaList()) {
+                if (prReins.getAbortado().equalsIgnoreCase("N")) {
+                    ctxListPrueba.add(prReins);
+                }
+                if(prReins.getTipoPrueba().getId()==1){
+                       ctxIdPruebaVis = prReins.getId();
+                }
+            }
+        }
+        int contPruebasFinalizadas = 0;
+        int contPruebasAprobadas = 0;
+        int contPruebasReprobadas = 0;
+        int contTotalPruebas = 0;
+        int contTestB = 0;
+        int contTestA = 0;
+        contTotalPruebas = ctxListPrueba.size();
+
+        for (Prueba ctxpru : ctxListPrueba) {
+            if (ctxpru.getAprobado().equals("Y") && (!ctxpru.getAbortado().equalsIgnoreCase("A")) && (!ctxpru.getAbortado().equalsIgnoreCase("Y")) && ctxpru.getFinalizada().equals("Y")) {
+                contPruebasAprobadas++;
+            }
+            if (ctxpru.getAprobado().equals("N") && (!ctxpru.getAbortado().equalsIgnoreCase("A")) && (!ctxpru.getAbortado().equalsIgnoreCase("Y")) && ctxpru.getFinalizada().equals("Y")) {
+                contPruebasReprobadas++;
+            }
+            if (ctxpru.getFinalizada().equals("Y") && ctxpru.getAbortado().equalsIgnoreCase("N")) {
+                if (ctxpru.getDefxpruebaList().size() > 0) {
+                    List<Defxprueba> ctxListDefxprueba = ctxpru.getDefxpruebaList();
+                    for (Defxprueba ctxDef : ctxListDefxprueba) {
+                        if(ctxDef.getTercerEstado() != null && ctxDef.getTercerEstado().equals("na")){
+                            continue;
+                        }
+                        if (ctxDef.getDefectos().getTipodefecto().equalsIgnoreCase("A")) {
+                            contTestA++;
+                        } else {
+                            contTestB++;
+                        }
+                    }
+                }
+            }
+        }// fin del ciclo de recorrido de las pruebas reales
+        System.out.println("Cuantas pruebas Hay ?"+contTotalPruebas);
+        
+         System.out.println("Cuantas pruebas Reprobadas ?"+contPruebasReprobadas);
+         System.out.println("Cuantas pruebas Aprobadas ?"+contPruebasAprobadas);
+        contPruebasFinalizadas = contPruebasReprobadas + contPruebasAprobadas;
+        String desicion = "";
+        if (contTotalPruebas == contPruebasFinalizadas) {
+            if (contTotalPruebas == contPruebasAprobadas) {
+                desicion = "APROBADA";
+            } else {
+                desicion = "REPROBADA";
+            }
+        } else {
+            desicion = "PENDIENTE";
+        }
+        if (!desicion.equalsIgnoreCase("PENDIENTE")) {
+            if (ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 1 || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 3 || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 109 || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 110) {
+                if (ctxHojaPrueba.getVehiculo().getServicios().getId() == 3 || ctxHojaPrueba.getVehiculo().getServicios().getId() == 1 || ctxHojaPrueba.getVehiculo().getServicios().getId() == 4) {
+                    if (contTestB > 9) {
+                        desicion = "REPROBADA";
+                        servRechazoPruebaVisual(ctxIdPruebaVis);
+                    }
+                    if (contTestA > 0) {
+                        desicion = "REPROBADA";
+                    }
+                }
+                if (ctxHojaPrueba.getVehiculo().getServicios().getId() == 2 || ctxHojaPrueba.getVehiculo().getEsEnsenaza() == 1) {
+                    if (contTestB > 4) {
+                        desicion = "REPROBADA";
+                        servRechazoPruebaVisual(ctxIdPruebaVis);
+                    }
+                    if (contTestA > 0) {
+                        desicion = "REPROBADA";
+                    }
+                }
+            }
+            if (ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 4) {
+                if (contTestB > 4) {
+                    desicion = "REPROBADA";
+                    servRechazoPruebaVisual(ctxIdPruebaVis);
+                }
+                if (contTestA > 0) {
+                    desicion = "REPROBADA";
+                }
+            }
+            if (ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 5) {
+                if (ctxHojaPrueba.getVehiculo().getServicios().getId() == 3 || ctxHojaPrueba.getVehiculo().getServicios().getId() == 1 || ctxHojaPrueba.getVehiculo().getServicios().getId() == 4) {
+                    if (contTestB > 6) {
+                        desicion = "REPROBADA";
+                        servRechazoPruebaVisual(ctxIdPruebaVis);
+                    }
+                    if (contTestA > 0) {
+                        desicion = "REPROBADA";
+                    }
+                }
+                if (ctxHojaPrueba.getVehiculo().getServicios().getId() == 2 || ctxHojaPrueba.getVehiculo().getEsEnsenaza() == 1) {
+                    if (contTestB > 4) {
+                        desicion = "REPROBADA";
+                        servRechazoPruebaVisual(ctxIdPruebaVis);
+                    }
+                    if (contTestA > 0) {
+                        desicion = "REPROBADA";
+                    }
+                }
+            }
+        }
+        return desicion;
+    } */
+
     public String verificarHojaFinalizada(HojaPruebas ctxHojaPrueba) {
         List<Prueba> ctxListPrueba = new ArrayList();
         Integer ctxIdPruebaVis=0;
@@ -614,6 +750,25 @@ public class HojaPruebasJpaController {
          }
          JOptionPane.showMessageDialog(null, " Desicion es  " + desicion );*/
         return desicion;
+    }
+    
+    // Submétodo auxiliar para agregar pruebas no encontradas en reinspreción
+    private void agregarPruebasNoEncontradas(List<Prueba> ctxListPrueba, List<Prueba> tempListPrueba, Reinspeccion r) {
+        for (Prueba ctxpru : tempListPrueba) {
+            boolean encontrado = r.getPruebaList().stream().anyMatch(prReins -> prReins.getTipoPrueba().getId() == ctxpru.getTipoPrueba().getId());
+            if (!encontrado && ctxpru.getAbortado().equalsIgnoreCase("N")) {
+                ctxListPrueba.add(ctxpru);
+            }
+        }
+    }
+    
+    // Submétodo auxiliar para agregar pruebas de reinspreción
+    private void agregarPruebasReinspeccion(List<Prueba> ctxListPrueba, Reinspeccion r) {
+        for (Prueba prReins : r.getPruebaList()) {
+            if (prReins.getAbortado().equalsIgnoreCase("N")) {
+                ctxListPrueba.add(prReins);
+            }
+        }
     }
    
     public void servRechazoPruebaVisual(Integer ctxIdPruebaVis){
@@ -965,7 +1120,7 @@ public class HojaPruebasJpaController {
         try {
             em = getEntityManager();
             //TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp  WHERE hp.fechaIngreso  BETWEEN :inicial and :final AND  NOT EXISTS (SELECT h FROM HojaPruebas h join h.certificados c where c.hojaPruebas.fechaIngreso BETWEEN :fi and :ff  ) ", HojaPruebas.class);
-            TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp   WHERE hp.fechaIngreso  BETWEEN :inicial and :final AND hp.estadoSICOV = :edoSicov ", HojaPruebas.class
+            TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp WHERE hp.fechaIngreso  BETWEEN :inicial and :final AND hp.estadoSICOV = :edoSicov", HojaPruebas.class
             );
             DateFormat dtfInicial = new SimpleDateFormat("yyyy/MM/dd 00:00:00");
             DateFormat dtfFinal = new SimpleDateFormat("yyyy/MM/dd 23:59:00");
@@ -990,6 +1145,64 @@ public class HojaPruebasJpaController {
                 }
             }
             return lstHoja;
+        } catch (Exception ex) {
+            Mensajes.mostrarExcepcion(ex);
+            return null;
+        } finally {
+
+        }
+    }
+
+    public List<HojaPruebas> findHojasPendientes(Date dinicial, Date dfinal) {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            //TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp  WHERE hp.fechaIngreso  BETWEEN :inicial and :final AND  NOT EXISTS (SELECT h FROM HojaPruebas h join h.certificados c where c.hojaPruebas.fechaIngreso BETWEEN :fi and :ff  ) ", HojaPruebas.class);
+            TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp WHERE hp.fechaIngreso BETWEEN :inicial and :final AND ((hp.estadoSICOV <> 'SINCRONIZADO' AND hp.estadoSICOV <> 'NO_APLICA') OR ((hp.preventiva = 'Y' OR hp.con_preventiva <> 0) AND hp.estado = 'PENDIENTE'))", HojaPruebas.class
+            );
+            DateFormat dtfInicial = new SimpleDateFormat("yyyy/MM/dd 00:00:00");
+            DateFormat dtfFinal = new SimpleDateFormat("yyyy/MM/dd 23:59:00");
+            DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            String fechaInicial = dtfInicial.format(dinicial);
+            String fechaFinal = dtfFinal.format(dfinal);
+            dinicial = format.parse(fechaInicial);
+            dfinal = format.parse(fechaFinal);
+
+            qCert.setParameter(
+                    "inicial", dinicial);
+            qCert.setParameter(
+                    "final", dfinal);
+            List<HojaPruebas> lstHojaPrueba = qCert.getResultList();
+            return lstHojaPrueba;
+        } catch (Exception ex) {
+            Mensajes.mostrarExcepcion(ex);
+            return null;
+        } finally {
+
+        }
+    }
+
+    public List<HojaPruebas> findHojasFinalizadas(Date dinicial, Date dfinal) {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            //TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp  WHERE hp.fechaIngreso  BETWEEN :inicial and :final AND  NOT EXISTS (SELECT h FROM HojaPruebas h join h.certificados c where c.hojaPruebas.fechaIngreso BETWEEN :fi and :ff  ) ", HojaPruebas.class);
+            TypedQuery<HojaPruebas> qCert = em.createQuery("SELECT hp FROM HojaPruebas hp WHERE hp.fechaIngreso BETWEEN :inicial and :final AND (hp.estadoSICOV = 'SINCRONIZADO' OR ((hp.preventiva = 'Y' OR hp.con_preventiva <> 0) AND hp.estado <> 'PENDIENTE'))", HojaPruebas.class
+            );
+            DateFormat dtfInicial = new SimpleDateFormat("yyyy/MM/dd 00:00:00");
+            DateFormat dtfFinal = new SimpleDateFormat("yyyy/MM/dd 23:59:00");
+            DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            String fechaInicial = dtfInicial.format(dinicial);
+            String fechaFinal = dtfFinal.format(dfinal);
+            dinicial = format.parse(fechaInicial);
+            dfinal = format.parse(fechaFinal);
+
+            qCert.setParameter(
+                    "inicial", dinicial);
+            qCert.setParameter(
+                    "final", dfinal);
+            List<HojaPruebas> lstHojaPrueba = qCert.getResultList();
+            return lstHojaPrueba;
         } catch (Exception ex) {
             Mensajes.mostrarExcepcion(ex);
             return null;
@@ -1135,11 +1348,11 @@ public class HojaPruebasJpaController {
                     "fechainicial", dtfInicial.parse(fechaInicial));
             qr.setParameter(
                     "fechafinal", dtfFinal.parse(fechaFinal));
-            List<HojaPruebas> listaHabilitaciones = q.getResultList();
+            List<HojaPruebas> listaHabilitaciones = q.getResultList(); //1134
             List<HojaPruebas> listaReinspecciones = qr.getResultList();
 
             return unirListasHabilitacionRechazo(listaHabilitaciones, listaReinspecciones);
-        } catch (ParseException ex) {
+        } catch (ParseException | NumberFormatException ex) {
             Mensajes.mostrarExcepcion(ex);
             return null;
         } finally {

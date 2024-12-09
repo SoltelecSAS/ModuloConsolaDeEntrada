@@ -67,9 +67,85 @@ public class PruebaJpaController {
                 }
             }
             em.getTransaction().commit();
-        } finally {
-
+        } catch(Exception e){
+            e.printStackTrace();
         }
+    }
+
+    // Método nuevo para crear una prueba con sus medidas
+    public void crearPruebaConMedidas(Prueba pruebaOriginal, HojaPruebas hojaPruebasReinspeccion) {
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+
+            // Crear una copia de Prueba
+            Prueba copiaPrueba = new Prueba();
+            copiaPrueba.setFecha(pruebaOriginal.getFecha());
+            copiaPrueba.setTipoPrueba(pruebaOriginal.getTipoPrueba());
+            copiaPrueba.setFechaFinal(pruebaOriginal.getFechaFinal());
+            copiaPrueba.setHojaPruebas(hojaPruebasReinspeccion);
+            copiaPrueba.setUsuarioFor(pruebaOriginal.getUsuarioFor());
+            copiaPrueba.setIdTipoAborto(pruebaOriginal.getIdTipoAborto());
+            copiaPrueba.setAutorizada(pruebaOriginal.getAutorizada());
+            copiaPrueba.setAprobado(pruebaOriginal.getAprobado());
+            copiaPrueba.setFinalizada(pruebaOriginal.getFinalizada());
+            copiaPrueba.setAbortado(pruebaOriginal.getAbortado());
+            copiaPrueba.setFechaAborto(pruebaOriginal.getFechaAborto());
+            copiaPrueba.setComentario(pruebaOriginal.getComentario());
+            copiaPrueba.setSerialEquipo(pruebaOriginal.getSerialEquipo());
+            copiaPrueba.setObservaciones(pruebaOriginal.getObservaciones());
+            copiaPrueba.setPista(pruebaOriginal.getPista());
+            copiaPrueba.setDefxpruebaList(pruebaOriginal.getDefxpruebaList());
+
+            // Clonar la lista de Medidas y asignarla a la copia de Prueba
+            List<Medida> medidasCopiadas = new ArrayList<>();
+            List<Medida> listaMedidasOriginal = pruebaOriginal.getMedidaList();
+
+            if (listaMedidasOriginal != null && !listaMedidasOriginal.isEmpty()) {
+                for (Medida medidaOriginal : listaMedidasOriginal) {
+                    Medida copiaMedida = new Medida();
+                    copiaMedida.setTipoMedida(medidaOriginal.getTipoMedida());
+                    copiaMedida.setValor(medidaOriginal.getValor());
+                    copiaMedida.setPrueba(copiaPrueba); // Establecer relación con la nueva prueba
+                    copiaMedida.setCondicion(medidaOriginal.getCondicion());
+                    copiaMedida.setSimult(medidaOriginal.getSimult());
+                    medidasCopiadas.add(copiaMedida);
+                }
+                copiaPrueba.setMedidaList(medidasCopiadas);
+            } else {
+                // Si no hay medidas, puedes optar por establecer la lista como vacía
+                copiaPrueba.setMedidaList(new ArrayList<>());
+            }
+            
+
+            // Persistir la copia de Prueba y las Medidas asociadas
+            em.persist(copiaPrueba);
+            for (Medida medida : medidasCopiadas) {
+                em.persist(medida);
+            }
+
+            em.getTransaction().commit();//128
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+    
+    // Método auxiliar para adjuntar medidas
+    private List<Medida> attachMedidas(EntityManager em, List<Medida> medidasList) {
+        List<Medida> attachedMedidasList = new ArrayList<>();
+        for (Medida medida : medidasList) {
+            Medida attachedMedida = em.getReference(medida.getClass(), medida.getId());
+            attachedMedidasList.add(attachedMedida);
+        }
+        return attachedMedidasList;
     }
 
     public void edit(Prueba pruebas) throws Exception {

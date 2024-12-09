@@ -1597,6 +1597,9 @@ public class ClienteCi2Servicio {
             Equipo equipo = equiposJpaController1.buscarPorSerial(prueba.getSerialEquipo());
             if (equipo != null) {
                 formulario.setP_h_equ_rev(formulario.getP_h_equ_rev().concat(String.format("%s:%s;", equipo.getMarca(), equipo.getResolucionambiental())));
+            }else if(prueba.getTipoPrueba().getId() == 8 && prueba.getSerialEquipo().contains("~")) {
+                String pef = prueba.getSerialEquipo().split("~")[2].split("-")[0];
+                formulario.setP_h_equ_rev(formulario.getP_h_equ_rev().concat(String.format("%s:%s;", prueba.getSerialEquipo().split("~")[1].split(";")[0], prueba.getSerialEquipo().split("~")[2].replace(pef, ""))));
             }
 
         }

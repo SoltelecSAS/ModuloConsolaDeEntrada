@@ -29,6 +29,7 @@ import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.SepararImagenes;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
 import com.soltelec.consolaentrada.utilities.UtilPropiedades;
+import com.soltelec.consolaentrada.utilities.Utils;
 import com.soltelec.consolaentrada.utilities.Validaciones;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.util.JRLoader;
@@ -142,11 +143,26 @@ public class LlamarReporte {
             parametros.put("MarcaSusp", "");
 
             if (this.ctxHojaPrueba.getIntentos() > 1) {
-                parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(this.ctxHojaPrueba.getFechaIngreso()));
+                Date fechaAnterior = Utils.obtenerFechaAnterior(this.ctxHojaPrueba.getId());
+                if (this.ctxHojaPrueba.getIntentos() >= 2 && fechaAnterior == null) {
+                    String fechaPrimeraRevision = Utils.obtenerFechaPrimeraRevision(this.ctxHojaPrueba.getCon_hoja_prueba(), this.ctxHojaPrueba.getId());
+                    System.out.println("Fecha primera revision: "+ fechaPrimeraRevision);
+                    parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + fechaPrimeraRevision);
+                }else{
+                    parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(fechaAnterior));
+                }
             }
             configurarPermisibles();
             reinspeccion = this.ctxHojaPrueba.getReinspeccionList().size() > 0;  //consultas.isReinspeccion(this.ctxHojaPrueba.getId() , cn);            
             if (reinspeccion) {
+
+                Integer km = Utils.obtenerKilometraje(this.ctxHojaPrueba.getId(), "desc");
+
+                String kilometraje = km.toString();
+
+                parametros.put("kilometrajeMedida", km == 0 ? "NO FUNCIONAL" : kilometraje);
+                
+
                 parametros.put("codigoPrueba", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 2");
                 reinspecionActual = this.ctxHojaPrueba.getReinspeccionList().iterator().next();
                 parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(reinspecionActual.getFechaSiguiente()));
@@ -162,7 +178,13 @@ public class LlamarReporte {
                 cargarSeriales(this.ctxHojaPrueba.getId(), cn);
 
             } else {
-                parametros.put("codigoPrueba", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1");
+
+                Integer km = Utils.obtenerKilometraje(this.ctxHojaPrueba.getId(), "asc");
+
+                String kilometraje = km.toString();
+
+                parametros.put("kilometrajeMedida", km == 0 ? "NO FUNCIONAL" : kilometraje);
+                parametros.put("codigoPrueba", this.ctxHojaPrueba.getCon_hoja_prueba() + " - "+this.ctxHojaPrueba.getIntentos());
                 parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(this.ctxHojaPrueba.getFechaIngreso()));
                 parametros.put("isReinspeccion", "NO");
                 ctxIndPruebas = cargarIdPruebasNoDuplicadas(this.ctxHojaPrueba, "I");
@@ -841,15 +863,23 @@ public class LlamarReporte {
                         parametros.put("PresRespuesto2", ajustarValorMedida(PresRespuesto2.trim()) + " psi ");
                         break;
 
-                    case 1006:
-
+                    /* case 1006:
                         parametros.put("kilometrajeMedida", cargarKilometraje(idPrueba));
-                        System.out.println("se inserta kilometraje");
-                        break;
+                        System.out.println("se inserta kilometraje"); */
+                        
+
+                        
+                        
                     default://Error con el codigo de la medida pra gases
                         break;
                 }
+
+                
             }
+
+            
+
+
         } catch (Exception e) {
             System.out.println("Error en el metodo : cargarMedidaPruebaVisual()" + e.getMessage());
         }
@@ -876,12 +906,6 @@ public class LlamarReporte {
         return String.valueOf(kilometraje);
     }
 
-    /**
-     *
-     * @param idPrueba
-     * @param listaMedidas
-     * @param tipoVehiculo
-     */
     private void cargarMedidaPruebaLucesMotos(List<Medida> listaMedidas) {
         System.out.println("----------------------------------------------------");
         System.out.println("-Cargar medidas para la prueba de Luces Motos-------");
@@ -1710,10 +1734,10 @@ public class LlamarReporte {
             int sumapd = 0, sumapi = 0, sumafd = 0, sumafi = 0;
             String efi = "";
 
-            int defecto_profundidad = validarDefectosPorfundidaLabrado();
+            int defectoProfundidad = validarDefectosPorfundidaLabrado();
 
             for (Medida m : listaMedidas) {
-                if (defecto_profundidad <= 0) {
+                if (defectoProfundidad <= 0) {
                     switch (m.getTipoMedida().getId()) {
                         case 5000://peso derecho eje 1
 /////////////////////////////////////////////////////////////////////////////////////////////condicion para que muestre valores de motocarro del eje 1 a la izquierda /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1991,7 +2015,7 @@ public class LlamarReporte {
                 }
             }
 
-            if (defecto_profundidad > 0) {
+            if (defectoProfundidad > 0) {
                 String observamedfre = "";
                 observamedfre = observamedfre.concat(" ").concat("EfiTotal: ").concat(efi).concat(" SumFuerzas: ").concat(Integer.toString(sumfuerzas)).concat(" SumPesos: ").concat(Integer.toString(sumpesos));
                 System.out.println("Voy a guardar las observaciones de la prueba " + observamedfre + idPrueba);
@@ -2032,9 +2056,9 @@ public class LlamarReporte {
             while (rs.next()) {
                 String id_defecto = rs.getString("id_defecto");
                 if (id_defecto != null) {
-                    if (id_defecto.equals("10094") || id_defecto.equals("10095") || id_defecto.equals("14016") || id_defecto.equals("15050")) {
+                    if (id_defecto.equals("14016") || id_defecto.equals("10094") || id_defecto.equals("10095") || id_defecto.equals("15050")) {
                         System.out.println("se encontro defecto" + id_defecto);
-                        defecto_profundidad = defecto_profundidad + 1;
+                        defecto_profundidad += 1;
                     }
                 }
             }
@@ -3961,6 +3985,7 @@ public class LlamarReporte {
                 if (Tipo_prueba_for == 1) {
                     cargarSerialesVisualFur(serialEquipo, marca);
                 }
+                //puto puto
                 if (Tipo_prueba_for == 2) {
                     cargandoSerialEquipoLuces(serialEquipo, marca);
                 }
@@ -4024,7 +4049,7 @@ public class LlamarReporte {
                                 "LEFT JOIN \n" + //
                                 "    equipos e ON e.serialresolucion = p.serialEquipo\n" + //
                                 "WHERE \n" + //
-                                "    hp.TESTSHEET = ?\n" + //
+                                "    hp.TESTSHEET = ? AND p.Abortada = 'N'\n" + //
                                 "ORDER BY \n" + //
                                 "    p.Tipo_prueba_for ASC;";
 

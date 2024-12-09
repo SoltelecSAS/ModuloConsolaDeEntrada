@@ -24,8 +24,13 @@ import com.soltelec.consolaentrada.utilities.Mensajes;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -157,7 +162,7 @@ public class ListenerEnvioFUR implements ActionListener {
                             if (seleccion == JOptionPane.NO_OPTION) {
                                 app.setVisible(false);
                                 return;
-                    }
+                        }
                         }
                         labelVariable.setText(" He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!");
                         if (ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA") || ctxHojaPrueba.getEstado().equalsIgnoreCase("REPROBADA")) {
@@ -173,7 +178,7 @@ public class ListenerEnvioFUR implements ActionListener {
                     
                     if (ctxCDA.getProveedorSicov().equalsIgnoreCase("CI2")) 
                     {
-                        System.out.println("pin" + ctxHojaPrueba.getPin() );
+                        System.out.println("pin: " + ctxHojaPrueba.getPin() );
                         if (ctxHojaPrueba.getPin().length() > 2 && ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("Iniciado")) {
                             ClienteCi2Servicio clienteSincoFur = new ClienteCi2Servicio(ctxHojaPrueba, ctxCDA);
                             clienteSincoFur.cargarInformacionBasica();
@@ -204,15 +209,26 @@ public class ListenerEnvioFUR implements ActionListener {
                              respServidor.setCodigoRespuesta("0000");*/
                             app.dispose();
                             if (respServidor == null) {
-                                Mensajes.mensajeAdvertencia("Disculpe, no Puede Enviar el 1er. FUR debido a que No Tengo COMUNICACION con el Servidor CI2 en este momento ..! \n Intente dentro de un Minuto si el problema persiste COMUNIQUESE con la Mesa de Ayuda");
+                                Mensajes.mensajeAdvertencia(
+                                "No se pudo enviar el primer FUR porque no hay comunicación con el servidor CI2 en este momento.\n"
+                                + "Por favor, intente nuevamente en un minuto. Si el problema persiste, comuníquese con la Mesa de Ayuda.");
                                 return;
                             }
                             if (respServidor.getCodigoRespuesta().equals("0000")) { //ok
                                 ctxHojaPrueba.setEstadoSICOV("Env1FUR");
                                 System.out.println("envie el primer fur");
-                                JOptionPane.showMessageDialog(null, "Se ha Enviado 1er. FUR perteneciente a la Placa  " + ctxHojaPrueba.getVehiculo().getPlaca() + " con exito ..!,\n Recuerde que usted acaba de Reportar el Resultado de las Pruebas al SICOV ");
+                                Mensajes.mensajeCorrecto(
+                                "El primer FUR correspondiente a la placa " 
+                                + ctxHojaPrueba.getVehiculo().getPlaca() 
+                                + " se ha enviado con éxito.\n"
+                                + "Recuerde que acaba de reportar el resultado de las pruebas al SICOV.");
                             } else {
-                                JOptionPane.showMessageDialog(null, "No pude Enviar 1er. FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + respServidor.getMensajeRespuesta() + "..!");
+                                Mensajes.mensajeError(
+                                "No se pudo enviar el primer FUR correspondiente a la placa " 
+                                + ctxHojaPrueba.getVehiculo().getPlaca() 
+                                + ". Respuesta sicov:\n" 
+                                + respServidor.getMensajeRespuesta() 
+                                + ".");
                                 System.out.println("Fallo por " + respServidor.getMensajeRespuesta());
                                 System.out.println("Kilometraje 2: "+kilometrajeVariable);
                             }
@@ -257,7 +273,7 @@ public class ListenerEnvioFUR implements ActionListener {
                                 System.out.println("Voy a Cargar Observaciones");
                                 clienteIndra.datosObservaciones();
                                 String sufFUR = null;
-                                if (ctxHojaPrueba.getReinspeccionList().isEmpty()) {
+                                if (ctxHojaPrueba.getReinspeccionList().isEmpty() && ctxHojaPrueba.getIntentos() < 2) {
                                     sufFUR = "-1";
                                 } else {
                                     sufFUR = "-2";
@@ -336,25 +352,41 @@ public class ListenerEnvioFUR implements ActionListener {
                             System.out.println("Trama fur indra");
                             System.out.println(datosFur.toString());
                             ResponseDTO responseDTO = clienteIn.setFur(datosFur.toString());
+
+                            //guardarEnArchivo(datosFur.toString());
+
                             System.out.println(responseDTO);
                             app.dispose();
                             if (responseDTO == null) {
-                                JOptionPane.showMessageDialog(null, "Disculpe, no Puede Enviar el 1er. FUR debido a que no Tengo Comunicacion en estos Momentos con el Servidor SICOV ..! \n Compruebe que el servicio este Levantado sino es asi Comuniquese Por favor con la mesa de Ayuda de INDRA ");
+                                Mensajes.mensajeAdvertencia(
+                                "No se pudo enviar el primer FUR porque no hay comunicación con el servidor de INDRA en este momento.\n"
+                                + "Por favor, intente nuevamente en un minuto. Si el problema persiste, comuníquese con la Mesa de Ayuda.");
+                                return;
                             }
-                            if (responseDTO != null) {
-                                if (responseDTO.getCodigoRespuesta().equals("1")) { //ok
-                                    ctxHojaPrueba.setEstadoSICOV("Env1FUR");
-                                    try {
-                                        controller.edit(ctxHojaPrueba);
-                                    } catch (Exception ex) {
-                                    }
-                                    JOptionPane.showMessageDialog(null, "Se ha Enviado 1er. FUR perteneciente a la Placa  " + ctxHojaPrueba.getVehiculo().getPlaca() + " con exito ..!\n Recuerde que usted acaba de Reportar el Resultado de las Pruebas al SICOV ");
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "No pude Enviar 1er. FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + responseDTO.getMensajeRespuesta() + "..!");
-                                    System.out.println("Fallo por " + responseDTO.getMensajeRespuesta());
-                                    System.out.println("Kilometraje 1: "+kilometrajeVariable);
+                            if (responseDTO.getCodigoRespuesta().equals("1")) { //ok
+                                ctxHojaPrueba.setEstadoSICOV("Env1FUR");
+                                try {
+                                    controller.edit(ctxHojaPrueba);
+                                } catch (Exception ex) {
+                                    System.out.println("Error editConstroller: "+ ex);
                                 }
+                                Mensajes.mensajeCorrecto(
+                                "El primer FUR correspondiente a la placa " 
+                                + ctxHojaPrueba.getVehiculo().getPlaca() 
+                                + " se ha enviado con éxito.\n"
+                                + "Recuerde que acaba de reportar el resultado de las pruebas al SICOV.");
+                            } else {
+                                //JOptionPane.showMessageDialog(null, "No pude Enviar 1er. FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + responseDTO.getMensajeRespuesta() + "..!");
+                                Mensajes.mensajeError(
+                                "No se pudo enviar el primer FUR correspondiente a la placa " 
+                                + ctxHojaPrueba.getVehiculo().getPlaca() 
+                                + ". Respuesta sicov:\n" 
+                                + responseDTO.getMensajeRespuesta()
+                                + ".");
+                                System.out.println("Fallo por " + responseDTO.getMensajeRespuesta());
+                                System.out.println("Kilometraje 1: "+kilometrajeVariable);
                             }
+                            
                         }// fin de Logica de Envio del Primer FUR
 
                     }// Fin de Validacion aplicado al Proveedor INDRA
@@ -367,6 +399,23 @@ public class ListenerEnvioFUR implements ActionListener {
                 controller.edit(ctxHojaPrueba);
             }
         } catch (Exception ex) {
+        }
+    }
+
+    public void guardarEnArchivo(String contenido) {
+        // Formatear la fecha y hora actual para el nombre del archivo
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String fechaHora = formatter.format(new Date());
+
+        // Crear el nombre del archivo con la fecha y hora actuales
+        String fileName = "datosFur_" + fechaHora + ".txt";
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Escribir los datos en el archivo
+            writer.write(contenido);
+            System.out.println("Archivo guardado como: " + fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

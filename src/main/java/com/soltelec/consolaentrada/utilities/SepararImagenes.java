@@ -55,35 +55,20 @@ public class SepararImagenes {
      * @param reinspeccion Indica si la foto es de una reinspeccion.
      */
     public void obtenerImagen(int numeroFoto, HojaPruebas ctxHojaPrueba, boolean reinspeccion,boolean flag) {
-        // Conexion connConf = Conexion.getInstance();
-        /* Class.forName(connConf.getDriver());*/
-//         PreparedStatement pstmt;
+        
         BufferedImage image1 = null;
-        BufferedImage image2;
-        BufferedImage imReins1 = null;
-        BufferedImage imReins2 = null;
-        /* Connection connect = DriverManager.getConnection(connConf.getUrl(), connConf.getUsuario(), connConf.getContrasena());
-         pstmt = connect.prepareStatement(String.format("select f.Foto1,f.Foto2 from fotos f where f.id_hoja_pruebas_for = %d;", idHojaPrueba));
-         rs = pstmt.executeQuery();*/
+        BufferedImage image2 = null;
+
         try {
             image2 = null;
             Fotos foto = ctxHojaPrueba.getFotosList().iterator().next();
-            System.out.println("trama_foto"+foto);
+            System.out.println("trama_foto: "+foto);
             InputStream inpStrFoto = new ByteArrayInputStream(foto.getFoto1());
             image1 = ImageIO.read(inpStrFoto);
             inpStrFoto = new ByteArrayInputStream(foto.getFoto2());
             image2 = ImageIO.read(inpStrFoto);
-            
-            
-            
-            
-            /*  pstmt = connect.prepareStatement(String.format("select f.Foto1,f.Foto2 from fotos f where f.id_hoja_pruebas_for = %d;",13332));
-             rs = pstmt.executeQuery();
-             while (rs.next()) {
-             imReins1 = ImageIO.read(rs.getBinaryStream(1));
-             imReins2 = ImageIO.read(rs.getBinaryStream(2));
-             }*/
-            if (reinspeccion) 
+
+            if (Utils.obtenerNumeroRevisionFoto(ctxHojaPrueba.getId()) == 4) 
             {
                 try 
                 {
@@ -110,7 +95,7 @@ public class SepararImagenes {
                  
                 } catch (Exception e) 
                 {
-                    System.out.println("Erro al cargar fotos para reinspeccion");
+                    System.out.println("Error al cargar fotos para reinspeccion");
                 }
 
             } else {
@@ -121,19 +106,6 @@ public class SepararImagenes {
             Logger.getLogger(SepararImagenes.class.getName()).log(Level.SEVERE, null, ex);
         }
          AffineTransform at = AffineTransform.getScaleInstance(2, 2);//matriz de transformacion
-        /* BufferedImage nuevaImagenEscalada = new BufferedImage((int) 640, (int) 480, BufferedImage.TYPE_INT_RGB);
-         nuevaImagenEscalada.createGraphics().drawRenderedImage(foto1, at);
-         //eve=nuevaImagenEscalada.getWidth();
-         //rei=nuevaImagenEscalada.getHeight();
-         String formato = "JPEG";
-         //Image imagenConcatenada = concatenarImagenes(foto1, nuevaImagenEscalada);
-         ByteArrayOutputStream out = new ByteArrayOutputStream();
-         ImageIO.write((RenderedImage) nuevaImagenEscalada, formato, out);//Escribe la imagen concatenada
-         InputStream in = new ByteArrayInputStream(out.toByteArray());
-         pstmt = connect.prepareStatement("update  fotos set fotos.Foto1 = ? where id_hoja_pruebas_for=12330");
-         pstmt.setBinaryStream(1, in);
-         pstmt.executeUpdate();
-         pstmt.close(); */
 
     }
     

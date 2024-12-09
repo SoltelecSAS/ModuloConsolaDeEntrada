@@ -15,6 +15,8 @@ public enum EstadoPrueba {
     RECHAZADA,
     ABORTADA,
     PENDIENTE,
-    ANULADA
+    ANULADA,
+    CANCELADA,
+    INDEFINIDA
     
 }

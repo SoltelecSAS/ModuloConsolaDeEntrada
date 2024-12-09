@@ -14,6 +14,8 @@ import com.soltelec.consolaentrada.models.entities.Prueba;
 import com.soltelec.consolaentrada.reporte.ImpresionReporte;
 import com.soltelec.consolaentrada.utilities.GenericExportExcel;
 import com.soltelec.consolaentrada.utilities.Mensajes;
+import com.soltelec.consolaentrada.utilities.Utils;
+
 import org.jdesktop.swingx.JXDatePicker;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
 import com.soltelec.consolaentrada.models.entities.Cda;
@@ -160,7 +162,12 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
         jScrollPane2.setViewportView(tblPruebas);
         tblPruebas.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        CmbBusqueda.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "todas", "Registrada", "preventiva", "RTM", "INICIADO", "Env1FUR" }));
+        CmbBusqueda.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Pendientes", "Finalizadas" ,"todas", "Registrada", "preventiva", "RTM", "INICIADO", "Env1FUR" }));
+        CmbBusqueda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CmbBusquedaActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Buscar por:");
 
@@ -269,7 +276,7 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.CENTER, javax.swing.GroupLayout.DEFAULT_SIZE, 1086, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.CENTER, javax.swing.GroupLayout.PREFERRED_SIZE, 1086, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnImprimir1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -348,6 +355,12 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
         String Seleccion = (String) CmbBusqueda.getSelectedItem();
 
         switch (Seleccion) {
+            case "Pendientes":
+                modeloTablaImpresionFecha.setListaHojaPruebas(new HojaPruebasJpaController().findHojasPendientes(dteFechaInicial.getDate(), dteFechaFinal.getDate()));
+                break;
+            case "Finalizadas":
+                modeloTablaImpresionFecha.setListaHojaPruebas(new HojaPruebasJpaController().findHojasFinalizadas(dteFechaInicial.getDate(), dteFechaFinal.getDate()));
+                break;
             case "Registrada":
                 modeloTablaImpresionFecha.setListaHojaPruebas(new HojaPruebasJpaController().findHojasEdoEnv1FUR(dteFechaInicial.getDate(), dteFechaFinal.getDate(), "Registrada"));
                 break;
@@ -479,7 +492,34 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
         ctxCDA = cdaControler.find(1);
         ctxHojaPrueba = controller.find(this.ctxHP.getId());
 
-        if (ctxCDA.getProveedorSicov().equals("CI2")) {
+        if (ctxCDA.getProveedorSicov().equals("CI2") && ctxHojaPrueba.getIntentos() > 1) {
+            try {
+                Pin pin = new Pin();
+                pin.setClave(ctxCDA.getPasswordSicov());
+                pin.setP_placa(ctxHojaPrueba.getVehiculo().getPlaca());
+                pin.setUsuario(ctxCDA.getUsuarioSicov());
+                ClienteCi2 clienteCi2 = new ClienteCi2(ctxCDA.getUrlServicioSicov());
+                pin.setP_pin(ctxHojaPrueba.getPin());
+                pin.setP_tipo_rtm("2");
+                RespuestaDTO respuestaDTO = clienteCi2.utilizarPin(pin);
+                if (respuestaDTO == null) {
+                    Mensajes.mensajeAdvertencia("Disculpe, No he tenido COMUNICACION con el Servidor CI2 en este momento ..! \n Intente dentro de un Minuto si el problema persiste COMUNIQUESE con la Mesa de Ayuda");
+                    Mensajes.mensajeAdvertencia("Por Favor, se RECOMIENDA NO continuar con el REGISTRO DEL VEHICULO, PARA NO GENERAR INCONSISTENCIAS ..!");
+                    return;
+                }
+                if (respuestaDTO.getCodigoRespuesta().equals("0000")) { //ok
+                    ctxHojaPrueba.setEstadoSICOV("Iniciado");
+                    controller.editCasoAddPin(ctxHojaPrueba);
+                    Mensajes.mensajeCorrecto(" Inicializado el PIN para Reinspeccion con EXITO ..¡ ");
+                } else {
+                    Mensajes.mensajeAdvertencia("Disculpe, No he podido iniciar el Pin para Reinspeccion, debido a :" + respuestaDTO.getMensajeRespuesta());
+                    //return;
+                }
+            } catch (Throwable ne) {
+            }
+        }//Validacion de Proveedor para la busqueda del Pin
+
+        if (ctxCDA.getProveedorSicov().equals("CI2") && ctxHojaPrueba.getIntentos() < 2) {
             try {
                 Pin pin = new Pin();
                 pin.setClave(ctxCDA.getPasswordSicov());
@@ -523,6 +563,10 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
             }
         }//Validacion de Proveedor para la busqueda del Pin      
     }//GEN-LAST:event_btnImprimir1ActionPerformed
+
+    private void CmbBusquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmbBusquedaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CmbBusquedaActionPerformed
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();

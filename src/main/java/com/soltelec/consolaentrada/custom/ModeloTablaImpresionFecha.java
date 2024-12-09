@@ -12,7 +12,7 @@ import com.soltelec.consolaentrada.models.entities.EstadoPrueba;
 import com.soltelec.consolaentrada.models.entities.HojaPruebas;
 import com.soltelec.consolaentrada.models.entities.Prueba;
 import com.soltelec.consolaentrada.models.entities.PruebaDTO;
-import com.soltelec.consolaentrada.views.ViewManager;
+import com.soltelec.consolaentrada.utilities.Mensajes;
 
 import javax.swing.table.AbstractTableModel;
 import java.text.SimpleDateFormat;
@@ -78,41 +78,28 @@ public class ModeloTablaImpresionFecha extends AbstractTableModel {
         HojaPruebasJpaController controller = new HojaPruebasJpaController();
         switch (columnIndex) {
             case 0:
-                    return hojaPrueba.getVehiculo().getPlaca();
+                    return hojaPrueba == null ||
+                           hojaPrueba.getVehiculo() == null ||
+                           hojaPrueba.getVehiculo().getPlaca() == null 
+                            
+                            ? "" : hojaPrueba.getVehiculo().getPlaca();
             case 1:
-                return hojaPrueba.getVehiculo().getTipoVehiculo().getNombre();
+                return  hojaPrueba == null ||
+                        hojaPrueba.getVehiculo() == null ||
+                        hojaPrueba.getVehiculo().getTipoVehiculo() == null
+                        
+                        ? "" :hojaPrueba.getVehiculo().getTipoVehiculo().getNombre();
             case 2:
                 if (hojaPrueba.getPreventiva().equals("Y")) {
                     return hojaPrueba.getCon_preventiva();
                 } else {
-                    return hojaPrueba.getCon_hoja_prueba();
-//                    return hojaPrueba.getId();
+                    return hojaPrueba.getCon_hoja_prueba()+"-"+hojaPrueba.getIntentos();
                 }
-//                return hojaPrueba.getId();
 
             case 3:
-//                 EstadoPrueba estado;
-//                if (hojaPrueba.getFinalizada().equals("Y")) {
-//                    if (hojaPrueba.getAprobado().equals("Y")) {
-//                        estado = EstadoPrueba.APROBADA;
-//                    } else {
-//                        estado = EstadoPrueba.REPROBADA;
-//                    }
-//                    
-//                    if (hojaPrueba.getAnulado().equals("Y")) {
-//                        estado = EstadoPrueba.ANULADA;
-//                    }
-//                } else {
-//                    estado = EstadoPrueba.PENDIENTE; 
-//                }
-//                return estado;                
-                //modificacion de estados hoja de pruebas error muchas conexiones 
                 EstadoPrueba estado;
                 String estado0 = (organizarMayores(hojaPrueba)).toString();
                 hojaPrueba.setEstado(estado0);
-//                try {
-//                } catch (Exception e) {
-//                }
                 return hojaPrueba.getEstado();
             case 4:
                 return hojaPrueba.getPreventiva().equals("Y");
@@ -216,7 +203,13 @@ public class ModeloTablaImpresionFecha extends AbstractTableModel {
         int contPruebasAprobadas = 0;
         int contTotalPruebas = arr.length;
         for (Object object : arr) {
-            if (((PruebaDTO) object).getFinalizada().equals("Y")) {
+            if (((PruebaDTO) object).getFinalizada() == null) {
+                Mensajes.mensajeAdvertencia("Se encontro una prueba defectuosa.\n id prueba:"+ ((PruebaDTO) object).getId() + "\nEl campo finalizado de esa prueba esta null. \nPuede continuar pero se recomienda contactar con soporte soltelec");
+                continue;
+            }
+            if (((PruebaDTO) object)
+            .getFinalizada()
+            .equals("Y")) {
                 contPruebasFinalizadas++;
             }
             if (((PruebaDTO) object).getAprobado().equals("Y")) {

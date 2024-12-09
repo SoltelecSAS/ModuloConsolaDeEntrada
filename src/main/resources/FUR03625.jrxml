@@ -6953,7 +6953,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<text><![CDATA[NÚMEROS DE LOS FUR ASOCIADOS AL VEHÍCULO PARA LA REVISIÓN:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="3" y="15" width="104" height="10" uuid="2a661fd7-62c5-4b0a-a137-2edb505a92f5"/>
+					<reportElement x="3" y="15" width="264" height="10" uuid="2a661fd7-62c5-4b0a-a137-2edb505a92f5"/>
 					<box>
 						<bottomPen lineWidth="0.0"/>
 					</box>
@@ -7237,7 +7237,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</image>
 			</frame>
 		</band>
-		<band height="162">
+		<band height="182">
 			<staticText>
 				<reportElement x="10" y="5" width="578" height="14" uuid="f296b229-96a7-4f6c-8fa8-d6facc6641e2"/>
 				<box>
@@ -7263,7 +7263,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[SERIAL]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="9" y="98" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
+				<reportElement x="9" y="111" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7305,7 +7305,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[ Profundimetro]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="9" y="98" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
+				<reportElement x="9" y="111" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7389,7 +7389,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[MARCA]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="280" y="78" width="211" height="10" uuid="edf47e61-329a-4ec9-bff9-0ef4ebc16b7b"/>
+				<reportElement x="280" y="78" width="211" height="22" uuid="edf47e61-329a-4ec9-bff9-0ef4ebc16b7b"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7397,10 +7397,13 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{InstGases}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{InstGases} != null && $P{InstGases}.indexOf("-") >= 0 ?
+    $P{InstGases}.substring($P{InstGases}.indexOf("-") + 1) + "\n" +
+    $P{InstGases}.substring(0, $P{InstGases}.indexOf("-")) :
+    $P{InstGases}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="280" y="48" width="211" height="10" uuid="252a41f4-c8e8-4add-9465-1dea4975a870"/>
@@ -7515,7 +7518,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{MarcaRuido}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="151" y="78" width="129" height="10" uuid="e713f2a1-8b29-4084-9ddf-cfde84a22896"/>
+				<reportElement x="151" y="78" width="129" height="22" uuid="e713f2a1-8b29-4084-9ddf-cfde84a22896"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7523,13 +7526,13 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{MarcaGases}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="9" y="118" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
+				<reportElement x="9" y="131" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7543,7 +7546,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[ Alineador al Paso]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="9" y="128" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
+				<reportElement x="9" y="141" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7557,7 +7560,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[ Analizador de Suspensión]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="9" y="138" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
+				<reportElement x="9" y="151" width="142" height="10" uuid="d0382f7f-8a8f-4291-af83-c3ab9e77a6f8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7571,7 +7574,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<text><![CDATA[ Taximetro]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="151" y="138" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
+				<reportElement x="151" y="151" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7585,7 +7588,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{MarcaTax}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="280" y="138" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
+				<reportElement x="280" y="151" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7599,7 +7602,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{InstTax}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="280" y="128" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
+				<reportElement x="280" y="141" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7613,7 +7616,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{InstSusp}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="151" y="128" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
+				<reportElement x="151" y="141" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7627,7 +7630,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{MarcaSusp}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="280" y="118" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
+				<reportElement x="280" y="131" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7641,7 +7644,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{InstDesvia}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="151" y="118" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
+				<reportElement x="151" y="131" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7655,7 +7658,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{MarcaDesvia}]]></textFieldExpression>
 			</textField>
 			<textField pattern="0.000" isBlankWhenNull="true">
-				<reportElement x="491" y="78" width="68" height="10" uuid="b190c977-7b86-4e5b-b786-4dfd28221b71"/>
+				<reportElement x="491" y="78" width="68" height="22" uuid="b190c977-7b86-4e5b-b786-4dfd28221b71"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7663,7 +7666,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{PefGases}]]></textFieldExpression>
@@ -7709,7 +7712,9 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="491" y="88" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="491" y="100" width="68" height="11" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7719,7 +7724,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="491" y="98" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="491" y="111" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7729,7 +7734,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="491" y="118" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="491" y="131" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7739,7 +7744,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="491" y="128" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="491" y="141" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7749,7 +7754,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="491" y="138" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="491" y="151" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7759,7 +7764,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="151" y="98" width="129" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="151" y="111" width="129" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7769,7 +7774,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="151" y="98" width="129" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="151" y="111" width="129" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7779,7 +7784,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="280" y="98" width="211" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="280" y="111" width="211" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7789,7 +7794,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<frame>
-				<reportElement x="280" y="98" width="211" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="280" y="111" width="211" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7799,7 +7804,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<textField>
-				<reportElement x="9" y="78" width="142" height="10" uuid="4d8432e2-cc07-4cfc-9eb0-680734bcdc67"/>
+				<reportElement x="9" y="78" width="142" height="22" uuid="4d8432e2-cc07-4cfc-9eb0-680734bcdc67"/>
 				<box leftPadding="1">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7807,13 +7812,13 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement>
+				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{FUELTYPE} == 3 ? "Opacimetro" : "Analizador de gases y Banco de gases"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{FUELTYPE} == 3 ? "Opacimetro" : "Analizador de gases y\nBanco de gases"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="151" y="108" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
+				<reportElement x="151" y="121" width="129" height="10" uuid="a569379d-1d1b-4232-b73a-7d98c9b1044b"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7827,7 +7832,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{holgurasElevadorMarca}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="280" y="108" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
+				<reportElement x="280" y="121" width="211" height="10" uuid="6acf848b-d86d-4d2b-be02-60c2e841dcd3"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7841,7 +7846,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{holgurasElevadorSerial}]]></textFieldExpression>
 			</textField>
 			<frame>
-				<reportElement x="491" y="108" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
+				<reportElement x="491" y="121" width="68" height="10" uuid="2c4f43af-222b-47eb-b9ef-6bc8a27b6fcd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7851,7 +7856,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</box>
 			</frame>
 			<textField isBlankWhenNull="true">
-				<reportElement x="9" y="108" width="142" height="10" uuid="b190c977-7b86-4e5b-b786-4dfd28221b71"/>
+				<reportElement x="9" y="121" width="142" height="10" uuid="b190c977-7b86-4e5b-b786-4dfd28221b71"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7865,7 +7870,9 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{holgurasElevador}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="9" y="88" width="142" height="10" uuid="b190c977-7b86-4e5b-b786-4dfd28221b71"/>
+				<reportElement x="9" y="100" width="142" height="11" uuid="b190c977-7b86-4e5b-b786-4dfd28221b71">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -7879,28 +7886,37 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				<textFieldExpression><![CDATA[$P{RpmSondaTemp}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="153" y="98" width="128" height="10" uuid="cd66d50f-a562-4a98-8bed-0e2de22980b0"/>
+				<reportElement x="153" y="111" width="128" height="10" uuid="cd66d50f-a562-4a98-8bed-0e2de22980b0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{MarcaTermo}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="281" y="98" width="211" height="10" uuid="b6877fb8-2284-4125-ae31-f1052a04e036"/>
+				<reportElement x="281" y="111" width="211" height="10" uuid="b6877fb8-2284-4125-ae31-f1052a04e036"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{InstTermo}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="150" y="88" width="131" height="10" uuid="06d2fe80-611b-4e41-b99f-b180707c9a61"/>
+				<reportElement x="150" y="101" width="130" height="10" uuid="06d2fe80-611b-4e41-b99f-b180707c9a61"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{MarcaRpm}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="279" y="88" width="212" height="10" uuid="52e2e54e-a71c-4572-a6c1-9b1deea9da0c"/>
+				<reportElement x="280" y="100" width="211" height="11" uuid="52e2e54e-a71c-4572-a6c1-9b1deea9da0c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>

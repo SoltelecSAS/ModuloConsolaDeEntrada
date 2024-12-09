@@ -6,10 +6,15 @@ package com.soltelec.consolaentrada.utilities;
  */
 //import com.soltelec.estandar.SartComunicadorException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -63,5 +68,16 @@ public class UtilPropiedades {
         System.out.print("-----------estoy en decimal Format double---------");
         System.out.print(df.format(args));
         return df.format(args);
+    }
+
+    public static Map<String, String> loadEnv() throws IOException {
+        Map<String, String> envMap = new HashMap<>();
+        Files.lines(Paths.get(".env")).forEach(line -> {
+            String[] keyValue = line.split("=", 2);
+            if (keyValue.length == 2) {
+                envMap.put(keyValue[0].trim(), keyValue[1].trim());
+            }
+        });
+        return envMap;
     }
 }

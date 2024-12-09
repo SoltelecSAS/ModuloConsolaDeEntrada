@@ -56,7 +56,7 @@ public class ModeloTablaHojas extends AbstractTableModel {
                 if (hojaPrueba.getPreventiva().equals("Y")) {
                     return hojaPrueba.getCon_preventiva();
                 } else {
-                    return hojaPrueba.getCon_hoja_prueba();
+                    return hojaPrueba.getCon_hoja_prueba()+ "-"+hojaPrueba.getIntentos();
 //                    return hojaPrueba.getId();
                 }
             //return hojaPrueba.getId();

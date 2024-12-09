@@ -16,9 +16,11 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.CifraDesifra;
+import com.soltelec.consolaentrada.utilities.UtilPropiedades;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -88,6 +90,12 @@ public class Conexion implements Serializable {
 
             String user = datos.get(2);
             String password = datos.get(4);
+
+            if (password.equalsIgnoreCase("Dental")) {
+                // Cargar el archivo .env manualmente
+                Map<String, String> env = UtilPropiedades.loadEnv();
+                password = env.get("dbPassword");
+            }
             
             if (!licencia) {
                 try (Connection conexion = DriverManager.getConnection(url, user, password)) {
@@ -147,7 +155,7 @@ public class Conexion implements Serializable {
             ipServidor = datos.get(1);
             usuario = datos.get(2);
             puerto = datos.get(3);
-            contrasena = datos.get(4);
+            contrasena = password;
 
             bufferedReader.close();
         } catch (IOException ex) {

@@ -28,6 +28,7 @@ import com.soltelec.consolaentrada.sicov.indra.ClienteIndraServicio;
 import com.soltelec.consolaentrada.sicov.indra.EnviarRuntSicov;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
+import com.soltelec.consolaentrada.utilities.Utils;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -134,9 +135,73 @@ public class ImpresionReporte {
         System.out.println("----------------ENVIANDO SEGUNDO FUR ----------------");
         System.out.println("----------------------------------------------------");
         try {
-            String strConsecutivo = null;
+            
+            
             int seleccion = JOptionPane.showOptionDialog(null, "¿Desea Enviar el Segundo FUR de esta Revision TecnoMecanica ?", "Envio Segundo FUR", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
             if (seleccion == JOptionPane.YES_OPTION) {
+
+                String strConsecutivo = null;
+                boolean tieneConsecutivoRunt = Utils.verificarConsecutivoRunt(ctxHojaPrueba.getId());
+                String consecutivoRunt = null;
+                
+                if (!tieneConsecutivoRunt) {
+                    // Solicitar el consecutivo_runt al usuario
+                    consecutivoRunt = JOptionPane.showInputDialog(
+                        null,
+                        "Ingrese el consecutivo RUNT:",
+                        "Falta Consecutivo RUNT",
+                        JOptionPane.PLAIN_MESSAGE
+                    );
+
+                    // Validar si se proporcionó un valor
+                    if (consecutivoRunt != null && !consecutivoRunt.trim().isEmpty()) {
+                        // Confirmar si el código es correcto
+                        int confirmacion = JOptionPane.showConfirmDialog(
+                            null,
+                            "¿Está seguro que el código '" + consecutivoRunt.trim() + "' es el correcto?",
+                            "Confirmar Consecutivo",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
+                        );
+
+                        if (confirmacion == JOptionPane.YES_OPTION) {
+                            try {
+                                // Insertar el consecutivo en la base de datos
+                                Utils.insertarConsecutivoRunt(ctxHojaPrueba.getId(), consecutivoRunt.trim());
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    "Consecutivo RUNT registrado con éxito.",
+                                    "Éxito",
+                                    JOptionPane.INFORMATION_MESSAGE
+                                );
+                            } catch (Exception e) {
+                                // Mostrar mensaje de error en caso de excepción
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    "Error al registrar el consecutivo RUNT: " + e.getMessage(),
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE
+                                );
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "Operación cancelada. No se registró el consecutivo RUNT.",
+                                "Cancelado",
+                                JOptionPane.WARNING_MESSAGE
+                            );
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            "El consecutivo RUNT es obligatorio. Operación cancelada.",
+                            "Advertencia",
+                            JOptionPane.WARNING_MESSAGE
+                        );
+                    }
+                }
+
+
                 long i;
                 envio = true;
                 Boolean nunValido = false;
@@ -468,7 +533,7 @@ public class ImpresionReporte {
                     System.out.println("Codigo de respuesta sicov: "+responseDTO.getCodigoRespuesta());
                     System.out.println("Descripcion de la respuesta sicov: "+responseDTO.getMensajeRespuesta());
                     if (responseDTO.getCodigoRespuesta().equals("1") || //ok
-                        responseDTO.getMensajeRespuesta() == "#La revisión se encuentra en estado Finalizada.") { //ok
+                        responseDTO.getMensajeRespuesta().contains("se encuentra en estado Finalizada") ) { //ok
 
                         this.ctxHojaPrueba.setEstadoSICOV("SINCRONIZADO");
                         if (this.ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA")) {

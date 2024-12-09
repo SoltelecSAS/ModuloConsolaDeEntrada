@@ -53,7 +53,7 @@ public class Validaciones {
                     if (!campo.getName().equalsIgnoreCase("Num de Serie") || !campo.getName().equalsIgnoreCase("Codigo Interno") ) {
                         estado = false;
                         ((JTextField) campo).setBackground(Color.YELLOW);
-                        mensaje += campo.getName() + ": Esta Vacio\n";
+                        mensaje += campo.getName() + ": Esta Vacio 2\n";
                     }
                 }
                 //validar si es un ComboBox    
@@ -70,7 +70,7 @@ public class Validaciones {
                 if (((JTextArea) campo).getText().isEmpty() && ((JTextArea) campo).isEnabled() && ((JTextArea) campo).isVisible() && campo.getName() != null) {
                     estado = false;
                     ((JTextArea) campo).setBackground(Color.YELLOW);
-                    mensaje += campo.getName() + ": Esta Vacio\n";
+                    mensaje += campo.getName() + ": Esta Vacio 1\n";
                 }
             }
         }// fin del bucle for

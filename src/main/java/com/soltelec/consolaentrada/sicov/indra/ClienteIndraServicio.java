@@ -15,6 +15,7 @@
  */
 package com.soltelec.consolaentrada.sicov.indra;
 
+import com.ctc.wstx.shaded.msv_core.util.Util;
 import com.soltelec.consolaentrada.indra.dto.*;
 import com.soltelec.consolaentrada.models.entities.Cda;
 import com.soltelec.consolaentrada.models.entities.Defxprueba;
@@ -27,10 +28,18 @@ import com.soltelec.consolaentrada.models.entities.Equipo;
 import com.soltelec.consolaentrada.models.entities.Reinspeccion;
 import com.soltelec.consolaentrada.models.entities.Usuario;
 import com.soltelec.consolaentrada.reporte.LlamarReporte;
+import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.UtilPropiedades;
+import com.soltelec.consolaentrada.utilities.Utils;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import javax.management.RuntimeErrorException;
+
 import org.jboss.resteasy.util.Base64;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -834,11 +843,47 @@ public class ClienteIndraServicio {
         equipos = new JsonEquipos();
         equipos.setEquipos(new ArrayList<DatosEquipos>());
         for(Prueba prueba : this.hojaPrueba.getListPruebas()) {
+
+            System.out.println(prueba);
+            System.out.println(prueba.getSerialEquipo());
+            System.out.println(prueba.getTipoPrueba());
+            if (
+            prueba.getSerialEquipo() != null &&
+            prueba.getSerialEquipo().contains("~") && 
+            prueba.getTipoPrueba().getId() == 8) {
+                datosEquipos = new DatosEquipos();
+                String clase = prueba.getSerialEquipo().split("~")[0];
+                String ltoePef = prueba.getSerialEquipo().split("~")[2].split("-")[0];
+                String marca = prueba.getSerialEquipo().split("~")[1].split(";")[1];
+                String serialesAnalizador = prueba.getSerialEquipo().split("~")[2].split(";")[0];
+                datosEquipos.setNombre(clase.equalsIgnoreCase("otto") ? "Gases" : "Diesel"); 
+                datosEquipos.setLtoe(clase.equalsIgnoreCase("otto") ? "" : ltoePef);
+                datosEquipos.setMarca(marca);
+                datosEquipos.setNoserie(serialesAnalizador.split("-")[1]);
+                datosEquipos.setNoseriebench(clase.equalsIgnoreCase("otto") ? (serialesAnalizador.split("-").length <3 ? serialesAnalizador.split("-")[1] : serialesAnalizador.split("-")[2]) : "");
+                datosEquipos.setPef(clase.equalsIgnoreCase("otto") ? ltoePef : "");
+                datosEquipos.setPrueba(vd(prueba.getTipoPrueba().getId().toString()));
+                System.out.println("-----------------------------------------------------------------------datos equipos: " + datosEquipos );
+
+                System.out.println(clase.equalsIgnoreCase("otto") ? "Otto" : "Diesel"); 
+                System.out.println(clase.equalsIgnoreCase("otto") ? "" : ltoePef);
+                System.out.println(marca);
+                System.out.println(serialesAnalizador.split("-")[1]);
+                System.out.println(clase.equalsIgnoreCase("otto") ? (serialesAnalizador.split("-").length <3 ? serialesAnalizador.split("-")[1] : serialesAnalizador.split("-")[2]) : "");
+                System.out.println(clase.equalsIgnoreCase("otto") ? ltoePef : "");
+                System.out.println(vd(prueba.getTipoPrueba().getId().toString()));
+
+                System.out.println();
+                continue;
+            }
+
+
             if (prueba.getTipoPrueba().getId() == 1) { // no incluir prueba visual
                 continue;
             }
             datosEquipos = new DatosEquipos();
             Equipo equipo = equiposJpaController1.buscarPorSerial(prueba.getSerialEquipo());
+
             if (equipo == null) {
                 continue;
             }
@@ -894,10 +939,33 @@ public class ClienteIndraServicio {
         datosFurAsociados = new DatosFurAsociados();
         try {
             if (this.hojaPrueba.getIntentos() > 1) {
-                datosFurAsociados.setNumeroFur(String.format("%d1", this.hojaPrueba.getCon_hoja_prueba()));
-                datosFurAsociados.setFechaHoraFur(UtilPropiedades.convertiFechas(this.hojaPrueba.getFechaIngreso(), "yyyy-MM-dd hh:mm:ss"));
-                System.out.println("Valor para el campo FUR ASOCIADO : " + datosFurAsociados.getNumeroFur());
-                System.out.println("Fecha para el campo FUR ASOCIADO : " + hojaPrueba.getFechaIngreso());
+                int nHojasRegistros = Utils.contarRegistrosHojaPruebas(this.hojaPrueba.getCon_hoja_prueba());
+                if (nHojasRegistros == 0) {
+                    Mensajes.mensajeError("Hoja de pruebas con la columna con_hoja_prueba = '"+this.hojaPrueba.getCon_hoja_prueba()+"' no encontrada");
+                    throw new RuntimeException("Hoja de pruebas con la columna con_hoja_prueba = '"+this.hojaPrueba.getCon_hoja_prueba()+"' no encontrada");
+                }
+                if (nHojasRegistros < 2) {
+                    datosFurAsociados.setNumeroFur(String.format("%d1", this.hojaPrueba.getCon_hoja_prueba()));
+                    datosFurAsociados.setFechaHoraFur(UtilPropiedades.convertiFechas(this.hojaPrueba.getFechaIngreso(), "yyyy-MM-dd hh:mm:ss"));
+                    System.out.println("Valor para el campo FUR ASOCIADO : " + datosFurAsociados.getNumeroFur());
+                    System.out.println("Fecha para el campo FUR ASOCIADO : " + hojaPrueba.getFechaIngreso());
+                }else{
+                    String fechaIngresoPrimeraRevision = null;
+                    Date fechaAnterior = Utils.obtenerFechaAnterior(this.hojaPrueba.getId());
+                    if (fechaAnterior != null) {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        fechaIngresoPrimeraRevision = dateFormat.format(fechaAnterior);
+                        datosFurAsociados.setFechaHoraFur(fechaIngresoPrimeraRevision);
+                    }else{
+                        fechaIngresoPrimeraRevision = Utils.obtenerFechaPrimeraRevision(this.hojaPrueba.getCon_hoja_prueba(), this.hojaPrueba.getId());
+                        datosFurAsociados.setFechaHoraFur(fechaIngresoPrimeraRevision);
+                    }
+                    
+                    datosFurAsociados.setNumeroFur(String.format("%d1", this.hojaPrueba.getCon_hoja_prueba()));
+                    System.out.println("2Valor para el campo FUR ASOCIADO : " + datosFurAsociados.getNumeroFur());
+                    System.out.println("2Fecha para el campo FUR ASOCIADO : " + fechaIngresoPrimeraRevision);
+                }
+                
             } else {
                 datosFurAsociados.setNumeroFur("");
             }
