@@ -223,6 +223,7 @@ public class ListenerEnvioFUR implements ActionListener {
                                 + " se ha enviado con éxito.\n"
                                 + "Recuerde que acaba de reportar el resultado de las pruebas al SICOV.");
                             } else {
+                                System.out.println("lo que se envio a sicov:\n"+ clienteSincoFur.getFormulario());
                                 Mensajes.mensajeError(
                                 "No se pudo enviar el primer FUR correspondiente a la placa " 
                                 + ctxHojaPrueba.getVehiculo().getPlaca() 
@@ -377,12 +378,12 @@ public class ListenerEnvioFUR implements ActionListener {
                                 + "Recuerde que acaba de reportar el resultado de las pruebas al SICOV.");
                             } else {
                                 //JOptionPane.showMessageDialog(null, "No pude Enviar 1er. FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + responseDTO.getMensajeRespuesta() + "..!");
+                                System.out.println("Lo que se envio a sicov:\n"+datosFur);
                                 Mensajes.mensajeError(
                                 "No se pudo enviar el primer FUR correspondiente a la placa " 
                                 + ctxHojaPrueba.getVehiculo().getPlaca() 
                                 + ". Respuesta sicov:\n" 
-                                + responseDTO.getMensajeRespuesta()
-                                + ".");
+                                + responseDTO.getMensajeRespuesta());
                                 System.out.println("Fallo por " + responseDTO.getMensajeRespuesta());
                                 System.out.println("Kilometraje 1: "+kilometrajeVariable);
                             }

@@ -108,12 +108,6 @@ public class ClienteCi2 {
         List<AuditoriaSicov> lstTramas = hpControler.recogerTramasExist(hpControler.find(233015));
         ListenerEnvioFUR listenerEnvioFUR = new ListenerEnvioFUR(233015L, lstTramas);
         listenerEnvioFUR.actionPerformed(null);
-//        Pin pin = new Pin();
-//        pin.setClave("f46839");
-//        pin.setP_pin("1606202000140");
-//        pin.setP_placa("HUX222");
-//        pin.setUsuario("soltelecpruebas");
-//        new ClienteCi2("http://186.116.8.156:9090/ci2_cda_ws/sincrofur.asmx?WSDL").utilizarPin(pin);
     }
 
 }

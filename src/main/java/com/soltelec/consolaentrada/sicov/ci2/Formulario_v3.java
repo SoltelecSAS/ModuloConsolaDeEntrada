@@ -8,6 +8,114 @@ package com.soltelec.consolaentrada.sicov.ci2;
 
 public class Formulario_v3 implements java.io.Serializable {
 
+
+    
+
+    @Override
+    public String toString() {
+        return "Formulario_v3 [usuario=" + usuario + ", clave=" + clave + ", p_pin=" + p_pin + ", p_3_plac=" + p_3_plac
+                + ", p_e_con_run=" + p_e_con_run + ", p_tw01=" + p_tw01 + ", p_e_apr=" + p_e_apr + ", p_fur_num="
+                + p_fur_num + ", p_fur_aso=" + p_fur_aso + ", p_cda=" + p_cda + ", p_nit=" + p_nit + ", p_dir=" + p_dir
+                + ", p_div=" + p_div + ", p_ciu=" + p_ciu + ", p_tel=" + p_tel + ", p_ema=" + p_ema + ", p_1_fec_pru="
+                + p_1_fec_pru + ", p_2_nom_raz=" + p_2_nom_raz + ", p_2_doc_tip=" + p_2_doc_tip + ", p_2_doc=" + p_2_doc
+                + ", p_2_dir=" + p_2_dir + ", p_2_tel=" + p_2_tel + ", p_2_ciu=" + p_2_ciu + ", p_2_dep=" + p_2_dep
+                + ", p_2_ema=" + p_2_ema + ", p_3_mar=" + p_3_mar + ", p_3_lin=" + p_3_lin + ", p_3_cla=" + p_3_cla
+                + ", p_3_mod=" + p_3_mod + ", p_3_cil=" + p_3_cil + ", p_3_ser=" + p_3_ser + ", p_3_vin=" + p_3_vin
+                + ", p_3_mot=" + p_3_mot + ", p_3_lic=" + p_3_lic + ", p_3_com=" + p_3_com + ", p_3_col=" + p_3_col
+                + ", p_3_nac=" + p_3_nac + ", p_3_fec_lic=" + p_3_fec_lic + ", p_3_tip_mot=" + p_3_tip_mot
+                + ", p_3_kil=" + p_3_kil + ", p_3_sil=" + p_3_sil + ", p_3_vid_pol=" + p_3_vid_pol + ", p_3_bli="
+                + p_3_bli + ", p_3_pot=" + p_3_pot + ", p_3_tip_car=" + p_3_tip_car + ", p_3_fec_ven_soa="
+                + p_3_fec_ven_soa + ", p_3_con_gnv=" + p_3_con_gnv + ", p_3_fec_ven_gnv=" + p_3_fec_ven_gnv
+                + ", p_4_rui_val=" + p_4_rui_val + ", p_4_rui_max=" + p_4_rui_max + ", p_5_der_int_b1=" + p_5_der_int_b1
+                + ", p_5_der_int_b2=" + p_5_der_int_b2 + ", p_5_der_int_b3=" + p_5_der_int_b3 + ", p_5_der_min="
+                + p_5_der_min + ", p_5_der_inc_b1=" + p_5_der_inc_b1 + ", p_5_der_inc_b2=" + p_5_der_inc_b2
+                + ", p_5_der_inc_b3=" + p_5_der_inc_b3 + ", p_5_der_ran=" + p_5_der_ran + ", p_5_sim_der_b="
+                + p_5_sim_der_b + ", p_5_izq_int_b1=" + p_5_izq_int_b1 + ", p_5_izq_int_b2=" + p_5_izq_int_b2
+                + ", p_5_izq_int_b3=" + p_5_izq_int_b3 + ", p_5_izq_min=" + p_5_izq_min + ", p_5_izq_inc_b1="
+                + p_5_izq_inc_b1 + ", p_5_izq_inc_b2=" + p_5_izq_inc_b2 + ", p_5_izq_inc_b3=" + p_5_izq_inc_b3
+                + ", p_5_izq_ran=" + p_5_izq_ran + ", p_5_sim_izq_b=" + p_5_sim_izq_b + ", p_5_der_int_a1="
+                + p_5_der_int_a1 + ", p_5_der_int_a2=" + p_5_der_int_a2 + ", p_5_der_int_a3=" + p_5_der_int_a3
+                + ", p_5_der_min_a=" + p_5_der_min_a + ", p_5_sim_der_a=" + p_5_sim_der_a + ", p_5_izq_int_a1="
+                + p_5_izq_int_a1 + ", p_5_izq_int_a2=" + p_5_izq_int_a2 + ", p_5_izq_int_a3=" + p_5_izq_int_a3
+                + ", p_5_izq_min_a=" + p_5_izq_min_a + ", p_5_sim_izq_a=" + p_5_sim_izq_a + ", p_5_der_int_e1="
+                + p_5_der_int_e1 + ", p_5_der_int_e2=" + p_5_der_int_e2 + ", p_5_der_int_e3=" + p_5_der_int_e3
+                + ", p_5_der_min_e=" + p_5_der_min_e + ", p_5_sim_der_e=" + p_5_sim_der_e + ", p_5_izq_int_e1="
+                + p_5_izq_int_e1 + ", p_5_izq_int_e2=" + p_5_izq_int_e2 + ", p_5_izq_int_e3=" + p_5_izq_int_e3
+                + ", p_5_izq_min_e=" + p_5_izq_min_e + ", p_5_sim_izq_e=" + p_5_sim_izq_e + ", p_6_int=" + p_6_int
+                + ", p_6_max=" + p_6_max + ", p_7_del_der_val=" + p_7_del_der_val + ", p_7_del_izq_val="
+                + p_7_del_izq_val + ", p_7_tra_der_val=" + p_7_tra_der_val + ", p_7_tra_izq_val=" + p_7_tra_izq_val
+                + ", p_7_min=" + p_7_min + ", p_8_efi_tot=" + p_8_efi_tot + ", p_8_efi_tot_min=" + p_8_efi_tot_min
+                + ", p_8_ej1_izq_fue=" + p_8_ej1_izq_fue + ", p_8_ej1_izq_pes=" + p_8_ej1_izq_pes + ", p_8_ej1_der_fue="
+                + p_8_ej1_der_fue + ", p_8_ej1_der_pes=" + p_8_ej1_der_pes + ", p_8_ej1_des=" + p_8_ej1_des
+                + ", p_8_ej1_ran=" + p_8_ej1_ran + ", p_8_ej1_max=" + p_8_ej1_max + ", p_8_ej2_izq_fue="
+                + p_8_ej2_izq_fue + ", p_8_ej2_izq_pes=" + p_8_ej2_izq_pes + ", p_8_ej2_der_fue=" + p_8_ej2_der_fue
+                + ", p_8_ej2_der_pes=" + p_8_ej2_der_pes + ", p_8_ej2_des=" + p_8_ej2_des + ", p_8_ej2_ran="
+                + p_8_ej2_ran + ", p_8_ej2_max=" + p_8_ej2_max + ", p_8_ej3_izq_fue=" + p_8_ej3_izq_fue
+                + ", p_8_ej3_izq_pes=" + p_8_ej3_izq_pes + ", p_8_ej3_der_fue=" + p_8_ej3_der_fue + ", p_8_ej3_der_pes="
+                + p_8_ej3_der_pes + ", p_8_ej3_des=" + p_8_ej3_des + ", p_8_ej3_ran=" + p_8_ej3_ran + ", p_8_ej3_max="
+                + p_8_ej3_max + ", p_8_ej4_izq_fue=" + p_8_ej4_izq_fue + ", p_8_ej4_izq_pes=" + p_8_ej4_izq_pes
+                + ", p_8_ej4_der_fue=" + p_8_ej4_der_fue + ", p_8_ej4_der_pes=" + p_8_ej4_der_pes + ", p_8_ej4_des="
+                + p_8_ej4_des + ", p_8_ej4_ran=" + p_8_ej4_ran + ", p_8_ej4_max=" + p_8_ej4_max + ", p_8_ej5_izq_fue="
+                + p_8_ej5_izq_fue + ", p_8_ej5_izq_pes=" + p_8_ej5_izq_pes + ", p_8_ej5_der_fue=" + p_8_ej5_der_fue
+                + ", p_8_ej5_der_pes=" + p_8_ej5_der_pes + ", p_8_ej5_des=" + p_8_ej5_des + ", p_8_ej5_ran="
+                + p_8_ej5_ran + ", p_8_ej5_max=" + p_8_ej5_max + ", p_8_efi_aux=" + p_8_efi_aux + ", p_8_efi_aux_min="
+                + p_8_efi_aux_min + ", p_8_sum_izq_aux_fue=" + p_8_sum_izq_aux_fue + ", p_8_sum_izq_aux_pes="
+                + p_8_sum_izq_aux_pes + ", p_8_sum_der_aux_fue=" + p_8_sum_der_aux_fue + ", p_8_sum_der_aux_pes="
+                + p_8_sum_der_aux_pes + ", p_9_ej1=" + p_9_ej1 + ", p_9_ej2=" + p_9_ej2 + ", p_9_ej3=" + p_9_ej3
+                + ", p_9_ej4=" + p_9_ej4 + ", p_9_ej5=" + p_9_ej5 + ", p_9_max=" + p_9_max + ", p_10_ref_com_lla="
+                + p_10_ref_com_lla + ", p_10_err_dis=" + p_10_err_dis + ", p_10_err_tie=" + p_10_err_tie + ", p_10_max="
+                + p_10_max + ", p_11_co_ral_val=" + p_11_co_ral_val + ", p_11_co_ral_nor=" + p_11_co_ral_nor
+                + ", p_11_co2_ral_val=" + p_11_co2_ral_val + ", p_11_co2_ral_nor=" + p_11_co2_ral_nor
+                + ", p_11_o2_ral_val=" + p_11_o2_ral_val + ", p_11_o2_ral_nor=" + p_11_o2_ral_nor + ", p_11_hc_ral_val="
+                + p_11_hc_ral_val + ", p_11_hc_ral_nor=" + p_11_hc_ral_nor + ", p_11_co_cru_val=" + p_11_co_cru_val
+                + ", p_11_co_cru_nor=" + p_11_co_cru_nor + ", p_11_co2_cru_val=" + p_11_co2_cru_val
+                + ", p_11_co2_cru_nor=" + p_11_co2_cru_nor + ", p_11_o2_cru_val=" + p_11_o2_cru_val
+                + ", p_11_o2_cru_nor=" + p_11_o2_cru_nor + ", p_11_hc_cru_val=" + p_11_hc_cru_val + ", p_11_hc_cru_nor="
+                + p_11_hc_cru_nor + ", p_11_tem_ral=" + p_11_tem_ral + ", p_11_rpm_ral=" + p_11_rpm_ral
+                + ", p_11_tem_cru=" + p_11_tem_cru + ", p_11_rpm_cru=" + p_11_rpm_cru + ", p_11_no_ral_val="
+                + p_11_no_ral_val + ", p_11_no_ral_nor=" + p_11_no_ral_nor + ", p_11_no_cru_val=" + p_11_no_cru_val
+                + ", p_11_no_cru_nor=" + p_11_no_cru_nor + ", p_11_cat=" + p_11_cat + ", p_11_hum_amb=" + p_11_hum_amb
+                + ", p_11_hum_rel=" + p_11_hum_rel + ", p_11_b_ci1=" + p_11_b_ci1 + ", p_11_b_ci2=" + p_11_b_ci2
+                + ", p_11_b_ci3=" + p_11_b_ci3 + ", p_11_b_ci4=" + p_11_b_ci4 + ", p_11_b_ci1_d=" + p_11_b_ci1_d
+                + ", p_11_b_ci2_d=" + p_11_b_ci2_d + ", p_11_b_ci3_d=" + p_11_b_ci3_d + ", p_11_b_ci4_d=" + p_11_b_ci4_d
+                + ", p_11_b_res_val_d=" + p_11_b_res_val_d + ", p_11_b_res_nor_d=" + p_11_b_res_nor_d
+                + ", p_11_b_res_nor_d_CC=" + p_11_b_res_nor_d_CC + ", p_11_b_c1_gob=" + p_11_b_c1_gob
+                + ", p_11_b_c2_gob=" + p_11_b_c2_gob + ", p_11_b_c3_gob=" + p_11_b_c3_gob + ", p_11_b_c4_gob="
+                + p_11_b_c4_gob + ", p_11_b_res_val=" + p_11_b_res_val + ", p_11_b_res_nor=" + p_11_b_res_nor
+                + ", p_11_b_rpm=" + p_11_b_rpm + ", p_11_b_tem_ini=" + p_11_b_tem_ini + ", p_11_b_tem_fin="
+                + p_11_b_tem_fin + ", p_11_b_tem_amb=" + p_11_b_tem_amb + ", p_11_b_hum=" + p_11_b_hum + ", p_11_b_lot="
+                + p_11_b_lot + ", p_v01=" + p_v01 + ", p_v02=" + p_v02 + ", p_v03=" + p_v03 + ", p_c_cod=" + p_c_cod
+                + ", p_c_des=" + p_c_des + ", p_c_gru=" + p_c_gru + ", p_c_tip_def_a=" + p_c_tip_def_a
+                + ", p_c_tip_def_b=" + p_c_tip_def_b + ", p_c_tip_def_a_tot=" + p_c_tip_def_a_tot
+                + ", p_c_tip_def_b_tot=" + p_c_tip_def_b_tot + ", p_d_cod=" + p_d_cod + ", p_d_des=" + p_d_des
+                + ", p_d_gru=" + p_d_gru + ", p_d_tip_def_a=" + p_d_tip_def_a + ", p_d_tip_def_b=" + p_d_tip_def_b
+                + ", p_d_tip_def_a_tot=" + p_d_tip_def_a_tot + ", p_d_tip_def_b_tot=" + p_d_tip_def_b_tot
+                + ", p_d1_cod=" + p_d1_cod + ", p_d1_des=" + p_d1_des + ", p_d1_gru=" + p_d1_gru + ", p_d1_tip_def_a="
+                + p_d1_tip_def_a + ", p_d1_tip_def_b=" + p_d1_tip_def_b + ", p_d1_tip_def_a_tot=" + p_d1_tip_def_a_tot
+                + ", p_d1_tip_def_b_tot=" + p_d1_tip_def_b_tot + ", p_d2_ej1_izq=" + p_d2_ej1_izq + ", p_d2_ej2_izq_r1="
+                + p_d2_ej2_izq_r1 + ", p_d2_ej2_izq_r2=" + p_d2_ej2_izq_r2 + ", p_d2_ej3_izq_r1=" + p_d2_ej3_izq_r1
+                + ", p_d2_ej3_izq_r2=" + p_d2_ej3_izq_r2 + ", p_d2_ej4_izq_r1=" + p_d2_ej4_izq_r1 + ", p_d2_ej4_izq_r2="
+                + p_d2_ej4_izq_r2 + ", p_d2_ej5_izq_r1=" + p_d2_ej5_izq_r1 + ", p_d2_ej5_izq_r2=" + p_d2_ej5_izq_r2
+                + ", p_d2_ej1_der=" + p_d2_ej1_der + ", p_d2_ej2_der_r1=" + p_d2_ej2_der_r1 + ", p_d2_ej2_der_r2="
+                + p_d2_ej2_der_r2 + ", p_d2_ej3_der_r1=" + p_d2_ej3_der_r1 + ", p_d2_ej3_der_r2=" + p_d2_ej3_der_r2
+                + ", p_d2_ej4_der_r1=" + p_d2_ej4_der_r1 + ", p_d2_ej4_der_r2=" + p_d2_ej4_der_r2 + ", p_d2_ej5_der_r1="
+                + p_d2_ej5_der_r1 + ", p_d2_ej5_der_r2=" + p_d2_ej5_der_r2 + ", p_d2_rep_r1=" + p_d2_rep_r1
+                + ", p_d2_rep_r2=" + p_d2_rep_r2 + ", p_d2_p_ej1_der=" + p_d2_p_ej1_der + ", p_d2_p_ej1_izq="
+                + p_d2_p_ej1_izq + ", p_d2_p_ej2_der_r1=" + p_d2_p_ej2_der_r1 + ", p_d2_p_ej2_der_r2="
+                + p_d2_p_ej2_der_r2 + ", p_d2_p_ej2_izq_r1=" + p_d2_p_ej2_izq_r1 + ", p_d2_p_ej2_izq_r2="
+                + p_d2_p_ej2_izq_r2 + ", p_d2_p_ej3_der_r1=" + p_d2_p_ej3_der_r1 + ", p_d2_p_ej3_der_r2="
+                + p_d2_p_ej3_der_r2 + ", p_d2_p_ej3_izq_r1=" + p_d2_p_ej3_izq_r1 + ", p_d2_p_ej3_izq_r2="
+                + p_d2_p_ej3_izq_r2 + ", p_d2_p_ej4_der_r1=" + p_d2_p_ej4_der_r1 + ", p_d2_p_ej4_der_r2="
+                + p_d2_p_ej4_der_r2 + ", p_d2_p_ej4_izq_r1=" + p_d2_p_ej4_izq_r1 + ", p_d2_p_ej4_izq_r2="
+                + p_d2_p_ej4_izq_r2 + ", p_d2_p_ej5_der_r1=" + p_d2_p_ej5_der_r1 + ", p_d2_p_ej5_der_r2="
+                + p_d2_p_ej5_der_r2 + ", p_d2_p_ej5_izq_r1=" + p_d2_p_ej5_izq_r1 + ", p_d2_p_ej5_izq_r2="
+                + p_d2_p_ej5_izq_r2 + ", p_d2_p_rep_r1=" + p_d2_p_rep_r1 + ", p_d2_p_rep_r2=" + p_d2_p_rep_r2
+                + ", p_e1_apr=" + p_e1_apr + ", p_f_com_obs=" + p_f_com_obs + ", p_h_nom_ope_rea_rev_tec="
+                + p_h_nom_ope_rea_rev_tec + ", p_h_equ_rev=" + p_h_equ_rev + ", p_i_sof_rev=" + p_i_sof_rev
+                + ", p_g_nom_fir_dir_tec=" + p_g_nom_fir_dir_tec + ", p_causa_rechazo=" + p_causa_rechazo + ", p_foto="
+                + p_foto + ", __equalsCalc=" + __equalsCalc + ", __hashCodeCalc=" + __hashCodeCalc + "]";
+    }
+
     private java.lang.String usuario = "";
     private java.lang.String clave = "";
     private java.lang.String p_pin = "";

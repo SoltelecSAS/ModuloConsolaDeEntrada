@@ -94,14 +94,13 @@ public class LlamarReporte {
     public LlamarReporte() {
         try {
             consultasCertificados = new ConsultasCertificados();
-            String strConsulta = "SELECT DATEDIFF((SELECT h.Fecha_ingreso_vehiculo from hoja_pruebas WHERE h.TESTSHEET=?),(SELECT s.fecha_actualizacion	FROM software s WHERE s.Id_sw=1))";
             report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte));
             report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte2));
             report3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporteNuevo));
             reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(logoViejoSuper));
             consultas = new Consultas();
         } catch (Throwable ex) {
-            int even = 0;
+            ex.printStackTrace();
         }
         //ultima prueba
     }
@@ -115,7 +114,7 @@ public class LlamarReporte {
             reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(logoViejoSuper));
             consultas = new Consultas();
         } catch (Throwable ex) {
-            int even = 0;
+            ex.printStackTrace();
         }
     }
 

@@ -140,11 +140,11 @@ public class ImpresionReporte {
             int seleccion = JOptionPane.showOptionDialog(null, "¿Desea Enviar el Segundo FUR de esta Revision TecnoMecanica ?", "Envio Segundo FUR", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
             if (seleccion == JOptionPane.YES_OPTION) {
 
-                String strConsecutivo = null;
+                String strConsecutivo = null;/* 
                 boolean tieneConsecutivoRunt = Utils.verificarConsecutivoRunt(ctxHojaPrueba.getId());
-                String consecutivoRunt = null;
+                String consecutivoRunt = null; */
                 
-                if (!tieneConsecutivoRunt) {
+                /* if (!tieneConsecutivoRunt) {
                     // Solicitar el consecutivo_runt al usuario
                     consecutivoRunt = JOptionPane.showInputDialog(
                         null,
@@ -199,7 +199,7 @@ public class ImpresionReporte {
                             JOptionPane.WARNING_MESSAGE
                         );
                     }
-                }
+                } */
 
 
                 long i;
@@ -408,9 +408,7 @@ public class ImpresionReporte {
         JOptionPane.showMessageDialog(null, "Se ha Enviado el 2do FUR  perteneciente a la Placa  " + ctxHojaPrueba.getVehiculo().getPlaca() + " con exito ..!");
         System.out.println("entro a validandoEnvioEvento ");
         ev = new EventosDao();
-      
         System.out.println(ev.InsertarEvento(UsuarioLogueado.getNick(), this.ctxHojaPrueba.getVehiculo().getPlaca(), this.ctxHojaPrueba));
-
     }
 
     /**
@@ -439,6 +437,8 @@ public class ImpresionReporte {
                     app.add(label);
                     app.setVisible(true);
                     ClienteCi2Servicio clienteSincoFur = new ClienteCi2Servicio(this.ctxHojaPrueba, ctxCDA);
+                    
+
                     clienteSincoFur.cargarInf2EnvFUR(nroCert);///----------------------------------------------------
                     ClienteCi2 clienteCi2 = new ClienteCi2(ctxCDA.getUrlServicioSicov());
                     RespuestaDTO respServidor = clienteCi2.enviarFur(clienteSincoFur.getFormulario());
@@ -460,9 +460,13 @@ public class ImpresionReporte {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                     } else {
-                        JOptionPane.showMessageDialog(null, "No pude enviar el 2do FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + respServidor.getMensajeRespuesta() + "..!");
-                        System.out.println("Fallo por " + respServidor.getMensajeRespuesta());
+                        
+                        System.out.println("Codigo respuesta sicov " + respServidor.getCodigoRespuesta());
+                        System.out.println("Mensaje Respuesta " + respServidor.getMensajeRespuesta());
+                        System.out.println("Datos enviados a sicov: \n"+clienteSincoFur);
+                        System.out.println("Formulario v3: "+ clienteSincoFur.getFormulario());
                         System.out.println("este es 2sd fur");
+                        JOptionPane.showMessageDialog(null, "No pude enviar el 2do FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + respServidor.getMensajeRespuesta() + "..!");
                     }
 
                 }// fin de logica de envio de doble FUR APLICADO CI2

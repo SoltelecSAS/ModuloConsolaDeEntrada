@@ -63,6 +63,18 @@ public class ClienteCi2Servicio {
     private String resolucion_gases = "";
     private String comentarioOpacidad;
 
+    
+
+    @Override
+    public String toString() {
+        return "ClienteCi2Servicio [hojaPrueba=" + hojaPrueba + ", formulario=" + formulario + ", cda=" + cda
+                + ", pruebasHoja=" + pruebasHoja + ", pin=" + pin + ", idTipoVehiculo=" + idTipoVehiculo + ", modelo="
+                + modelo + ", cilindraje=" + cilindraje + ", tecnicos=" + tecnicos + ", tiempoMotor=" + tiempoMotor
+                + ", tipoCombustible=" + tipoCombustible + ", claseVehiculo=" + claseVehiculo + ", log=" + log
+                + ", datosFotos=" + datosFotos + ", resolucion_gases=" + resolucion_gases + ", comentarioOpacidad="
+                + comentarioOpacidad + "]";
+    }
+
     public ClienteCi2Servicio() {
 
     }
