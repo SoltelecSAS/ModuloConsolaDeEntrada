@@ -64,14 +64,13 @@ public class LlamarReporte {
     private boolean imprimirPdf;
     JasperReport report, report2, report3, reportSuper;
     public int dve;
-    final String rutaReporte = "FUR03625.jasper";
-    final String rutaReporteNuevo = "FUR03625.jasper";
-    final String logoViejoSuper = "super.jasper";
-    final String rutaReporte2 = "preventiva.jasper";
+    final String fur03625 = "FUR03625.jasper";
+    final String fur3625Dos = "FUR03625.jasper";
+    final String reporteLogoViejo = "super.jasper";
+    final String reportePreventiva = "preventiva.jasper";
     ConsultasCertificados consultasCertificados;
     Consultas consultas;
     private ListenerPrimerCertificado listenerPrimerCertificado;
-    private double ang, Int, angv, Intv, angv_izq, Intv_izq;
     public boolean int1, int2;
     private Reinspeccion reinspecionActual;
     private boolean reinspeccion;
@@ -94,10 +93,10 @@ public class LlamarReporte {
     public LlamarReporte() {
         try {
             consultasCertificados = new ConsultasCertificados();
-            report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte));
-            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte2));
-            report3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporteNuevo));
-            reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(logoViejoSuper));
+            report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur03625));
+            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            report3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur3625Dos));
+            reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reporteLogoViejo));
             consultas = new Consultas();
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -109,9 +108,9 @@ public class LlamarReporte {
         this.imprimirPdf = imprimirPdf;
         try {
             consultasCertificados = new ConsultasCertificados();
-            report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte));
-            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte2));
-            reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(logoViejoSuper));
+            report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur03625));
+            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reporteLogoViejo));
             consultas = new Consultas();
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -206,10 +205,10 @@ public class LlamarReporte {
             String edoHP = (hpContJpa.verificarHojaFinalizada(ctxHojaPrueba));
             parametros.put("Aprobado", "");
             parametros.put("Reprobado", "");
-            if (getAprobadoReprobado().equalsIgnoreCase("APROBADA") ) {
+            if (Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA") ) {
                 parametros.put("Aprobado", "X");
             }
-            if (getAprobadoReprobado().equalsIgnoreCase("REPROBADA")) {
+            if (Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("REPROBADA")) {
                 parametros.put("Reprobado", "X");
                 if (ctxHojaPrueba.getIntentos() == 1) {
                     Calendar calDias = Calendar.getInstance();
@@ -352,10 +351,10 @@ public class LlamarReporte {
         try {
             consultasCertificados = new ConsultasCertificados();
 //            report = (JasperReport) JRLoader.loadObjectFromFile(rutaReporte);
-            report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte));
+            report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur03625));
 //            report2 = (JasperReport) JRLoader.loadObjectFromFile(rutaReporte2);
             consultas = new Consultas();
-            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(rutaReporte2));
+            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
         } catch (Throwable ex) {
             //  Mensajes.mostrarExcepcion(ex);
             int eve = 0;
@@ -928,7 +927,6 @@ public class LlamarReporte {
 
                     case 2013://INCLINACION BAJA  DERECHA
                         df.applyPattern("#0.0");
-                        ang = m.getValor();
                         String AngInclDerechaMoto = String.valueOf(m.getValor());
                         parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerechaMoto) + m.getCondicion());
                         break;

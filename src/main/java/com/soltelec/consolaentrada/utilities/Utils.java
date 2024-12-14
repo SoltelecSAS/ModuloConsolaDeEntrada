@@ -650,4 +650,94 @@ public class Utils {
         return false;
     }
     
+
+    public static String getAprobadoReprobado(int idHojaPrueba) {
+        String consulta =   "SELECT p.*, v.CARTYPE FROM pruebas p \n" +
+                            "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for\n" +
+                            "inner join vehiculos v on v.CAR = hp.Vehiculo_for "+
+                            "WHERE hp.TESTSHEET = ?\n" +
+                            "ORDER BY p.Fecha_prueba DESC;";
+    
+        Conexion.setConexionFromFile();
+    
+        boolean[] pruebasVistas = {false, false, false, false, false, false, false, false, false};
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement consultaPruebas = conexion.prepareStatement(consulta)) {
+    
+            // Añadir parámetros de la consulta (los que aparecen como ? en la consulta)
+            consultaPruebas.setInt(1, idHojaPrueba);
+    
+            // rc representa el resultado de la consulta
+            try (ResultSet rc = consultaPruebas.executeQuery()) {
+                int puntajeTotalDefectos = 0;
+                while (rc.next()) {
+    
+                    int tipoPrueba = rc.getInt("Tipo_prueba_for");
+    
+                    if (!pruebasVistas[tipoPrueba - 1]) {
+                        pruebasVistas[tipoPrueba - 1] = true;
+    
+                        String finalizada = rc.getString("Finalizada");
+                        String abortada = rc.getString("Abortada");
+                        
+                        // Verifica si la prueba está pendiente
+                        if ("N".equals(finalizada) || !"N".equals(abortada)) return "PENDIENTE";
+
+                        int idPrueba = rc.getInt("Id_Pruebas");
+                        int tipoVehiculo = rc.getInt("CARTYPE");
+    
+                        // Verifica si esta o no aprobada segun el puntaje de defectos
+                        puntajeTotalDefectos += calcularPuntajeDefectos(idPrueba);
+
+                        if (puntajeTotalDefectos > 4 && tipoVehiculo == 4) return "REPROBADA";
+                        if (puntajeTotalDefectos > 9 && tipoVehiculo != 4) return "REPROBADA";
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        // Si todas las pruebas han sido vistas y aprobadas
+        return "APROBADA";
+    }
+
+    public static int calcularPuntajeDefectos(int idPrueba) {
+        // Consulta SQL para obtener los tipos de defecto asociados a una prueba específica
+        String consulta = "SELECT d.Tipo_defecto FROM defectos d " +
+                          "INNER JOIN defxprueba dp ON dp.id_defecto = d.CARDEFAULT " +
+                          "WHERE dp.id_prueba = ?";
+    
+        // Inicializar la conexión y variables necesarias
+        Conexion.setConexionFromFile();
+        int puntajeTotal = 0;
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement consultaDefectos = conexion.prepareStatement(consulta)) {
+    
+            // Establecer el parámetro de la consulta
+            consultaDefectos.setInt(1, idPrueba);
+    
+            // Ejecutar la consulta
+            try (ResultSet rs = consultaDefectos.executeQuery()) {
+                while (rs.next()) {
+                    // Obtener el tipo de defecto
+                    String tipoDefecto = rs.getString("Tipo_defecto");
+    
+                    // Sumar el puntaje según el tipo de defecto
+                    if ("A".equals(tipoDefecto)) {
+                        puntajeTotal += 10;
+                    } else if ("B".equals(tipoDefecto)) {
+                        puntajeTotal += 1;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        // Retornar el puntaje total calculado (0 si no se encontraron registros)
+        return puntajeTotal;
+    }
 }

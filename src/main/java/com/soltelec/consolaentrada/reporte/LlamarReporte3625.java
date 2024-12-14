@@ -20,6 +20,7 @@ import com.soltelec.consolaentrada.models.entities.AuditoriaSicov;
 import com.soltelec.consolaentrada.utilities.CargarArchivos;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.SepararImagenes;
+import com.soltelec.consolaentrada.utilities.Utils;
 import com.soltelec.consolaentrada.utilities.Validaciones;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.util.JRLoader;
@@ -95,54 +96,8 @@ public class LlamarReporte3625 {
         }
     }
 
-    public String getAprobadoReprobado() {
-        String consulta =   "SELECT p.* FROM pruebas p \n" +
-                            "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for\n" +
-                            "WHERE hp.TESTSHEET = ?\n" +
-                            "ORDER BY p.Fecha_prueba DESC;";
     
-        Conexion.setConexionFromFile();
     
-        boolean[] pruebasVistas = {false, false, false, false, false, false, false, false};
-    
-        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
-             PreparedStatement consultaPruebas = conexion.prepareStatement(consulta)) {
-    
-            // Añadir parámetros de la consulta (los que aparecen como ? en la consulta)
-            consultaPruebas.setInt(1, ctxHojaPrueba.getId());
-    
-            // rc representa el resultado de la consulta
-            try (ResultSet rc = consultaPruebas.executeQuery()) {
-                while (rc.next()) {
-    
-                    int tipoPrueba = rc.getInt("Tipo_prueba_for");
-    
-                    if (!pruebasVistas[tipoPrueba - 1]) {
-                        pruebasVistas[tipoPrueba - 1] = true;
-    
-                        String finalizada = rc.getString("Finalizada");
-                        String abortada = rc.getString("Abortada");
-                        String aprobada = rc.getString("Aprobada");
-    
-                        // Verifica si la prueba está pendiente
-                        if ("N".equals(finalizada) || !"N".equals(abortada)) {
-                            return "PENDIENTE";
-                        }
-    
-                        // Verifica si la prueba está reprobada
-                        if ("Y".equals(finalizada) && !"Y".equals(aprobada)) {
-                            return "REPROBADA";
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    
-        // Si todas las pruebas han sido vistas y aprobadas
-        return "APROBADA";
-    }
 
     /**
      * Metodo de entrada o de inicio a partir de este se llaman todos los demas
@@ -198,10 +153,10 @@ public class LlamarReporte3625 {
             String edoHP = (hpContJpa.verificarHojaFinalizada(ctxHojaPrueba));
             parametros.put("Aprobado", "");
             parametros.put("Reprobado", "");
-            if (getAprobadoReprobado().equalsIgnoreCase("APROBADA")) {
+            if (Utils.getAprobadoReprobado(ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA")) {
                 parametros.put("Aprobado", "X");
             }
-            if (getAprobadoReprobado().equalsIgnoreCase("REPROBADA")) {
+            if (Utils.getAprobadoReprobado(ctxHojaPrueba.getId()).equalsIgnoreCase("REPROBADA")) {
                 parametros.put("Reprobado", "X");
                 if (ctxHojaPrueba.getIntentos() == 1) {
                     Calendar calDias = Calendar.getInstance();
@@ -340,9 +295,9 @@ public class LlamarReporte3625 {
             parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(reinspecionActual.getFechaAnterior()));
             cargarImagen(true, parametros, 0, true);
             if (reinspeccion.getAprobada().equals("Y")) {
-                parametros.put("Aprobado", "X");
+                //parametros.put("Aprobado", "X");
             } else {
-                parametros.put("Reprobado", "X");
+                //parametros.put("Reprobado", "X");
             }
             JasperPrint fillReport = JasperFillManager.fillReport(report, parametros, cn);
             //String destFileNamePdf="./certificado"+hojaPruebas+".pdf";
@@ -1388,10 +1343,10 @@ public class LlamarReporte3625 {
                     } else//si no tiene defectos tipo A
                     {
                         if (totalDefB <= 4) {
-                            parametros.put("Aprobado", "X");
+                            //parametros.put("Aprobado", "X");
                         } else {
-                            parametros.put("ComentDefectos", "Vehiculo Reprobado Defectos tipo B es Mayor a 5");
-                            parametros.put("Reprobado", "X");
+                            //parametros.put("ComentDefectos", "Vehiculo Reprobado Defectos tipo B es Mayor a 5");
+                            //parametros.put("Reprobado", "X");
                         }//fin si no tiene defectos tipo A
                     }
                 } else {//si no ha terminado todas las pruebas
@@ -1409,15 +1364,19 @@ public class LlamarReporte3625 {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular u oficial o diplomatico
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                
+                                
+                                
+                                
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico y ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -1438,23 +1397,23 @@ public class LlamarReporte3625 {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//si es particular, oficial o diplomatico 9 defectos
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }
 //                    int ensenanza = rs1.getInt("CLASS");
                         if (rs1.getInt("CLASS") == 27) {//si es de ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//fin ensenanza
                     }//fin else defectos tipoA
@@ -1475,22 +1434,22 @@ public class LlamarReporte3625 {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio especial
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    
 
                     }//fin else defectos tipoA
                 } else {//si no ha terminado todas las pruebas
-                    parametros.put("Reprobado", "");
+                    //parametros.put("Reprobado", "");
                 }//fn else de no terminar un minimo de pruebas pero terminar todas si es mayor el numero de pruebas al minimo
                 break;
             //fin de motocarros
@@ -1505,15 +1464,15 @@ public class LlamarReporte3625 {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 7) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -1535,15 +1494,15 @@ public class LlamarReporte3625 {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio especial
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -1563,9 +1522,9 @@ public class LlamarReporte3625 {
                         parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A                        
                         if (totalDefB < 10) {
-                            parametros.put("Aprobado", "X");
+                            //parametros.put("Aprobado", "X");
                         } else {
-                            parametros.put("Reprobado", "X");
+                            //parametros.put("Reprobado", "X");
                         }
                     }//end servicio publico/                  
                 } else {//si no ha terminado todas las pruebas
