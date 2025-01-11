@@ -23,6 +23,7 @@ import com.soltelec.consolaentrada.models.entities.AuditoriaSicov;
 import com.soltelec.consolaentrada.models.entities.Diseno;
 import com.soltelec.consolaentrada.models.entities.Equipo;
 import com.soltelec.consolaentrada.models.entities.TipoVehiculo;
+import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.CargarArchivos;
 import com.soltelec.consolaentrada.utilities.FormulaOpacidad;
 import com.soltelec.consolaentrada.utilities.Mensajes;
@@ -39,6 +40,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
@@ -51,12 +53,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 
 public class LlamarReporte {
 
@@ -117,7 +123,7 @@ public class LlamarReporte {
         }
     }
 
-    public void cargarReporte(HojaPruebas ctxHojaPrueba, Cda ctxCDA, long consecutivoRUNT, String txtPlaca) throws JRException, SQLException, ClassNotFoundException, ParseException {
+    public void cargarReporte(HojaPruebas ctxHojaPrueba, Cda ctxCDA, long consecutivoRUNT, String txtPlaca) throws JRException, SQLException, ClassNotFoundException, ParseException, IOException {
         this.ctxHojaPrueba = ctxHojaPrueba;
         this.ctxCDA = ctxCDA;
         idHojaPrueba = ctxHojaPrueba.getId();
@@ -206,9 +212,11 @@ public class LlamarReporte {
             parametros.put("Aprobado", "");
             parametros.put("Reprobado", "");
             if (Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA") ) {
+                System.out.println("------LA PRUEBA FUE APROBADA");
                 parametros.put("Aprobado", "X");
             }
             if (Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("REPROBADA")) {
+                System.out.println("------LA PRUEBA FUE REPROBADA");
                 parametros.put("Reprobado", "X");
                 if (ctxHojaPrueba.getIntentos() == 1) {
                     Calendar calDias = Calendar.getInstance();
@@ -261,17 +269,68 @@ public class LlamarReporte {
             app.setTitle("Impresion del FUR");
             app.setContentPane(jvModificado);
 
-            String destFileNamePdf = "C:\\Reportes\\reporte" + this.ctxHojaPrueba.getId() + ".pdf";
+            
 
-            if (imprimirPdf) {
+            /*if (imprimirPdf) {
                 JasperExportManager.exportReportToPdfFile(fillReport, destFileNamePdf);
+                
+                // Obtener el PDF como un arreglo de bytes
+                byte[] pdfBytes = JasperExportManager.exportReportToPdf(fillReport);
                 try {
                     File path = new File(destFileNamePdf);
                     Desktop.getDesktop().open(path);
                 } catch (IOException ex) {
                     ex.printStackTrace(System.err);
                 }
-            } else {
+            } */
+            
+            
+
+
+            if (imprimirPdf) {
+                
+                // Construir el nombre del archivo PDF
+                String destFileNamePdf = Utils.getRutaPdf(idHojaPrueba);
+
+                try {
+                    // Obtener el reporte como un arreglo de bytes
+                    byte[] pdfBytes = JasperExportManager.exportReportToPdf(fillReport);
+
+                    // Guardar el archivo en disco si es necesario
+                    FileOutputStream fos = new FileOutputStream(destFileNamePdf);
+                    fos.write(pdfBytes);
+                    fos.close();
+
+                    // Abrir el archivo PDF
+                    File path = new File(destFileNamePdf);
+                    Desktop.getDesktop().open(path);
+
+                    String registros = Utils.obtenerRegistrosDeEscriturasFur(idHojaPrueba);
+                    LocalDateTime fechaActual = LocalDateTime.now();
+
+                    // Especificar la zona horaria deseada
+                    ZoneId zonaHoraria = ZoneId.of("America/Bogota"); // Cambia a la zona horaria deseada
+
+                    // Convertir LocalDateTime a ZonedDateTime
+                    ZonedDateTime fechaConZona = fechaActual.atZone(zonaHoraria);
+
+                    // Formatear la fecha en formato dd-MM-AAAA
+                    DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    String fechaFormateada = fechaConZona.format(formato);
+
+                    if (registros.equals("")) {
+                        registros = "Primer pfd fur creado: "+fechaFormateada+".";
+                    }else{
+                        registros = "\nFur sobreescrito por '"+Utils.getDtName()+"' en la fecha de "+fechaFormateada;
+                    }
+                    // Aquí puedes utilizar la variable `pdfBytes` según lo necesites
+                    // Por ejemplo, enviarlo como parte de una respuesta HTTP o guardarlo en una base de datos
+                    Utils.actualizarPdfFur(idHojaPrueba, pdfBytes, registros);
+
+                } catch (IOException ex) {
+                    ex.printStackTrace(System.err);
+                }
+            }else {
                 JasperViewer jasperViewer = new JasperViewer(fillReport, false);
                 jasperViewer.setContentPane(jvModificado);
                 if (preventiva) {
@@ -420,11 +479,11 @@ public class LlamarReporte {
             parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(reinspecionActual.getFechaAnterior()));
             cargarImagen(true, parametros, 0, true);
 
-            if (Reinspeccion.getAprobada().equals("Y")) {
+            /* if (Reinspeccion.getAprobada().equals("Y")) {
                 parametros.put("Aprobado", "X");
             } else {
                 parametros.put("Reprobado", "X");
-            }
+            } */
             JasperPrint fillReport = JasperFillManager.fillReport(report, parametros, cn);
             //String destFileNamePdf="./certificado"+hojaPruebas+".pdf";
             File carpetaReportes = new File("C:\\Reportes");
@@ -964,7 +1023,7 @@ public class LlamarReporte {
                     //----------------------------------------------------------
                     //---------------------ALTAS MOTOS---------------------------
                     //----------------------------------------------------------
-                    case 2056://INTESIDAD ALTA DERECHA
+                    case 2057://INTESIDAD ALTA DERECHA
 
                         df.applyPattern("#0.0");
                         String IntesidadAltaIzqF1 = String.valueOf(m.getValor());
@@ -975,7 +1034,7 @@ public class LlamarReporte {
                         // }
 
                         break;
-                    case 2057://INTESIDAD ALTA IZQUIERDA
+                    case 2056://INTESIDAD ALTA IZQUIERDA
                         df.applyPattern("#0.0");
                         String IntAltaDer = String.valueOf(m.getValor());
                         // if(!IntAltaDer.equalsIgnoreCase("0.0")  )
@@ -2047,7 +2106,7 @@ public class LlamarReporte {
         try {
             String sql = "SELECT dp.id_defecto FROM defxprueba AS dp WHERE dp.id_prueba=?";
 //            String sql="SELECT MAX(p.Id_Pruebas) AS id_defecto FROM pruebas p WHERE p.Tipo_prueba_for=1 AND p.hoja_pruebas_for=? ORDER BY Id_Pruebas desc";
-            int idPrueba = consultarPruebaVisual(idHojaPrueba);
+            int idPrueba = Utils.getIdUltimaPruebaPorTipo(1, idHojaPrueba);
             ResultSet rs = conexionDBcargarMedida(sql, idPrueba);
 
             while (rs.next()) {
@@ -2641,16 +2700,17 @@ public class LlamarReporte {
                     parametros.put("PerCOCruc", "---");
 
                     String perOpecValue = "";
-                    Vehiculo v = this.ctxHojaPrueba.getVehiculo();
-                    if (v.getCilindraje() < 5000) {
-                        if (v.getModelo() > 2000 && v.getModelo() <= 2015 ) perOpecValue = "5.0";
-                        if (v.getModelo() >= 2016) perOpecValue = "4.0";
-                        if (v.getModelo() <= 2000) perOpecValue = "6.0";
-                    }else{
-                        if (v.getModelo() > 2000 && v.getModelo() <= 2015 ) perOpecValue = "4.5";
-                        if (v.getModelo() >= 2016) perOpecValue = "3.5";
-                        if (v.getModelo() <= 2000) perOpecValue = "5.5";
-                    }
+                    Vehiculo vehiculo = this.ctxHojaPrueba.getVehiculo();
+                    
+                    //De 1900 a 2025 hay 125 años, enero siempre comienza con el mes 0
+                    Date permisiblesDiesel2025 = new Date(125, 0, 1); // Año 2025 - 1900, mes 0 basado en cero (enero)
+
+                    // Determinar si la fecha de ingreso es posterior al 1 de enero de 2025
+                    boolean esPosterior2025 = ctxHojaPrueba.getFechaIngreso().after(permisiblesDiesel2025);
+                    
+                    // Calcula los permisisbles en diesel en funcion del cilindraje, modelo y si es fecha posterior al 2025
+                    perOpecValue = calcularPermisiblesDiesel(vehiculo.getCilindraje(), vehiculo.getModelo(), esPosterior2025);
+                    
                     parametros.put("PerOpac", perOpecValue);
 
                     /*
@@ -2671,6 +2731,21 @@ public class LlamarReporte {
                 }//end of diesel
             }
         }//end of methoc configurarPermisibles
+
+        private String calcularPermisiblesDiesel(int cilindraje, int modelo, boolean esPosterior2025) {
+            //Los permisibles en diesel se reducen 1.5 a partir del 2025
+            if (cilindraje < 5000) {
+                if (modelo > 2000 && modelo <= 2015) return esPosterior2025 ? "3.5" : "5.0";
+                if (modelo >= 2016) return esPosterior2025 ? "2.5" : "4.0";
+                if (modelo <= 2000) return esPosterior2025 ? "4.5" : "6.0";
+            } else {
+                if (modelo > 2000 && modelo <= 2015) return esPosterior2025 ? "3.0" : "4.5";
+                if (modelo >= 2016) return esPosterior2025 ? "2.0" : "3.5";
+                if (modelo <= 2000) return esPosterior2025 ? "4.0" : "5.5";
+            }
+            CMensajes.mensajeError("Error al calcular permisisbles diesel.\nPor favor verifique el modelo y cilindraje del vehiculo.");
+            throw new RuntimeException("Error al calcular permisibles diesel.");
+        }
 
         /**
          * Llena la tabla de resumen de los defectos por grupo Evalua la prueba
@@ -2879,14 +2954,14 @@ public class LlamarReporte {
                 if (numeroPruebasFinalizadas >= 5 && (numeroPruebasFinalizadas == numeroPruebasAutorizadas)) {
 
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else//si no tiene defectos tipo A
                     {
                         if (totalDefB < 5) {
-                            parametros.put("Aprobado", "X");
+                            //parametros.put("Aprobado", "X");
                         } else {
                             parametros.put("ComentDefectos", "Vehiculo Reprobado Defectos tipo B es Mayor a 5");
-                            parametros.put("Reprobado", "X");
+                            //parametros.put("Reprobado", "X");
                         }//fin si no tiene defectos tipo A
                     }
                 } else {//si no ha terminado todas las pruebas
@@ -2899,20 +2974,20 @@ public class LlamarReporte {
                 //sinembargo debe haber terminado y aprobado todas las pruebas
                 if (numeroPruebasFinalizadas >= 6 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     if (totalDefA > 0) {//si tiene un defecto tipo A no aprueba independientemente del tipo de servicio
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si es de servicio publico
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular u oficial o diplomatico
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico y ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -2928,28 +3003,28 @@ public class LlamarReporte {
                 //     6.Foto //7.sonometro 7 pruebas como minimo de ahi hay que mirar si faltan pruebas
                 if (numeroPruebasFinalizadas >= 6 && numeroPruebasAutorizadas == numeroPruebasFinalizadas) {
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A verficar los defectos tipo B
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//si es particular, oficial o diplomatico 9 defectos
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }
 //                    int ensenanza = rs1.getInt("CLASS");
                         if (rs1.getInt("CLASS") == 27) {//si es de ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//fin ensenanza
                     }//fin else defectos tipoA
@@ -2965,20 +3040,20 @@ public class LlamarReporte {
                 if (numeroPruebasFinalizadas >= 7 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio especial
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    
@@ -2995,20 +3070,20 @@ public class LlamarReporte {
                 if (numeroPruebasFinalizadas >= 5 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 7) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -3025,20 +3100,20 @@ public class LlamarReporte {
                 if (numeroPruebasFinalizadas >= 1 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 10) {
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio especial
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                parametros.put("Aprobado", "X");
+                                //parametros.put("Aprobado", "X");
                             } else {
-                                parametros.put("Reprobado", "X");
+                                //parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -3055,12 +3130,12 @@ public class LlamarReporte {
                 if (numeroPruebasFinalizadas >= 7 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A                        
                         if (totalDefB < 10) {
-                            parametros.put("Aprobado", "X");
+                            //parametros.put("Aprobado", "X");
                         } else {
-                            parametros.put("Reprobado", "X");
+                            //parametros.put("Reprobado", "X");
                         }
                     }//end servicio publico/                  
                 } else {//si no ha terminado todas las pruebas
@@ -3301,7 +3376,6 @@ public class LlamarReporte {
             llamarProcedimiento.setLong(1, hojaPruebas);
             llamarProcedimiento.execute();
         } catch (SQLException exc) {
-            Mensajes.mostrarExcepcion(exc);
         }
     }
 
@@ -3576,27 +3650,42 @@ public class LlamarReporte {
                 }
             }
 
+
+            //De 1900 a 2025 hay 125 años, enero siempre comienza con el mes 0
+            Date permisiblesDiesel2025 = new Date(124, 11, 31); // Año 2025 - 1900, mes 0 basado en cero (enero)
+
+            boolean esPosterior2025 = ctxHojaPrueba.getFechaIngreso().after(permisiblesDiesel2025);
+            
+            String permisible= "";
+
             if (tipoPrueba == 8) {
                 if (this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 3 ||
                 this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 11
                 ) {
+
                     if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 2000) {
                         if (this.ctxHojaPrueba.getVehiculo().getCilindraje() < 5000) {
-                            comentarioOpacidad += "Permisible: 6.0 (m⁻¹)";
+                            permisible = esPosterior2025 ? "4.5" : "6.0" ;
+                            comentarioOpacidad += "Permisible: "+permisible+" (m⁻¹)";
                         } else {
-                            comentarioOpacidad += "Permisible: 5.5 (m⁻¹)";
+                            permisible = esPosterior2025 ? "4.0" : "5.5" ;
+                            comentarioOpacidad += "Permisible: "+permisible+" (m⁻¹)";
                         }
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 2000 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 2015) {
                         if (this.ctxHojaPrueba.getVehiculo().getCilindraje() < 5000) {
-                            comentarioOpacidad += "Permisible: 5.0 (m⁻¹)";
+                            permisible = esPosterior2025 ? "3.5" : "5.0" ;
+                            comentarioOpacidad += "Permisible: "+permisible+" (m⁻¹)";
                         } else {
-                            comentarioOpacidad += "Permisible: 4.5 (m⁻¹)";
+                            permisible = esPosterior2025 ? "3.0" : "4.5" ;
+                            comentarioOpacidad += "Permisible: "+permisible+" (m⁻¹)";
                         }
                     } else {
                         if (this.ctxHojaPrueba.getVehiculo().getCilindraje() < 5000) {
-                            comentarioOpacidad += "Permisible: 4.0 (m⁻¹)";
+                            permisible = esPosterior2025 ? "2.5" : "4.0" ;
+                            comentarioOpacidad += "Permisible: "+permisible+" (m⁻¹)";
                         } else {
-                            comentarioOpacidad += "Permisible: 3.5 (m⁻¹)";
+                            permisible = esPosterior2025 ? "2.0" : "3.5" ;
+                            comentarioOpacidad += "Permisible: "+permisible+" (m⁻¹)";
                         }
                     }
                 }

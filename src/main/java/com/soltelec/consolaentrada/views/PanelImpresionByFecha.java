@@ -5,6 +5,7 @@
  */
 package com.soltelec.consolaentrada.views;
 
+import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.custom.ModeloTablaImpresionFecha;
 import com.soltelec.consolaentrada.custom.ModeloTablaPruebas;
 import com.soltelec.consolaentrada.models.controllers.HojaPruebasJpaController;
@@ -14,7 +15,6 @@ import com.soltelec.consolaentrada.models.entities.Prueba;
 import com.soltelec.consolaentrada.reporte.ImpresionReporte;
 import com.soltelec.consolaentrada.utilities.GenericExportExcel;
 import com.soltelec.consolaentrada.utilities.Mensajes;
-import com.soltelec.consolaentrada.utilities.Utils;
 
 import org.jdesktop.swingx.JXDatePicker;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
@@ -22,6 +22,11 @@ import com.soltelec.consolaentrada.models.entities.Cda;
 import com.soltelec.consolaentrada.models.entities.RespuestaDTO;
 import com.soltelec.consolaentrada.sicov.ci2.ClienteCi2;
 import com.soltelec.consolaentrada.sicov.ci2.Pin;
+import com.soltelec.consolaentrada.utilities.Utils;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.swing.*;
 import java.text.SimpleDateFormat;
@@ -315,22 +320,43 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirActionPerformed
+        Conexion.changeLicencia();
         impresionReporte = new ImpresionReporte();
         impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
         impresionReporte.setImprimirPdf(false);
         impresionReporte.preguntarConsecutivos(this.ctxHP);
+        
     }//GEN-LAST:event_btnImprimirActionPerformed
 
     private void btnPdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPdfActionPerformed
-        impresionReporte = new ImpresionReporte();
-        impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
-        impresionReporte.setImprimirPdf(true);
-        UsuarioJpaController usrCon = new UsuarioJpaController();
-        EntityManager em = usrCon.getEntityManager();
-        em.getTransaction().begin();
-        em.flush();
-        em.getTransaction().commit();
-        impresionReporte.preguntarConsecutivos(this.ctxHP);
+        Conexion.changeLicencia();
+        byte[] fur = Utils.obtenerPdfFur(idHojaPrueba);
+        if(fur == null){
+            impresionReporte = new ImpresionReporte();
+            impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
+            impresionReporte.setImprimirPdf(true);
+            UsuarioJpaController usrCon = new UsuarioJpaController();
+            EntityManager em = usrCon.getEntityManager();
+            em.getTransaction().begin();
+            em.flush();
+            em.getTransaction().commit();
+            impresionReporte.preguntarConsecutivos(this.ctxHP);
+        }else{
+            try{
+                String destFileNamePdf = Utils.getRutaPdf(idHojaPrueba);
+                // Guardar el archivo en disco si es necesario
+                FileOutputStream fos = new FileOutputStream(destFileNamePdf);
+                fos.write(fur);
+                fos.close();
+
+                // Abrir el archivo PDF
+                File path = new File(destFileNamePdf);
+                Desktop.getDesktop().open(path);
+            } catch (IOException ex) {
+                ex.printStackTrace(System.err);
+            }
+        }
+        
     }//GEN-LAST:event_btnPdfActionPerformed
 
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
@@ -343,6 +369,8 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
     public void cargarHojas(String consulta) {
         modeloTablaImpresionFecha.setListaHojaPruebas(new HojaPruebasJpaController().BuscarCriterios(consulta));
     }
+    
+    
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 

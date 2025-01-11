@@ -383,7 +383,7 @@ public class ImpresionReporte {
                     if (respServidor == null) {
                         JOptionPane.showMessageDialog(null, "Disculpe, no Puede Enviar el 2do. FUR debido a que no Tengo Comunicacion en estos Momentos con el Servidor SICOV ..! \n Compruebe que el servicio este Levantado sino es asi Comuniquese Por favor con la mesa de Ayuda de CI2 ");
                     }
-                    if (respServidor.getCodigoRespuesta().equals("0000")) { //ok
+                    if (respServidor.getCodigoRespuesta().equals("0000") || respServidor.getMensajeRespuesta().equalsIgnoreCase("Error: El FUR ya cuenta con número de certificado")) { //ok
 
                         this.ctxHojaPrueba.setEstadoSICOV("SINCRONIZADO");
                         if (this.ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA")) {
@@ -396,7 +396,7 @@ public class ImpresionReporte {
                         System.out.println(ev.InsertarEvento(UsuarioLogueado.getNick(), this.ctxHojaPrueba.getVehiculo().getPlaca(), this.ctxHojaPrueba));
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                    } else {
+                    }else {
                         
                         System.out.println("Codigo respuesta sicov " + respServidor.getCodigoRespuesta());
                         System.out.println("Mensaje Respuesta " + respServidor.getMensajeRespuesta());

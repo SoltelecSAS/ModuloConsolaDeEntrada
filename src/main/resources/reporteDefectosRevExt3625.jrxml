@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 5.5.2  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reporteDefectosRevExt" pageWidth="590" pageHeight="572" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="590" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c802565b-c8fe-48ad-a04b-b8d69587c5a8">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -10,35 +10,52 @@
 	<parameter name="isReimpeccion" class="java.lang.String"/>
 	<parameter name="idReinspeccion" class="java.lang.Integer"/>
 	<queryString>
-		<![CDATA[select DISTINCT Nombre_problema,d.Tipo_defecto,Nombre_grupo,d.codigo_super as CARDEFAULT,    
-d.⁠ codigo_Resolucion ⁠ AS d_codigo_Resolucion
-FROM            pruebas pr
-INNER JOIN      defxprueba dp ON pr.id_pruebas = dp.id_prueba
-AND             IFNULL(dp.tercer_estado, '') NOT IN ('na')
-INNER JOIN      defectos AS d ON dp.id_defecto = d.cardefault
-INNER JOIN      defectos_grupos_sub_grupos gsg ON gsg.id_sub_grupo = d.defgroupssub
-INNER JOIN      grupos AS g ON gsg.id_grupo = g.defgroup
-WHERE           CASE
-                WHEN $P{isreimpeccion} = 'NO' THEN pr.id_pruebas IN (
-                        SELECT MIN(id_pruebas)
-                        FROM   pruebas AS p
-                        WHERE  p.hoja_pruebas_for = $P{id_hojaprueba}
-                        AND    p.tipo_prueba_for = 1
-                        AND    p.finalizada = 'Y'
-                        AND    p.abortada = 'N'
-                        AND    gsg.id_grupo != 21
-                        GROUP BY p.tipo_prueba_for )
-                ELSE pr.id_pruebas IN (
-                        SELECT MAX(id_pruebas)
-                        FROM   pruebas AS p
-                        WHERE  p.hoja_pruebas_for = $P{id_hojaprueba}
-                        AND    p.tipo_prueba_for = 1
-                        AND    p.finalizada = 'Y'
-                        AND    p.abortada = 'N'
-                        AND    gsg.id_grupo != 21
-                        GROUP BY p.tipo_prueba_for)
-                END
-AND             pr.hoja_pruebas_for = $P{id_hojaprueba}]]>
+		<![CDATA[SELECT DISTINCT 
+    Nombre_problema,
+    d.Tipo_defecto,
+    COALESCE(Nombre_grupo, d.grupo) AS Nombre_grupo,
+    d.codigo_super AS CARDEFAULT,
+    d.`codigo_Resolucion` AS d_codigo_Resolucion
+FROM 
+    pruebas AS pr
+INNER JOIN 
+    defxprueba AS dp 
+    ON pr.id_pruebas = dp.id_prueba 
+    AND IFNULL(dp.tercer_estado, '') NOT IN ('na')
+INNER JOIN 
+    defectos AS d 
+    ON dp.id_defecto = d.CARDEFAULT
+LEFT JOIN 
+    grupos_sub_grupos gsg 
+    ON gsg.SCDEFGROUPSUB = d.DEFGROUPSSUB
+LEFT JOIN 
+    grupos AS g 
+    ON gsg.DEFGROUP = g.DEFGROUP
+WHERE 
+    CASE 
+        WHEN $P{isReimpeccion} = "NO" THEN
+            pr.id_pruebas IN (
+                SELECT MIN(id_pruebas) 
+                FROM pruebas AS p 
+                WHERE p.hoja_pruebas_for = $P{id_hojaprueba}
+                AND p.Tipo_prueba_for = 1 
+                AND p.Finalizada = 'Y' 
+                AND p.Abortada = 'N' 
+                GROUP BY p.Tipo_prueba_for
+            )
+        ELSE
+            pr.id_pruebas IN (
+                SELECT MAX(id_pruebas) 
+                FROM pruebas AS p 
+                WHERE p.hoja_pruebas_for = $P{id_hojaprueba}
+                AND p.Tipo_prueba_for = 1 
+                AND p.Finalizada = 'Y' 
+                AND p.Abortada = 'N' 
+                GROUP BY p.Tipo_prueba_for
+            )
+    END
+AND pr.hoja_pruebas_for = $P{id_hojaprueba} AND d.DEFGROUPSSUB <> 56
+-- AND d.CARDEFAULT NOT IN (84000, 84001, 84002, 84003, 84010, 84011, 84012, 84009)]]>
 	</queryString>
 	<field name="Nombre_problema" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
@@ -160,7 +177,7 @@ AND             pr.hoja_pruebas_for = $P{id_hojaprueba}]]>
 	</columnHeader>
 	<detail>
 		<band height="10" splitType="Stretch">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="70" y="0" width="367" height="10" uuid="5b4dfeb5-ce41-4509-9245-8dfc9449de6a"/>
 				<box rightPadding="3">
 					<pen lineWidth="0.5"/>
@@ -174,7 +191,7 @@ AND             pr.hoja_pruebas_for = $P{id_hojaprueba}]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Nombre_problema}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="437" y="0" width="79" height="10" uuid="240bd447-41c2-41a9-ae52-21f15b3f1cc0"/>
 				<box leftPadding="3">
 					<pen lineWidth="0.5"/>

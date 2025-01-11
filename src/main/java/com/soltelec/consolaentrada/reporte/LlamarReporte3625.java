@@ -155,9 +155,11 @@ public class LlamarReporte3625 {
             parametros.put("Reprobado", "");
             if (Utils.getAprobadoReprobado(ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA")) {
                 parametros.put("Aprobado", "X");
+                System.out.println("LA PRUEBA FUE APROBADA");
             }
             if (Utils.getAprobadoReprobado(ctxHojaPrueba.getId()).equalsIgnoreCase("REPROBADA")) {
                 parametros.put("Reprobado", "X");
+                System.out.println("LA PRUEBA FUE REPROBADA");
                 if (ctxHojaPrueba.getIntentos() == 1) {
                     Calendar calDias = Calendar.getInstance();
                     calDias.setTime(ctxHojaPrueba.getFechaIngreso());
@@ -1339,7 +1341,7 @@ public class LlamarReporte3625 {
                 //debe haber aprobado el mismo numero de pruebas que se autorizaron
                 if (numeroPruebasFinalizadas >= 5 && (numeroPruebasFinalizadas == numeroPruebasAutorizadas)) {
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else//si no tiene defectos tipo A
                     {
                         if (totalDefB <= 4) {
@@ -1350,7 +1352,7 @@ public class LlamarReporte3625 {
                         }//fin si no tiene defectos tipo A
                     }
                 } else {//si no ha terminado todas las pruebas
-                    parametros.put("Reprobado", "");
+                    //parametros.put("Reprobado", "");
                 }//fin else mas de un defecto tipo A
                 break;
             case 3:
@@ -1359,7 +1361,7 @@ public class LlamarReporte3625 {
                 //sinembargo debe haber terminado y aprobado todas las pruebas
                 if (numeroPruebasFinalizadas >= 6 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     if (totalDefA > 0) {//si tiene un defecto tipo A no aprueba independientemente del tipo de servicio
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si es de servicio publico
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular u oficial o diplomatico
@@ -1383,7 +1385,7 @@ public class LlamarReporte3625 {
 
                     }//fin else defectos tipoA
                 } else {//si no ha terminado todas las pruebas
-                    parametros.put("Reprobado", "");
+                    //parametros.put("Reprobado", "");
                 }//fin else de no terminar un minimo de pruebas
                 break;
             case 2:
@@ -1392,7 +1394,7 @@ public class LlamarReporte3625 {
                 //     6.Foto //7.sonometro 7 pruebas como minimo de ahi hay que mirar si faltan pruebas
                 if (numeroPruebasFinalizadas >= 6 && numeroPruebasAutorizadas == numeroPruebasFinalizadas) {
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A verficar los defectos tipo B
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//si es particular, oficial o diplomatico 9 defectos
@@ -1429,7 +1431,7 @@ public class LlamarReporte3625 {
                 if (numeroPruebasFinalizadas >= 7 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
@@ -1459,7 +1461,7 @@ public class LlamarReporte3625 {
                 if (numeroPruebasFinalizadas >= 5 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
@@ -1489,7 +1491,7 @@ public class LlamarReporte3625 {
                 if (numeroPruebasFinalizadas >= 1 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
@@ -1519,7 +1521,7 @@ public class LlamarReporte3625 {
                 if (numeroPruebasFinalizadas >= 7 && numeroPruebasFinalizadas == numeroPruebasAutorizadas) {
                     //si es de servicio publico
                     if (totalDefA > 0) {
-                        parametros.put("Reprobado", "X");
+                        //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A                        
                         if (totalDefB < 10) {
                             //parametros.put("Aprobado", "X");

@@ -1465,26 +1465,26 @@ public class ClienteCi2Servicio {
                     formulario.setP_11_b_res_nor("");
                     if (modelo <= 2000) {
                         if (cilindraje < 5000) {
-                            formulario.setP_11_b_res_nor_d("6.0");
+                            formulario.setP_11_b_res_nor_d("4.5");
                             formulario.setP_11_b_res_nor_d_CC("CC <5000");
                         } else if (cilindraje >= 5000) {
-                            formulario.setP_11_b_res_nor_d("5.5");
+                            formulario.setP_11_b_res_nor_d("3.0");
                             formulario.setP_11_b_res_nor_d_CC(" CC ≥ 5000");
                         }
                     } else if (modelo > 2000 && modelo <= 2015) {
                         if (cilindraje < 5000) {
-                            formulario.setP_11_b_res_nor_d("5.0");
+                            formulario.setP_11_b_res_nor_d("2.5");
                             formulario.setP_11_b_res_nor_d_CC("CC <5000");
                         } else if (cilindraje >= 5000) {
-                            formulario.setP_11_b_res_nor_d("4.5");
+                            formulario.setP_11_b_res_nor_d("3.0");
                             formulario.setP_11_b_res_nor_d_CC(" CC ≥ 5000");
                         }
                     } else {
                         if (modelo < 5000) {
-                            formulario.setP_11_b_res_nor_d("4.0");
+                            formulario.setP_11_b_res_nor_d("2.5");
                             formulario.setP_11_b_res_nor_d_CC("CC <5000");
                         } else if (modelo >= 5000) {
-                            formulario.setP_11_b_res_nor_d("3.5");
+                            formulario.setP_11_b_res_nor_d("2.0");
                             formulario.setP_11_b_res_nor_d_CC(" CC ≥ 5000");
                         }
                     }

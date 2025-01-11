@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 5.5.2  -->
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FUR3625" pageWidth="612" pageHeight="934" columnWidth="592" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" whenResourceMissingType="Empty" uuid="b5a86fed-5370-40a3-b9e6-9e0394fdb44e">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="23"/>
@@ -560,7 +560,7 @@ WHERE
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[PREVENTIVA N°:]]></text>
+					<text><![CDATA[PREVENTIVA No°:]]></text>
 				</staticText>
 				<textField>
 					<reportElement x="76" y="3" width="73" height="16" uuid="cc0a600c-165a-48eb-88af-3a01876f740a"/>
@@ -2293,7 +2293,7 @@ CON LOS MÉTODOS DEFINIDOS POR LA NTC 5375; NTC 6218; NTC 6282.]]></text>
 					<text><![CDATA[]]></text>
 				</staticText>
 				<textField isBlankWhenNull="true">
-					<reportElement x="200" y="50" width="38" height="10" uuid="ec71ec48-ba41-4811-842a-8d7a12b733c7"/>
+					<reportElement x="200" y="60" width="38" height="10" uuid="ec71ec48-ba41-4811-842a-8d7a12b733c7"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -2307,7 +2307,7 @@ CON LOS MÉTODOS DEFINIDOS POR LA NTC 5375; NTC 6218; NTC 6282.]]></text>
 					<textFieldExpression><![CDATA[$P{IntesidadAltaIzqF1}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement x="200" y="60" width="38" height="10" uuid="096a71fd-63c2-4996-8b74-591cbef0bd53"/>
+					<reportElement x="200" y="50" width="38" height="10" uuid="096a71fd-63c2-4996-8b74-591cbef0bd53"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -7025,7 +7025,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textElement>
 				<text><![CDATA[F. COMENTARIOS U OBSERVACIONES ADICIONALES DE LA REVISIÓN PREVENTIVA]]></text>
 			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="30" y="28" width="558" height="16" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="e967d73c-1579-4fa8-ba36-a33b5e73687b"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
@@ -7033,7 +7033,7 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{Comentarios}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" x="30" y="49" width="559" height="13" uuid="570ece17-f083-4060-841b-e352d4821342"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>

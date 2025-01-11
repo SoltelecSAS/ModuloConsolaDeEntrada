@@ -5,6 +5,7 @@
  */
 package com.soltelec.consolaentrada.views;
 
+import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.custom.ModeloTablaHojas;
 import com.soltelec.consolaentrada.custom.ModeloTablaPruebas;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
@@ -302,6 +303,7 @@ public class PanelImpresionByPlaca extends javax.swing.JPanel {
     }//GEN-LAST:event_txtPlacaKeyTyped
 
     private void btnImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirActionPerformed
+        Conexion.changeLicencia();
         impresionReporte = new ImpresionReporte();
         impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
         impresionReporte.setImprimirPdf(false);
@@ -309,6 +311,7 @@ public class PanelImpresionByPlaca extends javax.swing.JPanel {
     }//GEN-LAST:event_btnImprimirActionPerformed
 
     private void btnPdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPdfActionPerformed
+        Conexion.changeLicencia();
         impresionReporte = new ImpresionReporte();
         impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
         impresionReporte.setImprimirPdf(true);

@@ -205,8 +205,8 @@ public class ListenerEnvioFUR implements ActionListener {
                             clienteSincoFur.datosFotos();
                             ClienteCi2 clienteCi2 = new ClienteCi2(ctxCDA.getUrlServicioSicov());
                             RespuestaDTO respServidor = clienteCi2.enviarFur(clienteSincoFur.getFormulario());
-                            /*RespuestaDTO respServidor = new RespuestaDTO();
-                             respServidor.setCodigoRespuesta("0000");*/
+                            //RespuestaDTO respServidor = new RespuestaDTO();
+                            //respServidor.setCodigoRespuesta("0000");
                             app.dispose();
                             if (respServidor == null) {
                                 Mensajes.mensajeAdvertencia(
@@ -292,7 +292,8 @@ public class ListenerEnvioFUR implements ActionListener {
                                         || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 7 //Remolque
                                         || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 109 //taxis
                                         || ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 110//aplicaTaximetro 
-                                        /*|| ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 5*/) 
+                                        //|| ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 5
+                                        ) 
                                 
                                 {//Motocarro
                                     if (ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 3) { //Diesel                    

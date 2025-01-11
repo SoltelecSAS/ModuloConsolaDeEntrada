@@ -1,0 +1,12 @@
+id prueba: 173055
+puntuacion defectos: 0
+id prueba: 173050
+puntuacion defectos: 0
+id prueba: 173051
+puntuacion defectos: 0
+id prueba: 173052
+puntuacion defectos: 0
+id prueba: 173053
+puntuacion defectos: 0
+id prueba: 173054
+puntuacion defectos: 0

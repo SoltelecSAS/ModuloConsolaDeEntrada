@@ -21,6 +21,7 @@ import java.util.Map;
 import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.CifraDesifra;
 import com.soltelec.consolaentrada.utilities.UtilPropiedades;
+import com.soltelec.consolaentrada.utilities.Utils;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -56,6 +57,10 @@ public class Conexion implements Serializable {
     private static final String NOMBRE_ARCHIVO = "Conexion";
     private static boolean licencia = false;
 
+    public static void changeLicencia(){
+        licencia = false;
+    }
+
     public static void setConexionFromFile() {
         try {
 
@@ -86,7 +91,7 @@ public class Conexion implements Serializable {
 
             String consulta = "SELECT NIT FROM cda WHERE id_cda = 1";
             String url = "jdbc:mysql://" + datos.get(1) + ":" + datos.get(3) + "/" + datos.get(0) + "?zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false";
-            System.out.println("URL: "+url);
+            //System.out.println("URL: "+url);
 
             String user = datos.get(2);
             String password = datos.get(4);
@@ -158,6 +163,8 @@ public class Conexion implements Serializable {
             contrasena = password;
 
             bufferedReader.close();
+
+            Utils.crearColumnasParaAlmacenamiendoPdfs(); //Crea columnas de almacenamiento de datos de PDF de los fures si es necesario
         } catch (IOException ex) {
             CMensajes.mensajeError("No se pudo leer el archivo de conexion "+ CARPETA + NOMBRE_ARCHIVO + EXTENSION);
             System.out.println("No se pudo leer el archivo de conexion de la base de datos");
