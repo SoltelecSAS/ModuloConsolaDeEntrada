@@ -8,26 +8,12 @@ import com.soltelec.consolaentrada.models.controllers.conexion.PersistenceContro
 import com.soltelec.consolaentrada.models.controllers.exceptions.IllegalOrphanException;
 import com.soltelec.consolaentrada.models.controllers.exceptions.NonexistentEntityException;
 import com.soltelec.consolaentrada.models.entities.AuditoriaSicov;
-import com.soltelec.consolaentrada.models.entities.Certificado;
-import com.soltelec.consolaentrada.models.entities.ClaseVehiculo;
-import com.soltelec.consolaentrada.models.entities.Color;
 import com.soltelec.consolaentrada.models.entities.Defxprueba;
-import com.soltelec.consolaentrada.models.entities.Diseno;
 import com.soltelec.consolaentrada.models.entities.HojaPruebas;
-import com.soltelec.consolaentrada.models.entities.LineaVehiculo;
-import com.soltelec.consolaentrada.models.entities.Llanta;
-import com.soltelec.consolaentrada.models.entities.Marca;
-import com.soltelec.consolaentrada.models.entities.Pais;
 import com.soltelec.consolaentrada.models.entities.Propietario;
 import com.soltelec.consolaentrada.models.entities.Prueba;
-import com.soltelec.consolaentrada.models.entities.PruebaDTO;
 import com.soltelec.consolaentrada.models.entities.Reinspeccion;
-import com.soltelec.consolaentrada.models.entities.Servicio;
-import com.soltelec.consolaentrada.models.entities.ServicioEspecial;
-import com.soltelec.consolaentrada.models.entities.TipoGasolina;
-import com.soltelec.consolaentrada.models.entities.TipoVehiculo;
 import com.soltelec.consolaentrada.models.entities.Vehiculo;
-import com.soltelec.consolaentrada.models.statics.LoggedUser;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
 import java.io.IOException;
@@ -157,6 +143,7 @@ public class HojaPruebasJpaController {
                 ctxVehiculo.setDiseno(hojaPruebas.getVehiculo().getDiseno());
                 ctxVehiculo.setEsEnsenaza(hojaPruebas.getVehiculo().getEsEnsenaza());
                 ctxVehiculo.setPotencia(hojaPruebas.getVehiculo().getPotencia());
+                ctxVehiculo.setFecha(new Date());
                 hojaPruebas.setVehiculo(ctxVehiculo);
             }
         }
@@ -403,10 +390,21 @@ public class HojaPruebasJpaController {
     }
 
     public List<AuditoriaSicov> recogerTramasExist(HojaPruebas ctxHojaPrueba) {
+        System.out.println("Busquedad de tramas recogerTramasExist ctxHojaPrueba init");
         EntityManager em = null;
         em = getEntityManager();
         Query q = em.createQuery("SELECT a FROM AuditoriaSicov a WHERE a.idRevision= :idHp  ");
         q.setParameter("idHp", ctxHojaPrueba.getId());
+        List<AuditoriaSicov> lstEvSicov = q.getResultList();
+        System.out.println("Busquedad de tramas recogerTramasExist ctxHojaPrueba end");
+        return lstEvSicov;
+    }
+
+    public List<AuditoriaSicov> recogerTramasExist(Integer idHojaPruebas) {
+        EntityManager em = null;
+        em = getEntityManager();
+        Query q = em.createQuery("SELECT a FROM AuditoriaSicov a WHERE a.idRevision= :idHp  ");
+        q.setParameter("idHp", idHojaPruebas);
         List<AuditoriaSicov> lstEvSicov = q.getResultList();
         return lstEvSicov;
     }

@@ -12,12 +12,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.CifraDesifra;
 import com.soltelec.consolaentrada.utilities.UtilPropiedades;
@@ -25,9 +27,11 @@ import com.soltelec.consolaentrada.utilities.Utils;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -56,9 +60,19 @@ public class Conexion implements Serializable {
     private static final String EXTENSION = ".soltelec";
     private static final String NOMBRE_ARCHIVO = "Conexion";
     private static boolean licencia = false;
+    private static String nitCda;
+
+    public static String getNitCda(){
+        return Conexion.nitCda;
+    }
+
+    public static void setNitCda(String nit){
+        Conexion.nitCda = nit;
+    }
 
     public static void changeLicencia(){
         licencia = false;
+        Utils.eliminarCantA2();
     }
 
     public static void setConexionFromFile() {
@@ -90,7 +104,7 @@ public class Conexion implements Serializable {
             }
 
             String consulta = "SELECT NIT FROM cda WHERE id_cda = 1";
-            String url = "jdbc:mysql://" + datos.get(1) + ":" + datos.get(3) + "/" + datos.get(0) + "?zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false";
+            String url = "jdbc:mysql://" + datos.get(1) + ":" + datos.get(3) + "/" + datos.get(0) + "?zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true";
             //System.out.println("URL: "+url);
 
             String user = datos.get(2);
@@ -111,6 +125,14 @@ public class Conexion implements Serializable {
                         statement.execute(sql);
                         System.out.println("Modo ONLY_FULL_GROUP_BY desactivado correctamente.");
                     }
+
+                    
+                    // Verificar si el campo 'licence' existe en la tabla 'cda'
+                    if (!campoExiste(conexion, "cda", "licence")) {
+                        System.out.println("El campo licence no existe. Creando...");
+                        // Si no existe, crear el campo 'licence' con valor predeterminado true
+                        crearCampoLicence(conexion);
+                    }
             
                     // Preparar y ejecutar la consulta SQL después de modificar el modo SQL
                     try (PreparedStatement consultaDagma = conexion.prepareStatement(consulta)) {
@@ -120,10 +142,28 @@ public class Conexion implements Serializable {
                         try (ResultSet rc = consultaDagma.executeQuery()) {
                             while (rc.next()) {
                                 nit = rc.getString("NIT");
+
+                                Conexion.setNitCda(nit);
+
                                 String urlPeticion = "http://api.soltelec.com:8087/api/public/" + nit;
+                                //String urlPeticion = "http://localhost/api/public/" + nit;
                                 response = sendGet(urlPeticion);
             
-                                if (response.equalsIgnoreCase("true")) licencia = true;
+                                if (response.equalsIgnoreCase("true")){
+                                    licencia = true;
+                                    String updateSql = "UPDATE cda SET licence = 1 WHERE id_cda = 1";
+                                    try (Statement updateStmt = conexion.createStatement()) {
+                                        updateStmt.executeUpdate(updateSql);
+                                    }
+                                } 
+                                else {
+                                    // Si la respuesta no es "true", actualizar 'licence' a 0
+                                    String updateSql = "UPDATE cda SET licence = 0 WHERE id_cda = 1";
+                                    try (Statement updateStmt = conexion.createStatement()) {
+                                        updateStmt.executeUpdate(updateSql);
+                                        System.out.println("Campo 'licence' actualizado a 0.");
+                                    }
+                                }
                             }
                         }
             
@@ -161,6 +201,8 @@ public class Conexion implements Serializable {
             usuario = datos.get(2);
             puerto = datos.get(3);
             contrasena = password;
+
+            
 
             bufferedReader.close();
 
@@ -215,6 +257,86 @@ public class Conexion implements Serializable {
             }
         }
     }
+
+    public static String sendPost(String url, Object data) {
+        HttpURLConnection con = null;
+        try {
+            // Crear conexión
+            URL obj = new URL(url);
+            con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+
+            // Convertir el objeto a JSON
+            Gson gson = new Gson();
+            String jsonInputString = gson.toJson(data);
+
+            // Habilitar envío de datos
+            con.setDoOutput(true);
+
+            // Escribir datos en la solicitud
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Obtener respuesta del servidor
+            int responseCode = con.getResponseCode();
+            System.out.println("POST Response Code :: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) { // Código 200 OK
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) { // Código 404
+                return "404 Not Found";
+            } else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) { // Código 500
+                return "El CDA no se encuentra inscrito en la base de datos del VPS";
+            } else {
+                return "Unexpected Response Code: " + responseCode;
+            }
+        } catch (java.net.UnknownHostException e) {
+            e.printStackTrace();
+            return "Unknown Host Exception: " + e.getMessage();
+        } catch (java.net.ConnectException e) {
+            e.printStackTrace();
+            return "false";
+        } catch (java.net.SocketTimeoutException e) {
+            e.printStackTrace();
+            return "Socket Timeout Exception: " + e.getMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Exception: " + e.getMessage();
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
+        }
+    }
+
+    // Método para verificar si un campo existe en una tabla
+    private static boolean campoExiste(Connection conexion, String tabla, String campo) throws SQLException {
+        DatabaseMetaData metaData = conexion.getMetaData();
+        try (ResultSet rs = metaData.getColumns(null, null, tabla, campo)) {
+            return rs.next(); // Si hay un resultado, el campo existe
+        }
+    }
+
+    // Método para crear el campo 'licence' con valor predeterminado true
+    private static void crearCampoLicence(Connection conexion) throws SQLException {
+        String sql = "ALTER TABLE cda ADD COLUMN licence BOOLEAN DEFAULT true";
+        try (Statement stmt = conexion.createStatement()) {
+            stmt.executeUpdate(sql);
+        }
+    }
     
     public static String getBaseDatos() {
         return baseDatos;
@@ -249,6 +371,7 @@ public class Conexion implements Serializable {
     }
 
     public static String getUrl() {
+        if(ipServidor == null || puerto == null || baseDatos == null) setConexionFromFile();
         return "jdbc:mysql://" + ipServidor + ":" + puerto + "/" + baseDatos + "?zeroDateTimeBehavior=convertToNull";
     }
 

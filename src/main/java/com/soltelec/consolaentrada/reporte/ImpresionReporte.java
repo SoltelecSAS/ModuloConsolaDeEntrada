@@ -26,6 +26,7 @@ import com.soltelec.consolaentrada.sicov.ci2.ClienteCi2Servicio;
 import com.soltelec.consolaentrada.sicov.indra.ClienteIndra;
 import com.soltelec.consolaentrada.sicov.indra.ClienteIndraServicio;
 import com.soltelec.consolaentrada.sicov.indra.EnviarRuntSicov;
+import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
 import com.soltelec.consolaentrada.utilities.Utils;
@@ -54,7 +55,7 @@ public class ImpresionReporte {
     EventosSicovJpaController controllerEventos = new EventosSicovJpaController();
     EventosDao ev;
     private Long numeroHojaPrueba;
-    private final LlamarReporte llamarReporte;
+    private LlamarReporte llamarReporte;
     
     
     
@@ -74,6 +75,53 @@ public class ImpresionReporte {
     public ImpresionReporte() {
         this.numeroHojaPrueba = -1L;
         llamarReporte = new LlamarReporte();
+    }
+    
+    public ImpresionReporte(HojaPruebas ctxHojaPrueba, Long numeroHoja) {
+        this.numeroHojaPrueba = numeroHoja;
+        this.ctxHojaPrueba = ctxHojaPrueba;
+        if (numeroHojaPrueba > 0) {
+            CdaJpaController cdaControler = cdaControler = new CdaJpaController();
+            this.ctxHojaPrueba = controller.find(numeroHojaPrueba.intValue());
+            ctxCDA = cdaControler.find(1);
+        }
+        
+    }
+
+    public void preguntarConsecutivos() {
+        try {
+            if (numeroHojaPrueba > 0) {
+                try {
+                    if (!this.ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("NO_APLICA")) {
+                        if (this.ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("Env1FUR")) {
+                            validacionesPrimerFur();
+                        }
+//validar si se envio el fur 
+                        if (ctxCDA.getProveedorSicov().equalsIgnoreCase("CI2")) {
+                            validandoEnvioCI2();
+                        }
+
+                        if (ctxCDA.getProveedorSicov().equalsIgnoreCase("INDRA")) {
+                            validandoEnvioIndra();
+                        }
+                        
+
+                    } else {
+                        validandoTiPoPrueba();
+                    }
+
+                    //cargarReporte();
+
+                } catch (Exception ex) {
+
+                }
+            } else {
+                Mensajes.mensajeAdvertencia("Disculpe, No ha Seleccionado una hoja de prueba");
+            }//end else
+        }//end try
+        catch (ArrayIndexOutOfBoundsException aioe) {
+            Mensajes.mensajeAdvertencia("Disculpe, No ha Seleccionado una hoja de prueba");
+        }
     }
 
     /**
@@ -129,7 +177,7 @@ public class ImpresionReporte {
      * Metodo que envia el primer FUR
      *
      */
-    private void validacionesPrimerFur() {
+    public void validacionesPrimerFur() {
 
         System.out.println("----------------------------------------------------");
         System.out.println("----------------ENVIANDO SEGUNDO FUR ----------------");
@@ -140,20 +188,31 @@ public class ImpresionReporte {
             int seleccion = JOptionPane.showOptionDialog(null, "¿Desea Enviar el Segundo FUR de esta Revision TecnoMecanica ?", "Envio Segundo FUR", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
             if (seleccion == JOptionPane.YES_OPTION) {
 
+                
                 String strConsecutivo = null;
                 
                 envio = true;
                 Boolean nunValido = false;
                 lstCertificado = new ArrayList();
+                System.out.println("Creacion jpa pruebas");
                 PruebaJpaController pruebasJPA = new PruebaJpaController();
+                System.out.println("busqueda de pruebas");
                 List<Prueba> pruebas = pruebasJPA.findUltimasPruebasByHoja(ctxHojaPrueba.getId());
                 String even = "";
                 int posTrama = 0;
                 boolean encontrado = false;
+                System.out.println("Busquedad de tramas");
                 List<AuditoriaSicov> lstTramas = controller.recogerTramasExist(this.ctxHojaPrueba);
                 for (Prueba p : pruebas) {
+
+                    int count = 0;
+                    int limit = lstTramas.size();
                     for (AuditoriaSicov auScv : lstTramas) {
+                        count++;
+                        System.out.println("obteniendo tramas de auditoria sicov: ("+count+" de "+limit+"). INIT" );
                         posTrama = auScv.getTRAMA().indexOf("idRegistro");
+
+                        System.out.println("obteniendo..." );
                         even = auScv.getTRAMA().substring(posTrama + 13, auScv.getTRAMA().length() - 2);
                         if (p.getId() == Integer.parseInt(even) && p.getTipoPrueba().getId() != 3) {
                             encontrado = true;
@@ -163,43 +222,79 @@ public class ImpresionReporte {
                             encontrado = true;
                             break;
                         }
+                        System.out.println("obteniendo tramas de auditoria sicov: ("+count+" de "+limit+"). END" );
                     }
 
+                    System.out.println("for finalizado" );
+
                     if (encontrado == false) {
+                        
                         if (p.getFechaAborto() != null) {
+                            
+                            System.out.println("-------------------Fecha aborto init");
+                            System.out.println("fecha aborto: "+p.getFechaAborto());
                             int indicador = p.getFechaAborto().indexOf(";");
                             if (indicador > 0) {
 
                             } else {
                                 p = pruebasJPA.obtSeqSicov(p);
                             }
+                            System.out.println("-----------------Fecha aborto end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 1) {
+                            System.out.println("-------------------TramaSicovVisual init");
                             pruebasJPA.TramaSicovVisual(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------TramaSicovVisual end");
                         }
+                        
 
+
+                        
                         if (p.getTipoPrueba().getId() == 2) {
+                            System.out.println("-------------------tramaSicovLuces init");
                             pruebasJPA.tramaSicovLuces(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------tramaSicovLuces end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 4) {
+                            System.out.println("-------------------tramaSicovRuidoDesviacion init");
                             pruebasJPA.tramaSicovRuidoDesviacion(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------tramaSicovRuidoDesviacion end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 5) {
+                            System.out.println("-------------------tramaSicovFrenos init");
                             pruebasJPA.tramaSicovFrenos(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------tramaSicovFrenos end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 6) {
+                            System.out.println("-------------------TramaSicovSuspension init");
                             pruebasJPA.TramaSicovSuspension(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------TramaSicovSuspension end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 7) {
+                            System.out.println("-------------------tramaSicovRuido init");
                             pruebasJPA.tramaSicovRuido(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------tramaSicovRuido end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 8) {
+                            System.out.println("-------------------GASES init");
                             Integer idRun = ctxCDA.getIdRunt();
                             String placa = ctxHojaPrueba.getVehiculo().getPlaca();
                             char temperatura = ctxHojaPrueba.getFormaMedTemperatura();
@@ -210,11 +305,17 @@ public class ImpresionReporte {
                             int tipoGasolina = ctxHojaPrueba.getVehiculo().getTipoGasolina().getId();
 
                             pruebasJPA.tramaSicovGases(p, idRun, placa, temperatura, diametro, tipoGasolina);
+                            System.out.println("-------------------GASES end");
                         }
+                        
 
+                        
                         if (p.getTipoPrueba().getId() == 9) {
+                            System.out.println("-------------------TramaSicovTaxcimetro init");
                             pruebasJPA.TramaSicovTaxcimetro(p, ctxCDA.getIdRunt(), ctxHojaPrueba.getVehiculo().getPlaca());
+                            System.out.println("-------------------TramaSicovTaxcimetro end");
                         }
+                        
 
 //                        pruebasJPA.restauracionTramaSicovLlantas(p, ctxCDA.getIdRunt(),ctxHojaPrueba.getVehiculo().getPlaca());
                     }
@@ -225,7 +326,7 @@ public class ImpresionReporte {
 
                 while (nunValido == false) {
 
-                    strConsecutivo = JOptionPane.showInputDialog("Ingrese el numero de certificado asignado por el RUNT");
+                    strConsecutivo = JOptionPane.showInputDialog("Ingrese el numero de certificado asignado por el RUNT.");
 
                     if (strConsecutivo.length() > 2) {
                         try {
@@ -323,6 +424,9 @@ public class ImpresionReporte {
                     ctxCertificado.setAnulado("N");
                     ctxCertificado.setComentario(" ");
                     ctxCertificado.setImpreso("Y");
+                    ctxCertificado.setFechaAnulacion(new Date());
+                    ctxCertificado.setFechaExpedicion(new Date());
+                    ctxCertificado.setFechaImpresion(new Date());
                     lstCertificado.add(ctxCertificado);
                     this.ctxHojaPrueba.setCertificados(lstCertificado);
                     nroCert = ctxCertificado.getConsecutivo();
@@ -330,7 +434,8 @@ public class ImpresionReporte {
 /////////////////////////////////AQUI DEBE IR CODIGO PARA GUARDAR QUIEN ENVIO EL FUR    
             }
         } catch (Exception e) {
-            System.err.println("Error en el metodo : enviarPrimerFur() " + e.getMessage());
+            System.err.println("Error en el metodo : segundoFur() " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -346,6 +451,7 @@ public class ImpresionReporte {
         System.out.println("entro a validandoEnvioEvento ");
         ev = new EventosDao();
         System.out.println(ev.InsertarEvento(UsuarioLogueado.getNick(), this.ctxHojaPrueba.getVehiculo().getPlaca(), this.ctxHojaPrueba));
+        
     }
 
     /**
@@ -363,7 +469,7 @@ public class ImpresionReporte {
         try {
             if (envio == true) {
                 if (this.ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("Env1FUR")) {
-                    JLabel label = new JLabel("He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!");
+                    JLabel label = new JLabel("He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!1");
                     label.setLocation(10, 10);
                     label.setSize(100, 75);
                     JFrame ventanaPrincipal = new JFrame("Ventana principal");
@@ -383,7 +489,7 @@ public class ImpresionReporte {
                     if (respServidor == null) {
                         JOptionPane.showMessageDialog(null, "Disculpe, no Puede Enviar el 2do. FUR debido a que no Tengo Comunicacion en estos Momentos con el Servidor SICOV ..! \n Compruebe que el servicio este Levantado sino es asi Comuniquese Por favor con la mesa de Ayuda de CI2 ");
                     }
-                    if (respServidor.getCodigoRespuesta().equals("0000") || respServidor.getMensajeRespuesta().equalsIgnoreCase("Error: El FUR ya cuenta con número de certificado")) { //ok
+                    if (respServidor.getCodigoRespuesta().equals("0000") || (respServidor.getMensajeRespuesta().contains("Error: El FUR ya cuenta con n") && respServidor.getMensajeRespuesta().contains("mero de certificado"))) { //ok
 
                         this.ctxHojaPrueba.setEstadoSICOV("SINCRONIZADO");
                         if (this.ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA")) {
@@ -425,7 +531,7 @@ public class ImpresionReporte {
         try {
             if (envio == true) {
                 if (this.ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("Env1FUR")) {
-                    JLabel label = new JLabel("He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!");
+                    JLabel label = new JLabel("He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!2");
                     label.setLocation(10, 10);
                     label.setSize(100, 75);
                     JFrame ventanaPrincipal = new JFrame("Ventana principal");
@@ -495,7 +601,11 @@ public class ImpresionReporte {
             }// fin de logica de envio de doble FUR APLICADO INDRA 
 
         } catch (Exception e) {
+            
+            
+            e.printStackTrace();
             System.err.println("Error en el metodo : validandoEnvioIndra() " + e.getMessage());
+            CMensajes.mensajeError("No se puedo hacer una validacion del envio debido a: \n"+e.getMessage());
         }
     }
 
@@ -569,6 +679,9 @@ public class ImpresionReporte {
                         ctxCertificado.setAnulado("");
                         ctxCertificado.setComentario(" ");
                         ctxCertificado.setImpreso(" ");
+                        ctxCertificado.setFechaAnulacion(new Date());
+                        ctxCertificado.setFechaExpedicion(new Date());
+                        ctxCertificado.setFechaImpresion(new Date());
                         lstCertificado.add(ctxCertificado);
                         ctxHojaPrueba.setCertificados(lstCertificado);
                         controlerCertificado.nvoCertificado(ctxCertificado, this.ctxHojaPrueba);

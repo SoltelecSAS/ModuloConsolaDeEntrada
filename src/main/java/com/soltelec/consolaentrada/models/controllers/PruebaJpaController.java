@@ -1,5 +1,6 @@
 package com.soltelec.consolaentrada.models.controllers;
 
+import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.models.controllers.conexion.PersistenceController;
 import com.soltelec.consolaentrada.models.controllers.exceptions.IllegalOrphanException;
 import com.soltelec.consolaentrada.models.controllers.exceptions.NonexistentEntityException;
@@ -22,11 +23,14 @@ import com.soltelec.consolaentrada.tramasJson.TramaJsonTaximetro;
 import com.soltelec.consolaentrada.tramasJson.TramaJsonVisual;
 import com.soltelec.consolaentrada.tramasJson.tramaJsonLLantas;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
+import com.soltelec.consolaentrada.utilities.Utils;
 
 import javax.persistence.*;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -241,7 +245,9 @@ public class PruebaJpaController {
         }
     }
 
+
     public List<Prueba> findUltimasPruebasByHoja(int idHojaPruebas) {
+        System.out.println("busqueda de pruebas findUltimasPruebasByHoja init");
         EntityManager em = getEntityManager();
         TypedQuery<Integer> query = em.createQuery("SELECT MAX(p.id) FROM Prueba p WHERE p.hojaPruebas.id = :idHojaPruebas  GROUP BY p.tipoPrueba.id", Integer.class);
         query.setParameter("idHojaPruebas", idHojaPruebas);
@@ -250,6 +256,7 @@ public class PruebaJpaController {
         for (Integer idPrueba : idPruebas) {
             pruebas.add(em.find(Prueba.class, idPrueba));
         }
+        System.out.println("busqueda de pruebas findUltimasPruebasByHoja end");
         return pruebas;
     }
 
@@ -445,11 +452,13 @@ public class PruebaJpaController {
         em.getTransaction().commit();
     }
 
-    public Prueba obtSeqSicov(Prueba prueba) {
+    /* public Prueba obtSeqSicov(Prueba prueba) {
         EntityManager em = getEntityManager();
         em.getTransaction().begin();
         String ipFound = "";
         Integer evenSicov = 0;
+
+        System.out.println("consulta 1 obtSeqSicov");
         Query query = em.createQuery("SELECT hp FROM  HojaPruebas hp JOIN  hp.vehiculo v WHERE v.tipoGasolina.id=:tipoGas and v.tipoVehiculo.id=:tipoVeh order by hp.id desc ");
         query.setParameter("tipoGas", prueba.getHojaPruebas().getVehiculo().getTipoGasolina().getId());
         query.setParameter("tipoVeh", prueba.getHojaPruebas().getVehiculo().getTipoVehiculo().getId());
@@ -480,6 +489,8 @@ public class PruebaJpaController {
                 evenSicov = 8;
                 break;
         }
+
+        System.out.println("ejecucion 1 obtSeqSicov");
         List<HojaPruebas> lstHojaPrueba = query.getResultList();
         for (HojaPruebas hoja : lstHojaPrueba) {
             query = em.createQuery("SELECT a.ipEquipoMedicion FROM AuditoriaSicov a WHERE a.idRevision = :idHojaPruebas and a.tipoEvento= :evento");
@@ -491,18 +502,149 @@ public class PruebaJpaController {
                 break;
             }
         }
+
+        System.out.println("consulta 2 obtSeqSicov");
         Query q = em.createNativeQuery("SELECT MAX(SEQ_COUNT) from sequence WHERE SEQ_NAME = 'AUD_SICOV' ");
+        System.out.println("ejecucion 2 obtSeqSicov");
         Integer idAud = (Integer) q.getSingleResult();
-        SEQUENCE s = em.find(SEQUENCE.class, "AUD_SICOV");
-        int nvoAudi = idAud + 1;
-        s.setSEQCOUNT(nvoAudi);
-        Prueba pr = em.find(Prueba.class, prueba.getId());
-        pr.setFechaAborto(ipFound.concat(";").concat(String.valueOf(idAud)));
-        em.merge(s);
-        em.merge(pr);
+
+        if (idAud == null) idAud = 0; // Si no hay registros, inicializar en 0
+        int nuevoValorSecuencia = idAud + 1;
+
+        // Llamar al método JDBC para actualizar la secuencia
+        Utils.actualizarSecuenciaAudSicov(nuevoValorSecuencia);
+
+        //SEQUENCE s = em.find(SEQUENCE.class, "AUD_SICOV");
+        //int nvoAudi = idAud + 1;
+        //s.setSEQCOUNT(nvoAudi);
+        //Prueba pr = em.find(Prueba.class, prueba.getId());
+        // pr.setFechaAborto(ipFound.concat(";").concat(String.valueOf(idAud)));
+        //em.merge(s);
+        //em.merge(pr);
+        //em.getTransaction().commit(); 
+        Utils.actualizarFechaAbortoSicov(prueba.getId(), ipFound, idAud);
         em.getTransaction().commit();
-        return pr;
+        return prueba;
+    } */
+
+    /* public Prueba obtSeqSicov(Prueba prueba) {
+        String ipFound = "";
+        Integer evenSicov = 0;
+
+        System.out.println("id prueba: "+ prueba.getId());
+
+        String queryHojaPruebas = "SELECT hp.TESTSHEET FROM hoja_pruebas hp " +
+                "JOIN vehiculos v ON hp.Vehiculo_for = v.CAR " +
+                "WHERE v.FUELTYPE = ? AND v.CARTYPE = ? " +
+                "ORDER BY hp.TESTSHEET DESC LIMIT 10";
+
+        String queryAuditoria = "SELECT IP_EQUIPO_MEDICION FROM auditoria_sicov " +
+                "WHERE ID_REVISION = ? AND TIPO_EVENTO = ?";
+
+        String queryMaxSeq = "SELECT MAX(SEQ_COUNT) FROM sequence WHERE SEQ_NAME = 'AUD_SICOV'";
+
+        switch (prueba.getTipoPrueba().getId()) {
+            case 1: evenSicov = 7; break;
+            case 2: evenSicov = 2; break;
+            case 4: evenSicov = 5; break;
+            case 5: evenSicov = 4; break;
+            case 6: evenSicov = 6; break;
+            case 7: evenSicov = 3; break;
+            case 8: evenSicov = 1; break;
+            case 9: evenSicov = 8; break;
+        }
+
+        int idAud = 0;
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+            PreparedStatement stmtHojaPruebas = conexion.prepareStatement(queryHojaPruebas)) {
+
+            stmtHojaPruebas.setInt(1, prueba.getHojaPruebas().getVehiculo().getTipoGasolina().getId());
+            stmtHojaPruebas.setInt(2, prueba.getHojaPruebas().getVehiculo().getTipoVehiculo().getId());
+            ResultSet rsHoja = stmtHojaPruebas.executeQuery();
+
+            while (rsHoja.next()) {
+                int idHojaPrueba = rsHoja.getInt("TESTSHEET");
+                try (PreparedStatement stmtAuditoria = conexion.prepareStatement(queryAuditoria)) {
+                    stmtAuditoria.setInt(1, idHojaPrueba);
+                    stmtAuditoria.setInt(2, evenSicov);
+                    ResultSet rsAuditoria = stmtAuditoria.executeQuery();
+                    if (rsAuditoria.next()) {
+                        ipFound = rsAuditoria.getString("IP_EQUIPO_MEDICION");
+                        break;
+                    }
+                }
+            }
+
+            try (PreparedStatement stmtMaxSeq = conexion.prepareStatement(queryMaxSeq);
+                ResultSet rsMaxSeq = stmtMaxSeq.executeQuery()) {
+                idAud = rsMaxSeq.next() ? rsMaxSeq.getInt(1) : 0;
+                int nuevoValorSecuencia = idAud + 1;
+                Utils.actualizarSecuenciaAudSicov(nuevoValorSecuencia);
+                Utils.actualizarFechaAbortoSicov(prueba.getId(), ipFound, idAud);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        prueba.setFechaAborto(ipFound.concat(";").concat(String.valueOf(idAud)));
+        return prueba;
+    } */
+
+    public Prueba obtSeqSicov(Prueba prueba) {
+        String ipFound = "";
+        int evenSicov = obtenerEvenSicov(prueba.getTipoPrueba().getId());
+        int idAud = 0;
+    
+        System.out.println("id prueba: " + prueba.getId());
+    
+        String queryOptimizada = 
+            "SELECT a.IP_EQUIPO_MEDICION, " +
+            "       (SELECT MAX(SEQ_COUNT) FROM sequence WHERE SEQ_NAME = 'AUD_SICOV') AS maxSeq " +
+            "FROM hoja_pruebas hp " +
+            "JOIN vehiculos v ON hp.Vehiculo_for = v.CAR " +
+            "JOIN auditoria_sicov a ON a.ID_REVISION = hp.TESTSHEET " +
+            "WHERE v.FUELTYPE = ? AND v.CARTYPE = ? AND a.TIPO_EVENTO = ? " +
+            "ORDER BY hp.TESTSHEET DESC LIMIT 1";
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(queryOptimizada)) {
+    
+            stmt.setInt(1, prueba.getHojaPruebas().getVehiculo().getTipoGasolina().getId());
+            stmt.setInt(2, prueba.getHojaPruebas().getVehiculo().getTipoVehiculo().getId());
+            stmt.setInt(3, evenSicov);
+    
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    ipFound = rs.getString("IP_EQUIPO_MEDICION");
+                    idAud = rs.getInt("maxSeq") + 1;
+                }
+            }
+    
+            Utils.actualizarSecuenciaAudSicov(idAud);
+            Utils.actualizarFechaAbortoSicov(prueba.getId(), ipFound, idAud);
+    
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        prueba.setFechaAborto(ipFound.concat(";").concat(String.valueOf(idAud)));
+        return prueba;
     }
+    
+
+    private int obtenerEvenSicov(int tipoPruebaId) {
+        switch (tipoPruebaId) {
+            case 1: return 7;
+            case 2: return 2;
+            case 4: return 5;
+            case 5: return 4;
+            case 6: return 6;
+            case 7: return 3;
+            case 8: return 1;
+            case 9: return 8;
+            default: throw new IllegalArgumentException("Tipo de prueba no reconocido: " + tipoPruebaId);
+        }
+    }
+    
 
 //    public void restauracionTramaSicovTaximetro(Prueba prueba, Integer idRun) 
 //    {
@@ -804,10 +946,10 @@ public class PruebaJpaController {
      * @param idRun
      */
     public void TramaSicovVisual(Prueba prueba, Integer idRun, String placa) {
-        TramaJsonVisual dataTrama = new TramaJsonVisual();
         System.out.println("--------------------------------------------------");
         System.out.println("-------   TramaSicovSuspension         -----------");
         System.out.println("--------------------------------------------------");
+        TramaJsonVisual dataTrama = new TramaJsonVisual();
         try {
 //            for (Prueba prueba : ctxHojaPrueba.getListPruebas())
 //            {
@@ -847,10 +989,10 @@ public class PruebaJpaController {
      * @param idRun
      */
     public void TramaSicovSuspension(Prueba prueba, Integer idRun, String placa) {
-        TramaJsonSuspension dataTrama = new TramaJsonSuspension();
         System.out.println("--------------------------------------------------");
         System.out.println("-------   TramaSicovSuspension         -----------");
         System.out.println("--------------------------------------------------");
+        TramaJsonSuspension dataTrama = new TramaJsonSuspension();
         try {
 //            for (Prueba prueba : ctxHojaPrueba.getListPruebas())
 //            {
@@ -945,10 +1087,11 @@ public class PruebaJpaController {
      * @param idRun
      */
     public void tramaSicovRuido(Prueba prueba, Integer idRun, String placa) {
-        TramaJsonRuido dataTrama = new TramaJsonRuido();
         System.out.println("--------------------------------------------------");
         System.out.println("----------   tramaSicovRuido         -------------");
         System.out.println("--------------------------------------------------");
+        TramaJsonRuido dataTrama = new TramaJsonRuido();
+        
         try {
 //            for (Prueba prueba : ctxHojaPrueba.getListPruebas())
 //            {

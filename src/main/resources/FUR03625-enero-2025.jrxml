@@ -1263,7 +1263,7 @@ WHERE
 					<text><![CDATA[Combustible / Propulsión]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="1" y="10" width="102" height="10" uuid="e66a097f-6b19-4423-8864-90013fb241b8"/>
+					<reportElement x="8" y="10" width="89" height="10" uuid="e66a097f-6b19-4423-8864-90013fb241b8"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>

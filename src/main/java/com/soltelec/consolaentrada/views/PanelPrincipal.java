@@ -74,7 +74,7 @@ public class PanelPrincipal extends javax.swing.JPanel {
 
         btnReinspecciones.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnReinspecciones.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/soltelec/consolaentrada/images/Reinspecciones.png"))); // NOI18N
-        btnReinspecciones.setText("REPORTES-RECHAZADOS");
+        btnReinspecciones.setText("REINSPECCIONES");
         btnReinspecciones.setBorder(null);
         btnReinspecciones.setBorderPainted(false);
         btnReinspecciones.setContentAreaFilled(false);
@@ -262,23 +262,23 @@ public class PanelPrincipal extends javax.swing.JPanel {
         ViewManager.getInstance().showImpresionesByPlaca();
     }//GEN-LAST:event_btnReportesPlacaActionPerformed
 
-    private void btnReinspeccionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinspeccionesActionPerformed
-        ViewManager.getInstance().showReinspeccion();
-    }//GEN-LAST:event_btnReinspeccionesActionPerformed
-
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
 
         
         System.exit(0);
     }//GEN-LAST:event_btnSalirActionPerformed
 
+    private void btnFotosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFotosActionPerformed
+        ViewManager.getInstance().showFoto();
+    }//GEN-LAST:event_btnFotosActionPerformed
+
     private void btnSalir2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalir2ActionPerformed
-       ViewManager.getInstance().showCertificados();
+        ViewManager.getInstance().showCertificados();
     }//GEN-LAST:event_btnSalir2ActionPerformed
 
-    private void btnFotosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFotosActionPerformed
-       ViewManager.getInstance().showFoto();       
-    }//GEN-LAST:event_btnFotosActionPerformed
+    private void btnReinspeccionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReinspeccionesActionPerformed
+        ViewManager.getInstance().showReinspeccion();
+    }//GEN-LAST:event_btnReinspeccionesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

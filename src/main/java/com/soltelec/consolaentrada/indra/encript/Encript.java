@@ -47,6 +47,7 @@ public class Encript {
             in.close();
             return response.toString();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Error al encriptar los datos por favor reiniciar el servicio de Mysql y iniciar xampp" + e.getMessage());
         }
     }

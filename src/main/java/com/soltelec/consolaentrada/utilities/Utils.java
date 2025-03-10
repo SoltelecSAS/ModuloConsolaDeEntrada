@@ -1,7 +1,9 @@
 package com.soltelec.consolaentrada.utilities;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -15,6 +17,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +28,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.management.RuntimeErrorException;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.models.Dtos.InfoHojaPruebas;
@@ -98,6 +104,38 @@ public class Utils {
         }
     
         return fechaIngreso;
+    }
+
+    public static String obtenerFechaPrimeraRevision(int conHojaPrueba) {
+        String fechaMinimaStr = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
+        Conexion.setConexionFromFile();
+        
+        // Consulta SQL
+        String query = "SELECT MIN(Fecha_ingreso_vehiculo) FROM hoja_pruebas WHERE con_hoja_prueba = ?";
+        
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+                PreparedStatement stmt = conexion.prepareStatement(query)) {
+            
+            // Asigna el valor al parámetro
+            stmt.setInt(1, conHojaPrueba);
+            
+            // Ejecuta la consulta
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Timestamp timestamp = rs.getTimestamp(1);
+                if (timestamp != null) {
+                    fechaMinimaStr = sdf.format(new Date(timestamp.getTime()));
+                }
+            }
+            
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return fechaMinimaStr; // Retorna la fecha mínima en formato String o null si no hay resultado
     }
 
     public static int contarHojaPrueba(int conHojaPrueba) {
@@ -477,6 +515,34 @@ public class Utils {
         return fechaAnterior; // Retorna la fecha encontrada o null si no hay resultado
     }
 
+    public static int contarHojasPrueba(int conHojaPrueba) {
+        int count = 0; // Inicializamos el contador
+        
+        Conexion.setConexionFromFile();
+        
+        // Consulta SQL
+        String query = "SELECT COUNT(*) FROM hoja_pruebas WHERE con_hoja_prueba = ?";
+        
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+                PreparedStatement stmt = conexion.prepareStatement(query)) {
+            
+            // Asigna el valor al parámetro
+            stmt.setInt(1, conHojaPrueba);
+            
+            // Ejecuta la consulta
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1); // Obtiene el resultado de la consulta
+            }
+            
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return count; // Retorna el número de registros encontrados
+    }
+
     public static void actualizarFechaIngresoVehiculo(int testSheetId) {
         
         // Consulta SQL para actualizar la fecha
@@ -662,78 +728,96 @@ public class Utils {
     
 
     public static String getAprobadoReprobado(int idHojaPrueba) {
-        String consulta = "SELECT p.*, v.CARTYPE FROM pruebas p \n" +
-                          "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for\n" +
-                          "inner join vehiculos v on v.CAR = hp.Vehiculo_for " +
-                          "WHERE hp.TESTSHEET = ?\n" +
-                          "ORDER BY p.Fecha_prueba DESC;";
+        String consultaPruebas = "SELECT p.*, v.CARTYPE, v.esEnsenaza, hp.preventiva FROM pruebas p " +
+                                  "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for " +
+                                  "INNER JOIN vehiculos v on v.CAR = hp.Vehiculo_for " +
+                                  "WHERE hp.TESTSHEET = ? ORDER BY p.Fecha_prueba DESC;";
+    
+        String consultaPreventiva = "SELECT hp.preventiva FROM hoja_pruebas hp WHERE hp.TESTSHEET = ?";
+    
+        boolean[] pruebasVistas = new boolean[9];
         
-        // Archivo donde se guardará el log
-        File logFile = new File("pruebas_log.txt");
-        
-        try (PrintStream logStream = new PrintStream(new FileOutputStream(logFile))) {
-            // Redirige System.out a logStream
-            PrintStream originalOut = System.out;
-            System.setOut(logStream);
-            
-            Conexion.setConexionFromFile();
-
-            boolean[] pruebasVistas = {false, false, false, false, false, false, false, false, false};
-
-            try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
-                 PreparedStatement consultaPruebas = conexion.prepareStatement(consulta)) {
-
-                consultaPruebas.setInt(1, idHojaPrueba);
-
-                try (ResultSet rc = consultaPruebas.executeQuery()) {
-                    int puntajeTotalDefectos = 0;
-                    while (rc.next()) {
-
-                        int tipoPrueba = rc.getInt("Tipo_prueba_for");
-
-                        if (!pruebasVistas[tipoPrueba - 1]) {
-                            // Este mensaje será redirigido al archivo
-                            System.out.println("id prueba: " + rc.getString("id_Pruebas"));
-                            
-                            pruebasVistas[tipoPrueba - 1] = true;
-
-                            String finalizada = rc.getString("Finalizada");
-                            String abortada = rc.getString("Abortada");
-
-                            if ("N".equals(finalizada) || !"N".equals(abortada)) {
-                                System.setOut(originalOut); // Restaura System.out
-                                return "PENDIENTE";
-                            }
-
-                            int idPrueba = rc.getInt("Id_Pruebas");
-                            int tipoVehiculo = rc.getInt("CARTYPE");
-
-                            puntajeTotalDefectos += calcularPuntajeDefectos(idPrueba);
-                            System.out.println("puntuacion defectos: "+puntajeTotalDefectos);
-
-                            if (puntajeTotalDefectos > 4 && tipoVehiculo == 4) {
-                                System.setOut(originalOut); // Restaura System.out
-                                return "REPROBADA";
-                            }
-                            if (puntajeTotalDefectos > 9 && tipoVehiculo != 4) {
-                                System.setOut(originalOut); // Restaura System.out
-                                return "REPROBADA";
-                            }
-                            
-                        }
-                        //CMensajes.mensajeCorrecto(tipoPrueba+": id: "+rc.getString("id_Pruebas")+"\n"+puntajeTotalDefectos);
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement consultaPreventivaStmt = conexion.prepareStatement(consultaPreventiva);
+             PreparedStatement consultaPruebasStmt = conexion.prepareStatement(consultaPruebas)) {
+    
+            consultaPreventivaStmt.setInt(1, idHojaPrueba);
+    
+            try (ResultSet rsPreventiva = consultaPreventivaStmt.executeQuery()) {
+                if (rsPreventiva.next() && "Y".equalsIgnoreCase(rsPreventiva.getString("preventiva"))) {
+                    boolean elDtTomaLaDecision = dialogo2Opciones("Dejarme decidir", "Dejar que el software decida",
+                            "Decision resultado fur", "¿Cómo desea calificar la hoja de pruebas preventiva?");
+                    
+                    if (elDtTomaLaDecision) {
+                        boolean esAprobado = dialogo2Opciones("SI", "NO", "Decision resultado fur", 
+                                                              "¿Desea aprobar la preventiva?");
+                        return esAprobado ? "APROBADA" : "REPROBADA";
                     }
                 }
-            } catch (SQLException e) {
-                e.printStackTrace(logStream); // También loguea las excepciones en el archivo
-            } finally {
-                System.setOut(originalOut); // Restaura System.out en caso de error o al final
+            }
+    
+            consultaPruebasStmt.setInt(1, idHojaPrueba);
+            int puntajeTotalDefectos = 0;
+    
+            try (ResultSet rc = consultaPruebasStmt.executeQuery()) {
+                while (rc.next()) {
+                    int tipoPrueba = rc.getInt("Tipo_prueba_for");
+                    
+                    if (tipoPrueba < 1 || tipoPrueba > 9) continue; // Validación para evitar ArrayIndexOutOfBounds
+    
+                    if (!pruebasVistas[tipoPrueba - 1]) {
+                        pruebasVistas[tipoPrueba - 1] = true;
+    
+                        if ("N".equals(rc.getString("Finalizada")) || !"N".equals(rc.getString("Abortada"))) {
+                            return "PENDIENTE";
+                        }
+    
+                        int idPrueba = rc.getInt("Id_Pruebas");
+                        int tipoVehiculo = rc.getInt("CARTYPE");
+                        boolean esEnsenaza = rc.getInt("esEnsenaza") == 1;
+    
+                        puntajeTotalDefectos += calcularPuntajeDefectos(idPrueba);
+    
+                        if (esReprobado(puntajeTotalDefectos, tipoVehiculo, esEnsenaza)) {
+                            return "REPROBADA";
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+    
         return "APROBADA";
+    }
+    
+    // Método para centralizar la lógica de reprobación
+    private static boolean esReprobado(int puntaje, int tipoVehiculo, boolean esEnsenaza) {
+        if (puntaje > 0 && (tipoVehiculo == 121 || tipoVehiculo == 123) && esEnsenaza) return true;
+        if (puntaje > 6 && tipoVehiculo == 123) return true;
+        if (puntaje > 4 && tipoVehiculo == 4) return true;
+        if (puntaje > 9 && tipoVehiculo != 4) return true;
+        return false;
+    }
+    
+
+    public static boolean dialogo2Opciones(String opcion1, String opcion2, String title, String message) {
+        JFrame frame = new JFrame("Seleccionar Preventiva");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(300, 200);
+        frame.setLocationRelativeTo(null);
+
+        Object[] options = {opcion1, opcion2};
+        int choice = JOptionPane.showOptionDialog(frame,
+                message,
+                title,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        return choice == JOptionPane.YES_OPTION;
     }
 
     public static int calcularPuntajeDefectos(int idPrueba) {
@@ -925,31 +1009,6 @@ public class Utils {
         return false; // En caso de error o si no se actualizaron filas
     }
 
-    public static byte[] obtenerPdfFur(int idHojaPruebas) {
-        // Consulta SQL para obtener el valor de 'furData' basándose en el id
-        String consultaSelect = "SELECT furData FROM hoja_pruebas WHERE TESTSHEET = ?";
-    
-        // Conexión a la base de datos y ejecución de la consulta
-        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
-             PreparedStatement stmt = conexion.prepareStatement(consultaSelect)) {
-    
-            // Establecer el valor del parámetro en la consulta
-            stmt.setInt(1, idHojaPruebas);
-    
-            // Ejecutar la consulta y procesar el resultado
-            try (ResultSet resultSet = stmt.executeQuery()) {
-                if (resultSet.next()) {
-                    // Retornar el contenido de 'furData' como byte[]
-                    return resultSet.getBytes("furData");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    
-        return null; // En caso de error o si no se encuentra el registro
-    }
-
     public static String obtenerRegistrosDeEscriturasFur(int idHojaPruebas) {
         // Consulta SQL para obtener el valor de 'logWrite' basado en el id
         String consultaSelect = "SELECT logWrite FROM hoja_pruebas WHERE TESTSHEET = ?";
@@ -987,13 +1046,13 @@ public class Utils {
         return nombreUsuario;
     }
 
-    public static String getDtName(){
+    /* public static String getDtName(){
         if (nombreUsuario.equals("")){
             CMensajes.mensajeError("Sucedio un error al tratar de tratar de acceder al DT de la solicitud. Contactese con soporte soltelec");
             throw new RuntimeException("No se puede acceder al usuario porque no se ha usado antes la funcion getDtName(String nickUsuario, String contrasenia) de Utils para verificar credenciales y registrar el nombre del dt");
         }
         return nombreUsuario;
-    }
+    } */
 
     private static String getUserFromDb(String nickUsuario, String contrasenia) {
         String query = "SELECT Nombre_usuario FROM usuarios WHERE Contrasenia = ? AND Nick_usuario = ?;";
@@ -1022,7 +1081,7 @@ public class Utils {
     public static InfoHojaPruebas getInfoPruebas(Integer idHojaPruebas) {
         // Consulta SQL para obtener el valor de 'CARPLATE' basándose en 'TESTSHEET'
         String consultaSelect = 
-            "SELECT hp.TESTSHEET, v.CARPLATE, hp.preventiva, hp.Numero_intentos, hp.Fecha_ingreso_vehiculo \n"+
+            "SELECT hp.TESTSHEET, v.CARPLATE, hp.preventiva, hp.Numero_intentos, hp.Fecha_ingreso_vehiculo, hp.estado_sicov, hp.furData \n"+
             "FROM hoja_pruebas hp\n"+
             "INNER JOIN vehiculos v ON v.CAR = hp.Vehiculo_for\n"+
             "WHERE hp.TESTSHEET = ?\n";
@@ -1044,8 +1103,15 @@ public class Utils {
                     info.setPlaca(resultSet.getString("CARPLATE"));
                     info.setPreventiva(resultSet.getString("preventiva").equalsIgnoreCase("Y"));
 
+                    String estadoSicov = resultSet.getString("estado_sicov");
+                    boolean estaReportadoEnSicov = estadoSicov.equalsIgnoreCase("SINCRONIZADO");
+                    info.setReportadoASicov(estaReportadoEnSicov);
+
                     Timestamp timestamp = resultSet.getTimestamp("Fecha_ingreso_vehiculo");
                     info.setFechaIngreso(timestamp.toLocalDateTime());
+
+                    info.setDatosPdfFur(resultSet.getBytes("furData"));
+
                     return info;
                 }
             }
@@ -1081,4 +1147,269 @@ public class Utils {
 
         return destFileNamePdf;
     }
+
+    private static String estadoSicov;
+    public static void setEstadoSICOV(String estadoSicov){
+        Utils.estadoSicov = estadoSicov;
+    }
+
+    public static String getEstadoSicov(){
+        return Utils.estadoSicov;
+    }
+
+    public static String procesarRegistros(Integer idHojaPrueba, boolean registrarCambios) {
+        // Obtener los registros actuales
+        String registros = obtenerRegistrosDeEscriturasFur(idHojaPrueba);
+        
+        // Obtener la fecha y hora actual
+        LocalDateTime fechaActual = LocalDateTime.now();
+        
+        // Especificar la zona horaria deseada
+        ZoneId zonaHoraria = ZoneId.of("America/Bogota");
+        
+        // Convertir LocalDateTime a ZonedDateTime
+        ZonedDateTime fechaConZona = fechaActual.atZone(zonaHoraria);
+        
+        // Formatear la fecha y hora en formato "dd-MM-yyyy HH:mm:ss"
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String fechaHoraFormateada = fechaConZona.format(formato);
+        
+        // Procesar los registros
+        if (registros.equals("") || !registrarCambios) {
+            registros = "Pfd fur creado en la fecha y hora del " + fechaHoraFormateada + ".";
+        } else {
+            registros += "\nFur sobreescrito en la fecha y hora de " + fechaHoraFormateada;
+        }
+        
+        return registros;
+    }
+
+    public static boolean eliminarCantA2() {
+        String consultaColumnas = "SELECT COLUMN_NAME " +
+                                "FROM INFORMATION_SCHEMA.COLUMNS " +
+                                "WHERE TABLE_NAME = 'zbefore' AND TABLE_SCHEMA = '" + Conexion.getBaseDatos() + "' " +
+                                "AND COLUMN_NAME IN ('cant_a2')";
+
+        String consultaDatos = "SELECT cant_a2 FROM zbefore";
+        String eliminarColumnas = "ALTER TABLE zbefore DROP COLUMN cant_a2";
+
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+            Statement consulta = conexion.createStatement();
+            ResultSet resultado = consulta.executeQuery(consultaColumnas)) {
+
+            // Verificar si la columna existe
+            boolean cantA2Existe = false;
+
+            while (resultado.next()) {
+                String columna = resultado.getString("COLUMN_NAME");
+                if ("cant_a2".equals(columna)) cantA2Existe = true;
+            }
+
+            // Si la columna existe, guardar sus datos en un archivo y eliminarla
+            if (cantA2Existe) {
+                // Crear archivo y escribir los datos de la columna
+                try (Statement consultaDatosStmt = conexion.createStatement();
+                    ResultSet datos = consultaDatosStmt.executeQuery(consultaDatos);
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("artf.txt"))) {
+
+                    while (datos.next()) {
+                        String valor = datos.getString("cant_a2");
+                        writer.write(valor != null ? valor : "NULL");
+                        writer.newLine();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false; // Error al escribir el archivo
+                }
+
+                // Eliminar la columna
+                try (Statement eliminacion = conexion.createStatement()) {
+                    eliminacion.executeUpdate(eliminarColumnas);
+                    return true; // Columna eliminada exitosamente
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false; // Retorna false si no existe la columna o ocurre un error
+    }
+
+    public static boolean existenDefEnsenanza(int hojaPruebasId) {
+        boolean existeRegistro = false; // Inicializamos en false
+    
+        Conexion.setConexionFromFile();
+    
+        // Consulta SQL
+        String query = "SELECT gsg.* FROM hoja_pruebas hp " +
+                       "INNER JOIN pruebas p ON p.hoja_pruebas_for = hp.TESTSHEET " +
+                       "INNER JOIN defxprueba dp ON dp.id_prueba = p.Id_Pruebas " +
+                       "INNER JOIN defectos d ON d.CARDEFAULT = dp.id_defecto " +
+                       "INNER JOIN grupos_sub_grupos gsg ON gsg.SCDEFGROUPSUB = d.DEFGROUPSSUB " +
+                       "WHERE gsg.DEFGROUP = 21 AND hp.TESTSHEET = ?";
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(query)) {
+    
+            // Asignar el valor al parámetro
+            stmt.setInt(1, hojaPruebasId);
+    
+            // Ejecutar la consulta
+            ResultSet rs = stmt.executeQuery();
+    
+            // Verificar si hay al menos un registro
+            if (rs.next()) {
+                existeRegistro = true;
+            }
+    
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        return existeRegistro; // Retorna true si hay registros, false si no
+    }
+
+    public static void actualizarFechaAbortoSicov(int idPrueba, String ipFound, int idAud) {
+        String sql = "UPDATE pruebas SET Fecha_aborto = ? WHERE Id_Pruebas = ?";
+
+        Conexion.setConexionFromFile(); // Asegura que la conexión esté configurada
+
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(sql)) {
+
+            // Concatenamos la IP y el ID de auditoría
+            String nuevaFechaAborto = ipFound + ";" + idAud;
+
+            stmt.setString(1, nuevaFechaAborto);
+            stmt.setInt(2, idPrueba);
+
+            int filasActualizadas = stmt.executeUpdate();
+
+            if (filasActualizadas > 0) {
+                System.out.println("Fecha de aborto actualizada correctamente.");
+            } else {
+                System.out.println("No se encontró la prueba con ID: " + idPrueba);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al actualizar la fecha de aborto: " + e.getMessage());
+        }
+    }
+
+    public static void actualizarSecuenciaAudSicov(int nuevoValor) {
+        String sqlUpdate = "UPDATE sequence SET SEQ_COUNT = ? WHERE SEQ_NAME = 'AUD_SICOV'";
+        
+        Conexion.setConexionFromFile(); // Cargar configuración de conexión
+
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(sqlUpdate)) {
+
+            stmt.setInt(1, nuevoValor);
+
+            int filasActualizadas = stmt.executeUpdate();
+            if (filasActualizadas > 0) {
+                System.out.println("Secuencia AUD_SICOV actualizada correctamente a: " + nuevoValor);
+            } else {
+                System.out.println("No se encontró la secuencia AUD_SICOV para actualizar.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al actualizar la secuencia AUD_SICOV: " + e.getMessage());
+        }
+    }
+
+    public static boolean tienePinLaHp(int testSheetId) { //tiene pin la hoja de pruebas
+        String sqlQuery = "SELECT pin FROM hoja_pruebas WHERE TESTSHEET = ?";
+        
+        Conexion.setConexionFromFile(); // Cargar configuración de conexión
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(sqlQuery)) {
+            
+            stmt.setInt(1, testSheetId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String pin = rs.getString("pin");
+                    return pin != null && !pin.trim().isEmpty();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al consultar el campo pin: " + e.getMessage());
+        }
+        
+        return false;
+    }
+
+    public static boolean actualizarPin(int testSheetId, String nuevoPin) {
+        String sqlUpdate = "UPDATE hoja_pruebas SET pin = ? WHERE TESTSHEET = ?";
+        
+        Conexion.setConexionFromFile(); // Cargar configuración de conexión
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(sqlUpdate)) {
+            
+            stmt.setString(1, nuevoPin);
+            stmt.setInt(2, testSheetId);
+            
+            int filasActualizadas = stmt.executeUpdate();
+            return filasActualizadas > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Error al actualizar el campo pin: " + e.getMessage());
+        }
+        
+        return false;
+    }
+
+    public static boolean guardarOModificarMedida(int measureType, int test, Double nuevoValorMedida, String nuevoSimult) {
+        String verificarExistencia = "SELECT COUNT(*) FROM medidas WHERE MEASURETYPE = ? AND TEST = ?";
+        String actualizacion = "UPDATE medidas SET Valor_medida = ?, Simult = ? WHERE MEASURETYPE = ? AND TEST = ?";
+        String insercion = "INSERT INTO medidas (MEASURETYPE, TEST, Valor_medida, Simult) VALUES (?, ?, ?, ?)";
+    
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena())) {
+            
+            // Verificar si la medida existe
+            try (PreparedStatement consultaVerificacion = conexion.prepareStatement(verificarExistencia)) {
+                consultaVerificacion.setInt(1, measureType);
+                consultaVerificacion.setInt(2, test);
+    
+                try (ResultSet resultado = consultaVerificacion.executeQuery()) {
+                    if (resultado.next() && resultado.getInt(1) > 0) {
+                        // La medida existe, se actualiza
+                        try (PreparedStatement consultaActualizacion = conexion.prepareStatement(actualizacion)) {
+                            consultaActualizacion.setDouble(1, nuevoValorMedida);
+                            consultaActualizacion.setString(2, nuevoSimult);
+                            consultaActualizacion.setInt(3, measureType);
+                            consultaActualizacion.setInt(4, test);
+    
+                            int filasAfectadas = consultaActualizacion.executeUpdate();
+                            return filasAfectadas > 0; // Retorna true si se actualizó al menos una fila
+                        }
+                    } else {
+                        // La medida no existe, se inserta
+                        try (PreparedStatement consultaInsercion = conexion.prepareStatement(insercion)) {
+                            consultaInsercion.setInt(1, measureType);
+                            consultaInsercion.setInt(2, test);
+                            consultaInsercion.setDouble(3, nuevoValorMedida);
+                            consultaInsercion.setString(4, nuevoSimult);
+    
+                            int filasInsertadas = consultaInsercion.executeUpdate();
+                            return filasInsertadas > 0; // Retorna true si se insertó una fila
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        return false; // Retorna false si ocurre un error
+    }
+    
 }

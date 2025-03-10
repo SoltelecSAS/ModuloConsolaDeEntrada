@@ -8,11 +8,14 @@ package com.soltelec.consolaentrada.views;
 import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.custom.ModeloTablaImpresionFecha;
 import com.soltelec.consolaentrada.custom.ModeloTablaPruebas;
+import com.soltelec.consolaentrada.models.Dtos.InfoHojaPruebas;
+import com.soltelec.consolaentrada.models.Dtos.SuperUser;
 import com.soltelec.consolaentrada.models.controllers.HojaPruebasJpaController;
 import com.soltelec.consolaentrada.models.controllers.UsuarioJpaController;
 import com.soltelec.consolaentrada.models.entities.HojaPruebas;
 import com.soltelec.consolaentrada.models.entities.Prueba;
 import com.soltelec.consolaentrada.reporte.ImpresionReporte;
+import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.GenericExportExcel;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 
@@ -24,6 +27,7 @@ import com.soltelec.consolaentrada.sicov.ci2.ClienteCi2;
 import com.soltelec.consolaentrada.sicov.ci2.Pin;
 import com.soltelec.consolaentrada.utilities.Utils;
 import java.awt.Desktop;
+import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -320,38 +324,90 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirActionPerformed
-        Conexion.changeLicencia();
-        impresionReporte = new ImpresionReporte();
-        impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
-        impresionReporte.setImprimirPdf(false);
-        impresionReporte.preguntarConsecutivos(this.ctxHP);
+
+        InfoHojaPruebas info = Utils.getInfoPruebas(idHojaPrueba);
+        Utils.setEstadoSICOV(ctxHP.getEstadoSICOV());
+        
+        if(info.getDatosPdfFur() == null || !info.isReportadoASicov()){
+            Conexion.changeLicencia();
+            imprimirReporte(false);
+        }else{
+            JTextField usernameField = new JTextField(15);
+            JPasswordField passwordField = new JPasswordField(15);
+
+            JPanel panel = new JPanel(new GridLayout(2, 2));
+            panel.add(new JLabel("Usuario:"));
+            panel.add(usernameField);
+            panel.add(new JLabel("Contraseña:"));
+            panel.add(passwordField);
+
+
+            CMensajes.mensajeAdvertencia("Si desea visualizar el fur, por favor utilice la opcion 'PDF'");
+            int option = JOptionPane.showConfirmDialog(null, panel, "Credenciales Personal Soltelec", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            String username = "";
+            String password = "";
+
+            if (option == JOptionPane.OK_OPTION) {
+                username = usernameField.getText();
+                password = new String(passwordField.getPassword());
+
+                SuperUser superUser = new SuperUser();
+                superUser.setNickName(username);
+                superUser.setPassword(password);
+                superUser.setLog("Sobreescritura del fur en la placa "+ctxHP.getVehiculo().getPlaca()+"-"+ctxHP.getIntentos());
+                superUser.setNitCda(Conexion.getNitCda());
+
+                String response = Conexion.sendPost("http://api.soltelec.com:8087/api/public/superUser", superUser);
+
+                System.out.println("Response: "+response);
+
+                Boolean booleanReponse = Boolean.valueOf(response);
+
+                if (booleanReponse) {
+                    imprimirReporte(false);
+                }else{
+                    CMensajes.mensajeError("Credenciales incorrectas");
+                }
+
+            } else {
+                System.out.println("Login canceled");
+            }
+        }
         
     }//GEN-LAST:event_btnImprimirActionPerformed
 
     private void btnPdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPdfActionPerformed
-        Conexion.changeLicencia();
-        byte[] fur = Utils.obtenerPdfFur(idHojaPrueba);
-        if(fur == null){
-            impresionReporte = new ImpresionReporte();
-            impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
-            impresionReporte.setImprimirPdf(true);
-            UsuarioJpaController usrCon = new UsuarioJpaController();
+        
+        InfoHojaPruebas info = Utils.getInfoPruebas(idHojaPrueba);
+        Utils.setEstadoSICOV(ctxHP.getEstadoSICOV());
+        
+        if(info.getDatosPdfFur() == null || !Utils.getEstadoSicov().equalsIgnoreCase("SINCRONIZADO")){
+            /* UsuarioJpaController usrCon = new UsuarioJpaController();
             EntityManager em = usrCon.getEntityManager();
             em.getTransaction().begin();
             em.flush();
-            em.getTransaction().commit();
-            impresionReporte.preguntarConsecutivos(this.ctxHP);
+            em.getTransaction().commit(); */
+            Conexion.changeLicencia();
+            imprimirReporte(true);
         }else{
+            //segundoEnvioFur();
             try{
                 String destFileNamePdf = Utils.getRutaPdf(idHojaPrueba);
+
                 // Guardar el archivo en disco si es necesario
                 FileOutputStream fos = new FileOutputStream(destFileNamePdf);
-                fos.write(fur);
+                fos.write(info.getDatosPdfFur());
                 fos.close();
 
                 // Abrir el archivo PDF
-                File path = new File(destFileNamePdf);
-                Desktop.getDesktop().open(path);
+                try {
+                    File path = new File(destFileNamePdf);
+                    Desktop.getDesktop().open(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    CMensajes.mensajeError("El pdf ya se encuentra abierto. Por favor cierrelo para continuar");
+                }
             } catch (IOException ex) {
                 ex.printStackTrace(System.err);
             }
@@ -370,8 +426,13 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
         modeloTablaImpresionFecha.setListaHojaPruebas(new HojaPruebasJpaController().BuscarCriterios(consulta));
     }
     
+    private void imprimirReporte(boolean mostrarEnPdf){
+        impresionReporte = new ImpresionReporte();
+        impresionReporte.setNumeroHojaPrueba(idHojaPrueba);
+        impresionReporte.setImprimirPdf(mostrarEnPdf);
+        impresionReporte.preguntarConsecutivos(this.ctxHP);
+    }
     
-
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 
         System.out.println("********************** boton buscar activado **********************");

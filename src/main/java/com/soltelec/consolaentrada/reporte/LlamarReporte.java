@@ -11,27 +11,20 @@ import com.soltelec.consolaentrada.models.entities.Certificado;
 import com.soltelec.consolaentrada.models.entities.Prueba;
 import com.soltelec.consolaentrada.models.entities.HojaPruebas;
 import com.soltelec.consolaentrada.configuration.Conexion;
-import com.soltelec.consolaentrada.custom.ModeloTablaImpresionFecha;
 import com.soltelec.consolaentrada.models.entities.Vehiculo;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
 import com.soltelec.consolaentrada.models.controllers.EquiposJpaController1;
 import com.soltelec.consolaentrada.models.controllers.HojaPruebasJpaController;
 import com.soltelec.consolaentrada.models.controllers.ReinspeccionJpaController;
 import com.soltelec.consolaentrada.models.controllers.ReporteJpaController;
-import static com.soltelec.consolaentrada.models.controllers.conexion.PersistenceController.getEntityManager;
 import com.soltelec.consolaentrada.models.entities.AuditoriaSicov;
-import com.soltelec.consolaentrada.models.entities.Diseno;
 import com.soltelec.consolaentrada.models.entities.Equipo;
-import com.soltelec.consolaentrada.models.entities.TipoVehiculo;
 import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.CargarArchivos;
-import com.soltelec.consolaentrada.utilities.FormulaOpacidad;
 import com.soltelec.consolaentrada.utilities.Mensajes;
 import com.soltelec.consolaentrada.utilities.SepararImagenes;
 import com.soltelec.consolaentrada.utilities.UtilConexion;
-import com.soltelec.consolaentrada.utilities.UtilPropiedades;
 import com.soltelec.consolaentrada.utilities.Utils;
-import com.soltelec.consolaentrada.utilities.Validaciones;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
@@ -39,7 +32,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -53,27 +45,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 
 public class LlamarReporte {
 
     Map parametros = null;
     private boolean imprimirPdf;
-    JasperReport report, report2, report3, reportSuper;
+    JasperReport report, preventiva1, preventiva2, preventiva3, report3, reportSuper;
     public int dve;
     final String fur03625 = "FUR03625.jasper";
     final String fur3625Dos = "FUR03625.jasper";
     final String reporteLogoViejo = "super.jasper";
     final String reportePreventiva = "preventiva.jasper";
+    final String reportePreventivaVieja = "report2.jasper";
+    final String PreventivaViejaConDecision = "reportWithD.jasper";
     ConsultasCertificados consultasCertificados;
     Consultas consultas;
     private ListenerPrimerCertificado listenerPrimerCertificado;
@@ -94,13 +84,20 @@ public class LlamarReporte {
     private String OpCiclo3Value;
     private String OpCiclo4Value;
 
-    private double permisibleRalenti;
+    private double permisibleHcRalenti;
+    private double permisibleCoRalenti;
+
+    private double permisisbleEficaciaFrenos;
+
+    private boolean esAprobado;
 
     public LlamarReporte() {
         try {
             consultasCertificados = new ConsultasCertificados();
             report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur03625));
-            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            preventiva1 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            preventiva2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventivaVieja));
+            preventiva3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(PreventivaViejaConDecision));
             report3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur3625Dos));
             reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reporteLogoViejo));
             consultas = new Consultas();
@@ -115,7 +112,9 @@ public class LlamarReporte {
         try {
             consultasCertificados = new ConsultasCertificados();
             report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur03625));
-            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            preventiva1 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            preventiva2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventivaVieja));
+            preventiva3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(PreventivaViejaConDecision));
             reportSuper = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reporteLogoViejo));
             consultas = new Consultas();
         } catch (Throwable ex) {
@@ -125,9 +124,11 @@ public class LlamarReporte {
 
     public void cargarReporte(HojaPruebas ctxHojaPrueba, Cda ctxCDA, long consecutivoRUNT, String txtPlaca) throws JRException, SQLException, ClassNotFoundException, ParseException, IOException {
         this.ctxHojaPrueba = ctxHojaPrueba;
+        this.esAprobado = Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA");
         this.ctxCDA = ctxCDA;
         idHojaPrueba = ctxHojaPrueba.getId();
         List<Prueba> ctxIndPruebas = null;
+        
 
         try (Connection cn = cargarConexion()) {
             llamarProcedimientoMedidas(cn, this.ctxHojaPrueba.getId());
@@ -147,14 +148,15 @@ public class LlamarReporte {
             parametros.put("MarcaSusp", "");
 
             if (this.ctxHojaPrueba.getIntentos() > 1) {
-                Date fechaAnterior = Utils.obtenerFechaAnterior(this.ctxHojaPrueba.getId());
-                if (this.ctxHojaPrueba.getIntentos() >= 2 && fechaAnterior == null) {
-                    String fechaPrimeraRevision = Utils.obtenerFechaPrimeraRevision(this.ctxHojaPrueba.getCon_hoja_prueba(), this.ctxHojaPrueba.getId());
+                int numeroDeHojas = Utils.contarHojasPrueba(this.ctxHojaPrueba.getCon_hoja_prueba());
+                if (numeroDeHojas > 1) {
+                    String fechaPrimeraRevision = Utils.obtenerFechaPrimeraRevision(this.ctxHojaPrueba.getCon_hoja_prueba());
                     System.out.println("Fecha primera revision: "+ fechaPrimeraRevision);
                     parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + fechaPrimeraRevision);
                 }else{
-                    parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(fechaAnterior));
+                    parametros.put("ConsecutivoFecha", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 1 , " + new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(this.ctxHojaPrueba.getFechaIngreso()));
                 }
+                
             }
             configurarPermisibles();
             reinspeccion = this.ctxHojaPrueba.getReinspeccionList().size() > 0;  //consultas.isReinspeccion(this.ctxHojaPrueba.getId() , cn);            
@@ -211,11 +213,11 @@ public class LlamarReporte {
             String edoHP = (hpContJpa.verificarHojaFinalizada(ctxHojaPrueba));
             parametros.put("Aprobado", "");
             parametros.put("Reprobado", "");
-            if (Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA") ) {
+            if (esAprobado) {
                 System.out.println("------LA PRUEBA FUE APROBADA");
                 parametros.put("Aprobado", "X");
             }
-            if (Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("REPROBADA")) {
+            if (!esAprobado) {
                 System.out.println("------LA PRUEBA FUE REPROBADA");
                 parametros.put("Reprobado", "X");
                 if (ctxHojaPrueba.getIntentos() == 1) {
@@ -244,7 +246,29 @@ public class LlamarReporte {
             preventiva = consultas.isRevisionPreventiva(this.ctxHojaPrueba);
             if (preventiva) {
                 System.out.println("preventiva");
-                fillReport = JasperFillManager.fillReport(report2, parametros, cn);
+
+                boolean preventivaEscogida = Utils.dialogo2Opciones(
+                    "Preventiva nueva", 
+                    "Preventiva vieja", 
+                    "Seleccion Preventiva", 
+                    "Seleccione cual preventiva desea visualizar"
+                );
+
+                if (preventivaEscogida) fillReport = JasperFillManager.fillReport(preventiva1, parametros, cn);
+                else fillReport = JasperFillManager.fillReport(preventiva3, parametros, cn);
+
+                    /* boolean conDecisionVariable = Utils.dialogo2Opciones(
+                        "Preventiva con decision", 
+                        "Preventiva sin decision", 
+                        "Preventiva con o sin decision", 
+                        "Seleccione la preventiva vieja que desea"
+                    ); */
+
+                    /* fillReport = conDecision ? 
+                        JasperFillManager.fillReport(preventiva3, parametros, cn) :
+                        JasperFillManager.fillReport(preventiva2, parametros, cn); */
+                
+                
             } else if(fechaIngreso.isBefore(date1)){
                 System.out.println("Logo viejo");
                 fillReport = JasperFillManager.fillReport(reportSuper, parametros, cn);
@@ -254,83 +278,42 @@ public class LlamarReporte {
                 fillReport = JasperFillManager.fillReport(report, parametros, cn);
             }
 
-            File carpetaReportes = new File("C:\\Reportes");
+            // Construir el nombre y ubicacion del archivo PDF
+            String destFileNamePdf = Utils.getRutaPdf(idHojaPrueba);
 
-            if (!carpetaReportes.exists()) {
-                carpetaReportes.mkdir();
-            }
+            // Obtener el reporte como un arreglo de bytes
+            byte[] pdfBytes = JasperExportManager.exportReportToPdf(fillReport);
+
+            // Guardar el archivo en disco si es necesario
+            FileOutputStream fos = new FileOutputStream(destFileNamePdf);
+            fos.write(pdfBytes);
+            fos.close();
+
+            
 
             HojaPruebasJpaController hpControler = new HojaPruebasJpaController();
             List<AuditoriaSicov> lstTramas = hpControler.recogerTramasExist(this.ctxHojaPrueba);
-            ListenerEnvioFUR listenerEnvioFUR = new ListenerEnvioFUR(this.ctxHojaPrueba.getId().longValue(), lstTramas);
+            ListenerEnvioFUR listenerEnvioFUR = new ListenerEnvioFUR(this.ctxHojaPrueba.getId().longValue(), lstTramas, pdfBytes);
             JRViewerModificado jvModificado = new JRViewerModificado(fillReport);
             jvModificado.setListenerImprimir(listenerEnvioFUR);
             JFrame app = new JFrame("TEST");
             app.setTitle("Impresion del FUR");
             app.setContentPane(jvModificado);
 
-            
-
-            /*if (imprimirPdf) {
-                JasperExportManager.exportReportToPdfFile(fillReport, destFileNamePdf);
-                
-                // Obtener el PDF como un arreglo de bytes
-                byte[] pdfBytes = JasperExportManager.exportReportToPdf(fillReport);
-                try {
-                    File path = new File(destFileNamePdf);
-                    Desktop.getDesktop().open(path);
-                } catch (IOException ex) {
-                    ex.printStackTrace(System.err);
-                }
-            } */
-            
-            
-
+            boolean estaReportadoASicov = Utils.getEstadoSicov().equalsIgnoreCase("SINCRONIZADO");
+            String registros = Utils.procesarRegistros(idHojaPrueba, estaReportadoASicov);
+            Utils.actualizarPdfFur(idHojaPrueba, pdfBytes, registros);
 
             if (imprimirPdf) {
-                
-                // Construir el nombre del archivo PDF
-                String destFileNamePdf = Utils.getRutaPdf(idHojaPrueba);
-
                 try {
-                    // Obtener el reporte como un arreglo de bytes
-                    byte[] pdfBytes = JasperExportManager.exportReportToPdf(fillReport);
-
-                    // Guardar el archivo en disco si es necesario
-                    FileOutputStream fos = new FileOutputStream(destFileNamePdf);
-                    fos.write(pdfBytes);
-                    fos.close();
-
-                    // Abrir el archivo PDF
                     File path = new File(destFileNamePdf);
                     Desktop.getDesktop().open(path);
-
-                    String registros = Utils.obtenerRegistrosDeEscriturasFur(idHojaPrueba);
-                    LocalDateTime fechaActual = LocalDateTime.now();
-
-                    // Especificar la zona horaria deseada
-                    ZoneId zonaHoraria = ZoneId.of("America/Bogota"); // Cambia a la zona horaria deseada
-
-                    // Convertir LocalDateTime a ZonedDateTime
-                    ZonedDateTime fechaConZona = fechaActual.atZone(zonaHoraria);
-
-                    // Formatear la fecha en formato dd-MM-AAAA
-                    DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                    String fechaFormateada = fechaConZona.format(formato);
-
-                    if (registros.equals("")) {
-                        registros = "Primer pfd fur creado: "+fechaFormateada+".";
-                    }else{
-                        registros = "\nFur sobreescrito por '"+Utils.getDtName()+"' en la fecha de "+fechaFormateada;
-                    }
-                    // Aquí puedes utilizar la variable `pdfBytes` según lo necesites
-                    // Por ejemplo, enviarlo como parte de una respuesta HTTP o guardarlo en una base de datos
-                    Utils.actualizarPdfFur(idHojaPrueba, pdfBytes, registros);
-
-                } catch (IOException ex) {
-                    ex.printStackTrace(System.err);
+                } catch (Exception e) {
+                    CMensajes.mensajeError("El PDF ya se encuenta abierto en algun programa del computador. Por favor cierrelo para poder proceder");
                 }
+                
             }else {
+                
                 JasperViewer jasperViewer = new JasperViewer(fillReport, false);
                 jasperViewer.setContentPane(jvModificado);
                 if (preventiva) {
@@ -350,6 +333,8 @@ public class LlamarReporte {
             }
         }
     }
+
+    
 
     public String getAprobadoReprobado() {
         String consulta =   "SELECT p.* FROM pruebas p \n" +
@@ -413,7 +398,9 @@ public class LlamarReporte {
             report = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(fur03625));
 //            report2 = (JasperReport) JRLoader.loadObjectFromFile(rutaReporte2);
             consultas = new Consultas();
-            report2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            preventiva1 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventiva));
+            preventiva2 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(reportePreventivaVieja));
+            preventiva3 = (JasperReport) JRLoader.loadObject(CargarArchivos.cargarArchivo(PreventivaViejaConDecision));
         } catch (Throwable ex) {
             //  Mensajes.mostrarExcepcion(ex);
             int eve = 0;
@@ -479,11 +466,11 @@ public class LlamarReporte {
             parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(reinspecionActual.getFechaAnterior()));
             cargarImagen(true, parametros, 0, true);
 
-            /* if (Reinspeccion.getAprobada().equals("Y")) {
+            if (Reinspeccion.getAprobada().equals("Y")) {
                 parametros.put("Aprobado", "X");
             } else {
                 parametros.put("Reprobado", "X");
-            } */
+            }
             JasperPrint fillReport = JasperFillManager.fillReport(report, parametros, cn);
             //String destFileNamePdf="./certificado"+hojaPruebas+".pdf";
             File carpetaReportes = new File("C:\\Reportes");
@@ -581,7 +568,7 @@ public class LlamarReporte {
                 }
 
                 if (idTipoPrueba == 6) {
-                    cargaMedidaPruebaSuspension(listaMedidas);
+                    cargaMedidaPruebaSuspension(listaMedidas, idPrueba, p.getFinalizada() == "Y");
                 }
 
                 if (idTipoPrueba == 7) {
@@ -968,6 +955,8 @@ public class LlamarReporte {
         System.out.println("-Cargar medidas para la prueba de Luces Motos-------");
         System.out.println("----------------------------------------------------");
 
+        String asterisco = "";
+
         DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
 
         try {
@@ -987,7 +976,8 @@ public class LlamarReporte {
                     case 2013://INCLINACION BAJA  DERECHA
                         df.applyPattern("#0.0");
                         String AngInclDerechaMoto = String.valueOf(m.getValor());
-                        parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerechaMoto) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerechaMoto) + asterisco);
                         break;
 
                     case 2015://INTESIDAD BAJA FAROLA IZQUIERDA
@@ -1010,14 +1000,16 @@ public class LlamarReporte {
                     case 2002://INCLINACION BAJA PARA MOTO FAROLA IZQUIERDA
                         df.applyPattern("#0.0");
                         String InclinacionInquierdaF1 = String.valueOf(m.getValor());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
 //                      parametros.put("AngInclIzq", ajustarValorMedida(AngInclIzq) + m.getCondicion());
-                        parametros.put("InclinacionInquierdaF1", ajustarValorMedida(InclinacionInquierdaF1) + m.getCondicion());
+                        parametros.put("InclinacionInquierdaF1", ajustarValorMedida(InclinacionInquierdaF1) + asterisco);
                         break;
 
                     case 2022://INCLINACION BAJA FAROLA 3
                         df.applyPattern("#0.0");
                         String IntBajaIzq3 = String.valueOf(m.getValor());
-                        parametros.put("InclinacionDereF2", ajustarValorMedida(IntBajaIzq3.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("InclinacionDereF2", ajustarValorMedida(IntBajaIzq3.trim()) + asterisco);
                         break;
 
                     //----------------------------------------------------------
@@ -1075,6 +1067,8 @@ public class LlamarReporte {
         System.out.println("------Cargar medidas para la prueba de Luces -------");
         System.out.println("----------------------------------------------------");
 
+        String asterisco = "";
+
         DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
         //df.applyPattern("#0.00");
         try {
@@ -1093,7 +1087,8 @@ public class LlamarReporte {
 
                     case 2040://INCLINACION DERECHA FAROLA 1                        
                         String AngInclDerecha = String.valueOf(m.getValor());
-                        parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerecha.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerecha.trim()) + asterisco);
                         break;
 
                     case 2031://INTENSIDAD BAJA IZQUIERDA FAROLA 1                       
@@ -1104,7 +1099,8 @@ public class LlamarReporte {
 
                     case 2044://INCLINACION IZQUIERDA FAROLA 1                        
                         String InclinacionInquierdaF1 = String.valueOf(m.getValor());
-                        parametros.put("InclinacionInquierdaF1", ajustarValorMedida(InclinacionInquierdaF1.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("InclinacionInquierdaF1", ajustarValorMedida(InclinacionInquierdaF1.trim()) + asterisco);
                         break;
 
                     case 2036://INTENSIDAD ALTA IZQUIERDA FAROLA 1     -- 2032                  
@@ -1135,7 +1131,8 @@ public class LlamarReporte {
 
                     case 2041://INCLINACION DERECHA FAROLA 2                        
                         String InclinacionDereF2 = String.valueOf(m.getValor());
-                        parametros.put("InclinacionDereF2", ajustarValorMedida(InclinacionDereF2.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("InclinacionDereF2", ajustarValorMedida(InclinacionDereF2.trim()) + asterisco);
                         break;
 
                     case 2030://INTENSIDAD BAJA IZQUIERDA FAROLA 2                        
@@ -1146,7 +1143,8 @@ public class LlamarReporte {
 
                     case 2045://INCLINACION IZQUIERDA FAROLA 2                        
                         String InclinacionInquierdaF2 = String.valueOf(m.getValor());
-                        parametros.put("InclinacionInquierdaF2", ajustarValorMedida(InclinacionInquierdaF2.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("InclinacionInquierdaF2", ajustarValorMedida(InclinacionInquierdaF2.trim()) + asterisco);
                         break;
 
                     case 2037://INTENSIDAD ALTA DERECHA FAROLA 2                       
@@ -1178,7 +1176,8 @@ public class LlamarReporte {
 
                     case 2042://INCLINACION DERECHA FAROLA 3                        
                         String InclinacionDereF3 = String.valueOf(m.getValor());
-                        parametros.put("InclinacionDereF3", ajustarValorMedida(InclinacionDereF3.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("InclinacionDereF3", ajustarValorMedida(InclinacionDereF3.trim()) + asterisco);
                         break;
 
                     case 2029://INTENSIDAD BAJA IZQUIERDA FAROLA 2                        
@@ -1189,7 +1188,8 @@ public class LlamarReporte {
 
                     case 2046://INCLINACION IZQUIERDA FAROLA 3                        
                         String InclinacionInquierdaF3 = String.valueOf(m.getValor());
-                        parametros.put("InclinacionInquierdaF3", ajustarValorMedida(InclinacionInquierdaF3.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("InclinacionInquierdaF3", ajustarValorMedida(InclinacionInquierdaF3.trim()) + asterisco);
                         break;
 
                     case 2038://INTENSIDAD ALTA DERECHA FAROLA 2                        
@@ -1250,7 +1250,8 @@ public class LlamarReporte {
 
                     case 2021://Inclinacion baja derecha moto carro                        
                         String AngInclDerechaMC = String.valueOf(m.getValor());
-                        parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerechaMC.trim()) + m.getCondicion());
+                        asterisco = m.getValor() < 0.5 || m.getValor() > 3.5 ? "*" : "";
+                        parametros.put("AngInclDerecha", ajustarValorMedida(AngInclDerechaMC.trim()) + asterisco);
                         break;
 
                     default:
@@ -1345,6 +1346,7 @@ public class LlamarReporte {
         System.out.println("----------------------------------------------------");
         System.out.println("------Cargar medidas para la prueba de Gases -------");
         System.out.println("----------------------------------------------------");
+        String asterisco = "";
 
         DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
 
@@ -1359,10 +1361,10 @@ public class LlamarReporte {
                         // df.applyPattern("#0.0");
                         String HCRalenti = String.valueOf(m.getValor());
                         if (cero200) {
-                            HCRalenti = m.getValor() <=permisibleRalenti ? ajustarValorMedida(HCRalenti) : ajustarValorMedida(HCRalenti)+"*";
+                            HCRalenti = m.getValor() <=permisibleHcRalenti ? ajustarValorMedida(HCRalenti) : ajustarValorMedida(HCRalenti)+"*";
                             parametros.put("HCRalenti", HCRalenti);
                         }else{
-                            HCRalenti = m.getValor() <=permisibleRalenti ? ajustarValorMedida(HCRalenti) : ajustarValorMedida(HCRalenti)+"*";
+                            HCRalenti = m.getValor() <=permisibleHcRalenti ? ajustarValorMedida(HCRalenti) : ajustarValorMedida(HCRalenti)+"*";
                             parametros.put("HCRalenti", HCRalenti);//Esta no se da nunca con decimales garantizado desde prueba
                             break;
                         }
@@ -1372,8 +1374,9 @@ public class LlamarReporte {
                         //df.applyPattern("#0.0");
                         // String CORalenti = df.format(m.getValor());// se comentaria debidso a que si se deja funcionando redondea los varoles de gases en ralenti
                         String CORalenti = String.valueOf(m.getValor());
+                        asterisco = m.getValor() > permisibleCoRalenti ? "*" : "";
 
-                        parametros.put("CORalenti", ajustarValorMedida(CORalenti.trim()) + m.getCondicion());
+                        parametros.put("CORalenti", ajustarValorMedida(CORalenti.trim()) + asterisco);
                         break;
                     case 8003:
                         // df.applyPattern("#0.0");
@@ -1459,7 +1462,10 @@ public class LlamarReporte {
                     case 8020://medida de CO2 Ralenti dos tiempos
                         df.applyPattern("#0.0");
                         String CORalenti2T = String.valueOf(m.getValor());
-                        parametros.put("CORalenti", ajustarValorMedida(CORalenti2T.trim()) + m.getCondicion());
+
+                        String asterisco2 = m.getValor() > permisibleCoRalenti ? "*" : "";
+
+                        parametros.put("CORalenti", ajustarValorMedida(CORalenti2T.trim()) + asterisco2);
                         break;
 
                     case 8028://medida de RPM Ralenti dos tiempos
@@ -1482,7 +1488,7 @@ public class LlamarReporte {
                     case 8018://medida de HC Ralenti Dos tiempos
                         df.applyPattern("#0.0");
                         String HCRalenti2T = String.valueOf(m.getValor());
-                        HCRalenti2T = m.getValor() <=permisibleRalenti ? ajustarValorMedida(HCRalenti2T) : ajustarValorMedida(HCRalenti2T)+"*";
+                        HCRalenti2T = m.getValor() <=permisibleHcRalenti ? ajustarValorMedida(HCRalenti2T) : ajustarValorMedida(HCRalenti2T)+"*";
                         parametros.put("HCRalenti", HCRalenti2T + m.getCondicion());
                         break;
 
@@ -1931,7 +1937,8 @@ public class LlamarReporte {
                             break;
                         case 5024://Eficacia de frenado
                             String EficTotal = String.valueOf(m.getValor());
-                            parametros.put("EficTotal", ajustarValorMedida(EficTotal) + m.getCondicion());
+                            String asterisco = permisisbleEficaciaFrenos > m.getValor() ? "*" : "";
+                            parametros.put("EficTotal", ajustarValorMedida(EficTotal) + asterisco);
                             break;
                         case 5032:
                             String DesEje1 = String.valueOf(m.getValor());
@@ -2166,7 +2173,7 @@ public class LlamarReporte {
      *
      * @param listaMedidas
      */
-    private void cargaMedidaPruebaSuspension(List<Medida> listaMedidas) {
+    private void cargaMedidaPruebaSuspension(List<Medida> listaMedidas, Integer idPrueba, boolean estaFinalizada) {
         System.out.println("----------------------------------------------------");
         System.out.println("------Cargar medidas para la prueba de Suspension ---");
         System.out.println("----------------------------------------------------");
@@ -2174,33 +2181,92 @@ public class LlamarReporte {
         DecimalFormat df = new DecimalFormat();
 //        df.applyPattern("#0.00");
         df.setRoundingMode(RoundingMode.DOWN);
+
+        Float[][] medidas = {{6016f, 0.0f},{6020f, 0.0f},{6017f, 0.0f},{6021f, 0.0f}};
         try {
 //            df.applyPattern("#0.00");//un solo digito no creo no
             for (Medida m : listaMedidas) {
                 switch (m.getTipoMedida().getId()) {
                     case 6016:
-                        String DelanteraDer = String.valueOf(m.getValor());
-                        parametros.put("DelanteraDer", ajustarValorMedida(DelanteraDer.trim()) + m.getCondicion());
+
+                        medidas[0][1] = m.getValor();
+                        //String DelanteraDer = String.valueOf(m.getValor());
+                        //parametros.put("DelanteraDer", ajustarValorMedida(DelanteraDer.trim()) + m.getCondicion());
                         break;
                     case 6020:
-                        String DelanteraIzq = String.valueOf(m.getValor());
-                        parametros.put("DelanteraIzq", ajustarValorMedida(DelanteraIzq.trim()) + m.getCondicion());
+                        medidas[1][1]  = m.getValor();
+                        //String DelanteraIzq = String.valueOf(m.getValor());
+                        //parametros.put("DelanteraIzq", ajustarValorMedida(DelanteraIzq.trim()) + m.getCondicion());
                         break;
                     case 6017:
-                        String TraseraDerecha = String.valueOf(m.getValor());
-                        parametros.put("TraseraDerecha", ajustarValorMedida(TraseraDerecha) + m.getCondicion());//sin decimales
+                        medidas[2][1]  = m.getValor();
+                        //String TraseraDerecha = String.valueOf(m.getValor());
+                        //parametros.put("TraseraDerecha", ajustarValorMedida(TraseraDerecha) + m.getCondicion());//sin decimales
                         break;
                     case 6021:
-                        String TraseraIzq = String.valueOf(m.getValor());
-                        parametros.put("TraseraIzq", ajustarValorMedida(TraseraIzq.trim()) + m.getCondicion());
+                        medidas[3][1]  = m.getValor();
+                        //String TraseraIzq = String.valueOf(m.getValor());
+                        //parametros.put("TraseraIzq", ajustarValorMedida(TraseraIzq.trim()) + m.getCondicion());
                         break;
                     default:
                         break;
                 }//end of switch
             }//end of for ista de medidas
 
+            boolean tieneAsterisco = parametros.get("PerSusp").toString().equalsIgnoreCase("40");
+            boolean mostrarMensajeSuspension = false;
+            for (int i = 0; i < medidas.length; i++) {
+                if (medidas[i][1]  <= 0 || medidas[i][1]  >= 100) {
+
+                    Float suma = 0.0f;
+                    int totalNumerosValidos = 0;
+                    for (int j = 0; j < medidas.length; j++) {
+                        if (medidas[j][1]  > 0 && medidas[j][1]  < 100) {
+                            totalNumerosValidos++;
+                            suma += medidas[j][1] ;
+                        }
+                    }
+                    if (totalNumerosValidos > 0) {
+                        Float promedio = suma / totalNumerosValidos;
+                        medidas[i][1] = promedio;
+            
+                        // Guardar la nueva medida
+                        Utils.guardarOModificarMedida(medidas[i][0].intValue(), idPrueba, promedio.doubleValue(), "N");
+                    }else{
+                        mostrarMensajeSuspension = estaFinalizada;
+                    }
+                }
+                if (medidas[i][0].intValue() == 6016){
+                    String DelanteraDer = String.valueOf(medidas[i][1]);
+                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
+                    parametros.put("DelanteraDer", medidas[i][1] == 0 ? "" : ajustarValorMedida(DelanteraDer.trim()) + asterisco);
+                } 
+                if (medidas[i][0].intValue() == 6020) {
+                    String DelanteraIzq = String.valueOf(medidas[i][1]);
+                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
+                    parametros.put("DelanteraIzq", medidas[i][1] == 0 ? "" : ajustarValorMedida(DelanteraIzq.trim()) + asterisco);
+                }
+                if (medidas[i][0].intValue() == 6017) {
+                    String TraseraDerecha = String.valueOf(medidas[i][1]);
+                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
+                    parametros.put("TraseraDerecha", medidas[i][1] == 0 ? "" : ajustarValorMedida(TraseraDerecha) + asterisco);//sin decimales
+                }
+                if (medidas[i][0].intValue() == 6021) {
+                    String TraseraIzq = String.valueOf(medidas[i][1]);
+                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
+                    parametros.put("TraseraIzq", medidas[i][1] == 0 ? "" : ajustarValorMedida(TraseraIzq.trim()) + asterisco);
+                }
+            }
+
+            if (mostrarMensajeSuspension) {
+                CMensajes.mensajeError("Se debe repetir la prueba de suspension debido a que ningun valor se encuentra dentro de los rangos permitidos");
+            }
+
+
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Error en el metodo : cargaMedidaPruebaSuspension() " + e.getMessage());
+            CMensajes.mensajeError("Error en el metodo : cargaMedidaPruebaSuspension() \n" + e.getMessage());
         }
     }
 
@@ -2367,6 +2433,26 @@ public class LlamarReporte {
         Date fechaIngresoVehiculo = sdf.parse(sdf.format(consultarFechaIngresoVehiculo(idHojaPrueba))); //linea 2248
 
         parametros.put("diametro", "");
+
+        if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 123) {//Motocarro
+            //parametros.put("PerO2","[0-11]");
+            parametros.put("PerCO2", "---");
+            //Desviacion
+            parametros.put("PerDesv", "---");
+            //Taximetro
+            parametros.put("PerTaxi", "---");
+            //Suspension
+            parametros.put("PerSusp", "---");
+            //Frenos
+            parametros.put("PerEficTotal", "30");//30%
+            permisisbleEficaciaFrenos = 30.0;
+            parametros.put("PerEficAux", "18");//no hay desequilibrio
+            parametros.put("PerDeseqB", "20-30");
+            parametros.put("PerDeseq", ">30");
+            parametros.put("PerSumaLuces", "225");
+        }
+
+
         if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 5) {//Motocarro
             //parametros.put("PerO2","[0-11]");
             parametros.put("PerCO2", "---");
@@ -2378,6 +2464,7 @@ public class LlamarReporte {
             parametros.put("PerSusp", "---");
             //Frenos
             parametros.put("PerEficTotal", "30");//30%
+            permisisbleEficaciaFrenos = 30.0;
             parametros.put("PerEficAux", "18");//no hay desequilibrio
             parametros.put("PerDeseqB", "20-30");
             parametros.put("PerDeseq", ">30");
@@ -2398,26 +2485,31 @@ public class LlamarReporte {
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2) {
                 if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 2009) {
                     parametros.put("PerHCRal", "[0-10000]");
-                    permisibleRalenti = 10000;
+                    permisibleHcRalenti = 10000;
                     parametros.put("PerCORal", "[0-4.5]");
+                    permisibleCoRalenti = 4.5;
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-8000]");
-                        permisibleRalenti = 8000;
+                        permisibleHcRalenti = 8000;
                         parametros.put("PerCORal", "[0-3.5]");
+                        permisibleCoRalenti = 3.5;
                     }
                 } else {
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
-                        permisibleRalenti = 1600;
+                        permisibleHcRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.6]");
+                        permisibleCoRalenti = 3.6;
                     } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
-                        permisibleRalenti = 1600;
+                        permisibleHcRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.5]");
+                        permisibleCoRalenti = 3.5;
                     } else {
                         parametros.put("PerHCRal", "[0-2000]");
-                        permisibleRalenti = 2000;
+                        permisibleHcRalenti = 2000;
                         parametros.put("PerCORal", "[0-4.5]");
+                        permisibleCoRalenti = 4.5;
                     }
                 }
 
@@ -2425,17 +2517,20 @@ public class LlamarReporte {
                 //caso para motos cuatro tiempos
                 if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1600]");
-                    permisibleRalenti = 1600;
+                    permisibleHcRalenti = 1600;
                     parametros.put("PerCORal", "[0-3.6]");
+                    permisibleCoRalenti = 3.6;
                 } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1300]");
-                    permisibleRalenti = 1300;
+                    permisibleHcRalenti = 1300;
                     parametros.put("PerCORal", "[0-3.5]");
+                    permisibleCoRalenti = 3.5;
                 } else {
                     parametros.put("PerHCRal", "[0-2000]");
-                    permisibleRalenti = 2000;
+                    permisibleHcRalenti = 2000;
                     parametros.put("PerCORal", "[0-4.5]");
                     System.out.println("aqui estoy--------------------------------------------");
+                    permisibleCoRalenti = 4.5;
                 }
             }
             System.out.println("saliiiiii motocarro-------------------------------------------------");
@@ -2451,25 +2546,33 @@ public class LlamarReporte {
         if (
             tipoVehiculo.equalsIgnoreCase("Moto") 
             || tipoVehiculo.equalsIgnoreCase("CICLOMOTOR")
+            || tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")
         ) {//Motocicletas
+
             //parametros.put("PerO2","[0-11]");
             parametros.put("PerCO2", "---");
-            //Desviacion
-            parametros.put("PerDesv", "---");
-            //Taximetro
-            parametros.put("PerTaxi", "---");
-            //Suspension
-            parametros.put("PerSusp", "---");
-            //Frenos
-            parametros.put("PerEficTotal", tipoVehiculo.equalsIgnoreCase("Moto") ? "30" : "40");//30%
-            parametros.put("PerEficAux", "---");//no hay desequilibrio
-            parametros.put("PerDeseq", "---");
-            parametros.put("PerDeseqB", "---");
-            parametros.put("PerSumaLuces", "---");
+            if (!tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")) {
+                
+                
+                //Desviacion
+                parametros.put("PerDesv", "---");
+                //Taximetro
+                parametros.put("PerTaxi", "---");
+                //Suspension
+                parametros.put("PerSusp", "---");
+                //Frenos
+                parametros.put("PerEficTotal", tipoVehiculo.equalsIgnoreCase("Moto") ? "30" : "40");//30%
+                permisisbleEficaciaFrenos = tipoVehiculo.equalsIgnoreCase("Moto") ? 30.0 : 40.0;
+                parametros.put("PerEficAux", "---");//no hay desequilibrio
+                parametros.put("PerDeseq", "---");
+                parametros.put("PerDeseqB", "---");
+                parametros.put("PerSumaLuces", "---");
+            }
+            
             //Desviacion : el permisible es solamente uno
             //Dispositivos de cobro: el permisible es solamente uno
             //Gases :
-            if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 4) {
+            if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 4 || tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")) {
                 parametros.put("PerO2", "[0-6]");
             }
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2 && this.ctxHojaPrueba.getVehiculo().getModelo() < 2010) {
@@ -2480,29 +2583,33 @@ public class LlamarReporte {
             System.out.println("aqui estoy-------voy a entra a validar seteo-----------------------------------");
             //Date date1 = new Date(fechaIngresoVehiculo);
             //Date date2 = new Date(fechaInicioResolucion);
-            if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2) {
+            if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2 && !tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")) {
                 if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 2009) {
                     parametros.put("PerHCRal", "[0-10000]");
-                    permisibleRalenti = 10000;
+                    permisibleHcRalenti = 10000;
                     parametros.put("PerCORal", "[0-4.5]");
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-8000]");
-                        permisibleRalenti = 8000;
+                        permisibleHcRalenti = 8000;
                         parametros.put("PerCORal", "[0-3.5]");
+                        permisibleCoRalenti = 3.5;
                     }
                 } else {
                     if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
-                        permisibleRalenti = 1600;
+                        permisibleHcRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.6]");
+                        permisibleCoRalenti = 3.6;
                     } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                         parametros.put("PerHCRal", "[0-1600]");
-                        permisibleRalenti = 1600;
+                        permisibleHcRalenti = 1600;
                         parametros.put("PerCORal", "[0-3.5]");
+                        permisibleCoRalenti = 3.5;
                     } else {
                         parametros.put("PerHCRal", "[0-2000]");
-                        permisibleRalenti = 2000;
+                        permisibleHcRalenti = 2000;
                         parametros.put("PerCORal", "[0-4.5]");
+                        permisibleCoRalenti = 4.5;
                     }
                 }
 
@@ -2510,16 +2617,19 @@ public class LlamarReporte {
                 //caso para motos cuatro tiempos
                 if (fechaIngresoVehiculo.after(fechaInicioResolucion) && fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1600]");
-                    permisibleRalenti = 1600;
+                    permisibleHcRalenti = 1600;
                     parametros.put("PerCORal", "[0-3.6]");
+                    permisibleCoRalenti = 3.6;
                 } else if (fechaIngresoVehiculo.after(fechaInicioResolucion0762Tabla27)) {
                     parametros.put("PerHCRal", "[0-1300]");
-                    permisibleRalenti = 1300;
+                    permisibleHcRalenti = 1300;
                     parametros.put("PerCORal", "[0-3.5]");
+                    permisibleCoRalenti = 3.5;
                 } else {
                     parametros.put("PerHCRal", "[0-2000]");
-                    permisibleRalenti = 2000;
+                    permisibleHcRalenti = 2000;
                     parametros.put("PerCORal", "[0-4.5]");
+                    permisibleCoRalenti = 4.5;
                     System.out.println("aqui estoy--------------------------------------------");
                 }
             }
@@ -2533,6 +2643,14 @@ public class LlamarReporte {
             }*/
             //no mostrar permisibles de Opacidad porque ninguna moto es diesel
             parametros.put("PerOpac", "---");
+        }else if(tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")){
+            //Frenos:
+            parametros.put("PerEficTotal","30");
+            permisisbleEficaciaFrenos = 30;
+            parametros.put("PerEficAux", "18");
+            parametros.put("PerDeseqB", "20-30");
+            parametros.put("PerDeseq", ">30");//ojo de 20 a 30 es defecto tipo B
+            parametros.put("PerSumaLuces", "225");
         } else if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 1 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 3 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 109 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 110) {// 1 -> Livianos ,  3-> pesados, 2-> 4x4 109 or 110-> aplica a taxi 
             if (this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 1 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 10 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 4 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 2) {
                 parametros.put("PerO2", "[0-5]");
@@ -2554,8 +2672,12 @@ public class LlamarReporte {
             parametros.put("PerSusp", "40");
             //else
             //parametros.put("PerSusp","---");//a pesados no se realiza suspension
+
+            //String tipoVehiculo = this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getNombre();
+
             //Frenos:
-            parametros.put("PerEficTotal", "50");
+            parametros.put("PerEficTotal","50");
+            permisisbleEficaciaFrenos = 50;
             parametros.put("PerEficAux", "18");
             parametros.put("PerDeseqB", "20-30");
             parametros.put("PerDeseq", ">30");//ojo de 20 a 30 es defecto tipo B
@@ -2570,26 +2692,29 @@ public class LlamarReporte {
                 if (fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                     if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 1970) {
                         parametros.put("PerHCRal", "[0-800]");
-                        permisibleRalenti = 800;
+                        permisibleHcRalenti = 800;
                         parametros.put("PerCORal", "[0-5.0]");
+                        permisibleCoRalenti = 5.0;
                         parametros.put("PerHCCruc", "[0-800]");
                         parametros.put("PerCOCruc", "[0-5.0]");
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1970 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1984) {
                         parametros.put("PerHCRal", "[0-650]");
-                        permisibleRalenti = 650;
+                        permisibleHcRalenti = 650;
                         parametros.put("PerCORal", "[0-4.0]");
+                        permisibleCoRalenti = 4.0;
                         parametros.put("PerHCCruc", "[0-650]");
                         parametros.put("PerCOCruc", "[0-4.0]");
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1984 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1997) {
                         parametros.put("PerHCRal", "[0-400]");
-                        permisibleRalenti = 400;
+                        permisibleHcRalenti = 400;
                         parametros.put("PerCORal", "[0-3.0]");
                         parametros.put("PerHCCruc", "[0-400]");
                         parametros.put("PerCOCruc", "[0-3.0]");
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1997) {
                         parametros.put("PerHCRal", "[0-200]");
-                        permisibleRalenti = 200;
+                        permisibleHcRalenti = 200;
                         parametros.put("PerCORal", "[0-1.0]");
+                        permisibleCoRalenti = 1.0;
                         parametros.put("PerHCCruc", "[0-200]");
                         parametros.put("PerCOCruc", "[0-1.0]");
                         cero200 = true;
@@ -2599,27 +2724,31 @@ public class LlamarReporte {
                     int modelo = this.ctxHojaPrueba.getVehiculo().getModelo();
                     if (modelo <= 1984) {
                         parametros.put("PerHCRal", "[0-650]");
-                        permisibleRalenti = 650;
+                        permisibleHcRalenti = 650;
                         parametros.put("PerCORal", "[0-4.0]");
+                        permisibleCoRalenti = 4.0;
                         parametros.put("PerHCCruc", "[0-650]");
                         parametros.put("PerCOCruc", "[0-4.0]");
                     } else if (modelo >= 1985 && modelo <= 1997) {
                         parametros.put("PerHCRal", "[0-400]");
-                        permisibleRalenti = 400;
+                        permisibleHcRalenti = 400;
                         parametros.put("PerCORal", "[0-3.0]");
+                        permisibleCoRalenti = 3.0;
                         parametros.put("PerHCCruc", "[0-400]");
                         parametros.put("PerCOCruc", "[0-3.0]");
                     } else if (modelo >= 1998 && modelo <= 2009) {
                         parametros.put("PerHCRal", "[0-200]");
-                        permisibleRalenti = 200;
+                        permisibleHcRalenti = 200;
                         parametros.put("PerCORal", "[0-1.0]");
+                        permisibleCoRalenti = 1.0;
                         parametros.put("PerHCCruc", "[0-200]");
                         parametros.put("PerCOCruc", "[0-1.0]");
                         cero200 = true;
                     } else {//modelo >= 2010
                         parametros.put("PerHCRal", "[0-160]");
-                        permisibleRalenti = 160;
+                        permisibleHcRalenti = 160;
                         parametros.put("PerCORal", "[0-0.8]");
+                        permisibleCoRalenti = 0.8;
                         parametros.put("PerHCCruc", "[0-160]");
                         parametros.put("PerCOCruc", "[0-0.8]");
                     }
@@ -2638,26 +2767,30 @@ public class LlamarReporte {
                     if (fechaIngresoVehiculo.before(fechaInicioResolucion0762Tabla27)) {
                         if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 1970) {
                             parametros.put("PerHCRal", "[0-800]");
-                            permisibleRalenti = 800;
+                            permisibleHcRalenti = 800;
                             parametros.put("PerCORal", "[0-5.0]");
+                            permisibleCoRalenti = 5.0;
                             parametros.put("PerHCCruc", "[0-800]");
                             parametros.put("PerCOCruc", "[0-5.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1970 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1984) {
                             parametros.put("PerHCRal", "[0-650]");
-                            permisibleRalenti = 650;
+                            permisibleHcRalenti = 650;
                             parametros.put("PerCORal", "[0-4.0]");
+                            permisibleCoRalenti = 4.0;
                             parametros.put("PerHCCruc", "[0-650]");
                             parametros.put("PerCOCruc", "[0-4.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1984 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1997) {
                             parametros.put("PerHCRal", "[0-400]");
-                            permisibleRalenti = 400;
+                            permisibleHcRalenti = 400;
                             parametros.put("PerCORal", "[0-3.0]");
+                            permisibleCoRalenti = 3.0;
                             parametros.put("PerHCCruc", "[0-400]");
                             parametros.put("PerCOCruc", "[0-3.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1997) {
                             parametros.put("PerHCRal", "[0-200]");
-                            permisibleRalenti = 200;
+                            permisibleHcRalenti = 200;
                             parametros.put("PerCORal", "[0-1.0]");
+                            permisibleCoRalenti = 1.0;
                             parametros.put("PerHCCruc", "[0-200]");
                             parametros.put("PerCOCruc", "[0-1.0]");
                             cero200 = true;
@@ -2666,27 +2799,31 @@ public class LlamarReporte {
                         int modelo = this.ctxHojaPrueba.getVehiculo().getModelo();
                         if (modelo <= 1984) {
                             parametros.put("PerHCRal", "[0-650]");
-                            permisibleRalenti = 650;
+                            permisibleHcRalenti = 650;
                             parametros.put("PerCORal", "[0-4.0]");
+                            permisibleCoRalenti = 4.0;
                             parametros.put("PerHCCruc", "[0-650]");
                             parametros.put("PerCOCruc", "[0-4.0]");
                         } else if (modelo >= 1985 && modelo <= 1997) {
                             parametros.put("PerHCRal", "[0-400]");
-                            permisibleRalenti = 400;
+                            permisibleHcRalenti = 400;
                             parametros.put("PerCORal", "[0-3.0]");
+                            permisibleCoRalenti = 3.0;
                             parametros.put("PerHCCruc", "[0-400]");
                             parametros.put("PerCOCruc", "[0-3.0]");
                         } else if (modelo >= 1998 && modelo <= 2009) {
                             parametros.put("PerHCRal", "[0-200]");
-                            permisibleRalenti = 200;
+                            permisibleHcRalenti = 200;
                             parametros.put("PerCORal", "[0-1.0]");
+                            permisibleCoRalenti = 1.0;
                             parametros.put("PerHCCruc", "[0-200]");
                             parametros.put("PerCOCruc", "[0-1.0]");
                             cero200 = true;
                         } else {//modelo >= 2010
                             parametros.put("PerHCRal", "[0-160]");
-                            permisibleRalenti = 160;
+                            permisibleHcRalenti = 160;
                             parametros.put("PerCORal", "[0-0.8]");
+                            permisibleCoRalenti = 0.8;
                             parametros.put("PerHCCruc", "[0-160]");
                             parametros.put("PerCOCruc", "[0-0.8]");
                         }
@@ -2834,7 +2971,7 @@ public class LlamarReporte {
         int defEnse = rs.getInt(1);
 
         if (valida > 0) {
-            if (defEnse > 0) {
+            if (Utils.existenDefEnsenanza(ctxHojaPrueba.getId()) || (ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 121 && !esAprobado)) {
                 parametros.put("ReprobadoEnse", "X");
             } else {
                 parametros.put("AprobadoEnse", "X");
@@ -2958,10 +3095,10 @@ public class LlamarReporte {
                     } else//si no tiene defectos tipo A
                     {
                         if (totalDefB < 5) {
-                            //parametros.put("Aprobado", "X");
+                            parametros.put("Aprobado", "X");
                         } else {
                             parametros.put("ComentDefectos", "Vehiculo Reprobado Defectos tipo B es Mayor a 5");
-                            //parametros.put("Reprobado", "X");
+                            parametros.put("Reprobado", "X");
                         }//fin si no tiene defectos tipo A
                     }
                 } else {//si no ha terminado todas las pruebas
@@ -2979,15 +3116,15 @@ public class LlamarReporte {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular u oficial o diplomatico
                             if (totalDefB < 10) {
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico y ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -3008,23 +3145,23 @@ public class LlamarReporte {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//si es particular, oficial o diplomatico 9 defectos
                             if (totalDefB < 10) {
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         }
 //                    int ensenanza = rs1.getInt("CLASS");
                         if (rs1.getInt("CLASS") == 27) {//si es de ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         }//fin ensenanza
                     }//fin else defectos tipoA
@@ -3045,15 +3182,15 @@ public class LlamarReporte {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 10) {
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio especial
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    
@@ -3075,15 +3212,15 @@ public class LlamarReporte {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 7) {
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio ensenanza
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -3105,15 +3242,15 @@ public class LlamarReporte {
                         int servicio = rs1.getInt("SERVICE");
                         if (servicio == 3 || servicio == 1 || servicio == 4) {//particular diplomatico u oficial
                             if (totalDefB < 10) {
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         } else if (servicio == 2 || servicio == 5) {//publico o servicio especial
                             if (totalDefB < 5) {//con 5 o mas se reprueba
-                                //parametros.put("Aprobado", "X");
+                                parametros.put("Aprobado", "X");
                             } else {
-                                //parametros.put("Reprobado", "X");
+                                parametros.put("Reprobado", "X");
                             }
                         }//end servicio publico
 //                    int ensenanza = rs1.getInt("CLASS");
@@ -3133,9 +3270,9 @@ public class LlamarReporte {
                         //parametros.put("Reprobado", "X");
                     } else {//si no hay defectos tipo A                        
                         if (totalDefB < 10) {
-                            //parametros.put("Aprobado", "X");
+                            parametros.put("Aprobado", "X");
                         } else {
-                            //parametros.put("Reprobado", "X");
+                            parametros.put("Reprobado", "X");
                         }
                     }//end servicio publico/                  
                 } else {//si no ha terminado todas las pruebas
@@ -3162,7 +3299,11 @@ public class LlamarReporte {
         ConsultasReinspeccion crei = new ConsultasReinspeccion();
         ResultSet rs;
 
-        String tipoDoc = this.ctxHojaPrueba.getPropietario().getTipoIdentificacion().name();
+        String tipoDoc = this.
+        ctxHojaPrueba.
+        getPropietario().
+        getTipoIdentificacion().
+        name();
         //Colocar la expresion
 
         StringBuilder sb = new StringBuilder();

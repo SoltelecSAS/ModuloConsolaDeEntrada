@@ -6993,18 +6993,32 @@ ocupantes, la de los usuarios de la vía pública.]]></text>
 					<text><![CDATA[¿ES APROBADO? : SI ]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="153" y="7" width="19" height="14" uuid="3d015464-65c1-4d50-b1ef-dc501f8cc122"/>
+					<reportElement x="166" y="7" width="19" height="14" uuid="3d015464-65c1-4d50-b1ef-dc501f8cc122"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<text><![CDATA[NO ]]></text>
 				</staticText>
-				<line>
-					<reportElement x="109" y="16" width="25" height="1" uuid="30b5504d-8d2b-47f5-a6ab-40a58e4e2639"/>
-				</line>
-				<line>
-					<reportElement x="169" y="16" width="25" height="1" uuid="9568ed34-1d62-405d-be53-191c448d1f57"/>
-				</line>
+				<textField>
+					<reportElement x="105" y="7" width="39" height="14" uuid="992651b7-444e-45cc-893c-3839f6410779"/>
+					<box>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{Aprobado}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="189" y="7" width="39" height="14" uuid="ea5fca98-dfbc-4618-bea3-e6125434f0e5"/>
+					<box>
+						<bottomPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{Reprobado}]]></textFieldExpression>
+				</textField>
 			</frame>
 			<staticText>
 				<reportElement x="2" y="3" width="19" height="55" uuid="c3667be1-e3bd-44ba-9363-dc2ab372ccaa"/>

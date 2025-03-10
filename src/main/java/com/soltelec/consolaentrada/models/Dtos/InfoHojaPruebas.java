@@ -11,4 +11,6 @@ public class InfoHojaPruebas {
     private boolean preventiva;
     private Integer numeroIntentos;
     private LocalDateTime fechaIngreso;
+    private boolean reportadoASicov;
+    private byte[] datosPdfFur;
 }

@@ -24,13 +24,13 @@ public class PersistenceController {
        
         if (Conexion.getBaseDatos()==null) {
             HashMap map = new HashMap();
-            Conexion conexion = Conexion.getInstance();
+            //Conexion conexion = Conexion.getInstance();
                 map.put("javax.persistence.jdbc.url", Conexion.getUrl());
             map.put("javax.persistence.jdbc.user", Conexion.getUsuario());
             map.put("javax.persistence.jdbc.password", Conexion.getContrasena());
             em = Persistence.createEntityManagerFactory("ConsolaEntradaPU", map).createEntityManager();
         }
-        System.out.println(Conexion.getUrl());
+        System.out.println("Entity manager: "+Conexion.getUrl());
         return em;
     }
      public static void closeEntityManager() {  

@@ -400,6 +400,10 @@ public class SicovSoap_BindingStub extends org.apache.axis.client.Stub implement
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
+
+
+        
+
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[4]);
         _call.setUseSOAPAction(true);
@@ -412,6 +416,15 @@ public class SicovSoap_BindingStub extends org.apache.axis.client.Stub implement
 
         setRequestHeaders(_call);
         setAttachments(_call);
+
+
+        if(_call.getSOAPActionURI() != null) System.out.println("SOAPAction: " + _call.getSOAPActionURI());
+        if(_call.getOperationName() != null)System.out.println("Operation Name: " + _call.getOperationName());
+        if(_call.getEncodingStyle() != null)System.out.println("Encoding Style: " + _call.getEncodingStyle());
+        if(_call.getSOAPActionURI() != null)System.out.println("Use SOAP Action: " + _call.getSOAPActionURI());
+        if(super.cachedEndpoint != null)System.out.println("Endpoint: " + super.cachedEndpoint);
+        if(_call.getMessageContext().getPropertyNames() != null)System.out.println("Request Headers: " + _call.getMessageContext().getPropertyNames());
+
  try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {cadena});
 
         if (_resp instanceof java.rmi.RemoteException) {
@@ -446,7 +459,15 @@ public class SicovSoap_BindingStub extends org.apache.axis.client.Stub implement
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {placa, extranjero});
+
+        System.out.println("SOAPAction: " + _call.getSOAPActionURI());
+        System.out.println("Operation Name: " + _call.getOperationName());
+        System.out.println("Encoding Style: " + _call.getEncodingStyle());
+        System.out.println("Use SOAP Action: " + _call.getSOAPActionURI());
+        System.out.println("Endpoint: " + super.cachedEndpoint);
+        System.out.println("Request Headers: " + _call.getMessageContext().getPropertyNames());
+
+        try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {placa, extranjero});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
@@ -468,6 +489,9 @@ public class SicovSoap_BindingStub extends org.apache.axis.client.Stub implement
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
+
+        System.out.println("operation: _operations[6] "+_operations[6]);
+
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[6]);
         _call.setUseSOAPAction(true);
@@ -480,22 +504,35 @@ public class SicovSoap_BindingStub extends org.apache.axis.client.Stub implement
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {nombreEmpleado, numeroIdentificacion, placa, extranjero, consecutivoRUNT, idRunt, direccionIpEquipo});
 
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (com.soltelec.consolaentrada.sicov.indra.FURRespuesta) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (com.soltelec.consolaentrada.sicov.indra.FURRespuesta) org.apache.axis.utils.JavaUtils.convert(_resp, com.soltelec.consolaentrada.sicov.indra.FURRespuesta.class);
+
+        if(_call.getSOAPActionURI() != null) System.out.println("SOAPAction: " + _call.getSOAPActionURI());
+        if(_call.getOperationName() != null)System.out.println("Operation Name: " + _call.getOperationName());
+        if(_call.getEncodingStyle() != null)System.out.println("Encoding Style: " + _call.getEncodingStyle());
+        if(_call.getSOAPActionURI() != null)System.out.println("Use SOAP Action: " + _call.getSOAPActionURI());
+        if(super.cachedEndpoint != null)System.out.println("Endpoint: " + super.cachedEndpoint);
+        if(_call.getMessageContext().getPropertyNames() != null)System.out.println("Request Headers: " + _call.getMessageContext().getPropertyNames());
+
+        try {
+            
+            java.lang.Object _resp = _call.invoke(
+                new java.lang.Object[] {nombreEmpleado, numeroIdentificacion, placa, extranjero, consecutivoRUNT, idRunt, direccionIpEquipo}
+            ); //esta es la 483
+
+            if (_resp instanceof java.rmi.RemoteException) {
+                throw (java.rmi.RemoteException)_resp;
             }
+            else {
+                extractAttachments(_call);
+                try {
+                    return (com.soltelec.consolaentrada.sicov.indra.FURRespuesta) _resp;
+                } catch (java.lang.Exception _exception) {
+                    return (com.soltelec.consolaentrada.sicov.indra.FURRespuesta) org.apache.axis.utils.JavaUtils.convert(_resp, com.soltelec.consolaentrada.sicov.indra.FURRespuesta.class);
+                }
+            }
+        } catch (org.apache.axis.AxisFault axisFaultException) {
+            throw axisFaultException;
         }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-  throw axisFaultException;
-}
     }
 
 }

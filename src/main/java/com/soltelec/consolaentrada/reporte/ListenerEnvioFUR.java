@@ -20,7 +20,10 @@ import com.soltelec.consolaentrada.sicov.ci2.ClienteCi2;
 import com.soltelec.consolaentrada.sicov.ci2.ClienteCi2Servicio;
 import com.soltelec.consolaentrada.sicov.indra.ClienteIndra;
 import com.soltelec.consolaentrada.sicov.indra.ClienteIndraServicio;
+import com.soltelec.consolaentrada.utilities.CMensajes;
 import com.soltelec.consolaentrada.utilities.Mensajes;
+import com.soltelec.consolaentrada.utilities.Utils;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,6 +53,14 @@ public class ListenerEnvioFUR implements ActionListener {
     private Consultas consultas;
     private ConsultasCertificados consultasCertificados;
     private List<AuditoriaSicov> lstTramasEncontradas;
+    private byte[] datosPdfFur = null;
+
+    public ListenerEnvioFUR(Long idHojaPrueba, List<AuditoriaSicov> lstTramasEncontradas, byte[] datosPdfFur) {
+        this.idHojaPrueba = idHojaPrueba;
+        consultas = new Consultas();
+        this.lstTramasEncontradas = lstTramasEncontradas;
+        this.datosPdfFur = datosPdfFur;
+    }
 
     public ListenerEnvioFUR(Long idHojaPrueba, List<AuditoriaSicov> lstTramasEncontradas) {
         this.idHojaPrueba = idHojaPrueba;
@@ -60,6 +71,8 @@ public class ListenerEnvioFUR implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) 
     {
+
+        System.out.println("Entro para 1er envFurSicov");
         String kilometrajeVariable="0";
         Connection cn = null;
         HojaPruebasJpaController controller = new HojaPruebasJpaController();
@@ -68,9 +81,44 @@ public class ListenerEnvioFUR implements ActionListener {
         {
             if (ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("Iniciado"))
             {
+                //maldito sicov
                 int seleccion = JOptionPane.showOptionDialog(null, "Esta a punto de enviar el PRIMER FUR de esta revisión tecnico mecanica; ¿Desea Continuar?",
                         "Envio Primer FUR", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-                if (seleccion == JOptionPane.YES_OPTION) 
+
+                CdaJpaController cdaControler = new CdaJpaController();
+                ctxCDA = cdaControler.find(1);
+
+                boolean tienePin = Utils.tienePinLaHp(idHojaPrueba.intValue()) || ctxCDA.getProveedorSicov().equalsIgnoreCase("INDRA");
+                if (seleccion == JOptionPane.YES_OPTION && !tienePin) {
+                    CMensajes.mensajeAdvertencia(
+                        "No se encontro el pin del vehiculo para poder realizar el envio del primer fur.\n"+
+                        "Por favor a continuacion dele clic en aceptar y despues ingrese el numero del pin."
+                    );
+                    String pin = "";
+                    while (true) { // Bucle para repetir si el usuario elige "No"
+                        // Mostrar un cuadro de diálogo para ingresar un texto
+                        pin = JOptionPane.showInputDialog(null, "Ingrese el pin:", "Ingreso pin", JOptionPane.QUESTION_MESSAGE);
+
+                        // Si el usuario presiona "Cancelar", terminamos el programa
+                        if (pin == null) {
+                            JOptionPane.showMessageDialog(null, "No ingresó ningún pin o se cancelo el ingreso. Saliendo...");
+                            break;
+                        }
+
+                        // Mostrar cuadro de confirmación
+                        int confirm = JOptionPane.showConfirmDialog(null, "¿Seguro que el pin es: " + pin + "?", "Confirmar Entrada", JOptionPane.YES_NO_OPTION);
+
+                        // Si el usuario presiona "Sí", se confirma el dato y salimos del bucle
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            Utils.actualizarPin(idHojaPrueba.intValue(), pin.trim());
+                            JOptionPane.showMessageDialog(null, "Pin actualizado con exito. Por favor vuelva a intentar enviar el 1er fur.\n Numero pin:" + pin);
+                            break;
+                        }
+                        // Si presiona "No", se repite el proceso
+                    }
+                }
+
+                if (seleccion == JOptionPane.YES_OPTION && tienePin) 
                 {
                     JLabel labelVariable = new JLabel("Validando FUR Antes de Envio..!");
                     labelVariable.setLocation(10, 10);
@@ -83,8 +131,7 @@ public class ListenerEnvioFUR implements ActionListener {
                     app.add(labelVariable);
                     app.repaint();
                     app.setVisible(true);
-                    CdaJpaController cdaControler = new CdaJpaController();
-                    ctxCDA = cdaControler.find(1);
+                    
                     if (ctxHojaPrueba.getEstadoSICOV().equalsIgnoreCase("Iniciado")) 
                     {
                         PruebaJpaController pruebasJPA = new PruebaJpaController();
@@ -162,9 +209,9 @@ public class ListenerEnvioFUR implements ActionListener {
                             if (seleccion == JOptionPane.NO_OPTION) {
                                 app.setVisible(false);
                                 return;
+                            }
                         }
-                        }
-                        labelVariable.setText(" He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!");
+                        labelVariable.setText(" He presentado Problemas al Momento del Envio FUR, comuniquese con el Equipo de Soporte de SOLTELEC  ..!3");
                         if (ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA") || ctxHojaPrueba.getEstado().equalsIgnoreCase("REPROBADA")) {
                             ctxHojaPrueba.setFinalizada("Y");
                             System.out.println("Confirmacion de cierre de Hoja de prueba su estado es:  " + ctxHojaPrueba.getAprobado());
@@ -217,6 +264,12 @@ public class ListenerEnvioFUR implements ActionListener {
                             if (respServidor.getCodigoRespuesta().equals("0000")) { //ok
                                 ctxHojaPrueba.setEstadoSICOV("Env1FUR");
                                 System.out.println("envie el primer fur");
+
+                                if (datosPdfFur != null) {
+                                    String registros = Utils.procesarRegistros(idHojaPrueba.intValue(), false);
+                                    Utils.actualizarPdfFur(idHojaPrueba.intValue(), datosPdfFur, registros);
+                                }
+                                
                                 Mensajes.mensajeCorrecto(
                                 "El primer FUR correspondiente a la placa " 
                                 + ctxHojaPrueba.getVehiculo().getPlaca() 
@@ -372,6 +425,12 @@ public class ListenerEnvioFUR implements ActionListener {
                                 } catch (Exception ex) {
                                     System.out.println("Error editConstroller: "+ ex);
                                 }
+
+                                if (datosPdfFur != null) {
+                                    String registros = Utils.procesarRegistros(idHojaPrueba.intValue(), false);
+                                    Utils.actualizarPdfFur(idHojaPrueba.intValue(), datosPdfFur, registros);
+                                }
+
                                 Mensajes.mensajeCorrecto(
                                 "El primer FUR correspondiente a la placa " 
                                 + ctxHojaPrueba.getVehiculo().getPlaca() 

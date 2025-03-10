@@ -1,0 +1,194 @@
+[DAQ]
+puerto: COM3
+
+[BANCO]
+desviacion: no
+suspension: si
+frenos: si
+pista_mixta: no
+
+[SOFTWARE]
+pruebas_unidas: si
+tiempo_mensajes: 5000
+registrar_medidas: si
+backup_registro: si
+rodillo_motocarro: derecho
+
+
+[DESVIACION]
+ancho_placa: 1
+aplica_sensor: 0
+resol_min: -14
+resol_max: 14
+tiempo_mensajes: 5000
+
+[SUSPENSION]
+umbral_peso_susp: 500
+factor_escala_susp: 0.9
+temporizador_inercia: 250
+salida_motor_derecho: 010000
+salida_motor_izquierdo: 100000
+tiempo_mensajes: 3000
+
+[TIPOPISTA]
+valida_tipo: 2
+tipo_pista: Liviano
+
+[FRENOMETRO]
+umbral_velo: 5
+umbral_peso_fren: 500
+factor_desq: 1.7
+livianos:
+pasos: 12
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 3000
+salidas: 000000 ,000101
+tiempo: 5000
+salidas: 000000 ,000000
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 3000
+salidas: 000000 ,000101
+tiempo: 3000
+salidas: 000000 ,000101
+tiempo: 5000
+salidas: 000000 ,000000
+tiempo: 2000
+
+4x4:
+pasos: 24
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,001001
+tiempo: 3000
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 3000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000110
+tiempo: 3000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 3000
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,001001
+tiempo: 3000
+salidas: 000000 ,001001
+tiempo: 3000
+salidas: 000000 ,001001
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 3000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000110
+tiempo: 3000
+salidas: 000000 ,000110
+tiempo: 3000
+salidas: 000000 ,000110
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 3000
+
+pesados:
+pasos: 4
+salidas: 000000 ,000000
+tiempo: 3000
+salidas: 000000 ,000000
+tiempo: 4000
+salidas: 000000 ,000000
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 2000
+
+motos:
+pasos: 10
+salidas: 000000,000001
+tiempo: 3000
+salidas: 000000,000011
+tiempo: 3000
+salidas: 000000,000011
+tiempo: 10000
+salidas: 000000,000001
+tiempo: 3000
+salidas: 000000,000000
+tiempo: 3000
+salidas: 000000,000001
+tiempo: 3000
+salidas: 000000,000011
+tiempo: 3000
+salidas: 000000,000011
+tiempo: 10000
+salidas: 000000,000001
+tiempo: 3000
+salidas: 000000,000000
+tiempo: 3000
+
+motocarro:
+pasos: 12
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 1000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000000
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 1000
+salidas: 010000 ,000101
+tiempo: 2000
+salidas: 010000 ,000101
+tiempo: 2000
+salidas: 000000 ,000101
+tiempo: 3000
+salidas: 000000 ,000000
+tiempo: 2000
+
+
+
+
+[TAXIMETRO]
+diametro_rodillo: 0.203568206
+pulsos_por_vuelta: 4
+metros_por_unidad: 80
+segundos_por_unidad: 50
+unidades_distancia_a_medir: 5
+unidades_tiempo_a_medir: 3
+temporizador_pulso: 34
+pulso_x_milesima: 29
+show_cronometro: 0
+ajuste_taximetro: 1.18
+
