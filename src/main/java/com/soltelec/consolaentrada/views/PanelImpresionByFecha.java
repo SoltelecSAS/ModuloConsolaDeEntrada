@@ -492,8 +492,8 @@ public class PanelImpresionByFecha extends javax.swing.JPanel {
         HojaPruebas hojaPruebas = modeloTablaImpresionFecha.getListaHojaPruebas().get(tblHojaPruebas.getSelectedRow());
         HojaPruebasJpaController controHP = new HojaPruebasJpaController();;
         ctxHP = controHP.find(hojaPruebas.getId());
-        System.out.println("******************Numero de hoja de priuebas:" + hojaPruebas.getId());
-        System.out.println("******************Numero de hoja de priuebas:" + ctxHP.getId());
+        System.out.println("******************Numero de hoja de pruebas:" + hojaPruebas.getId());
+        System.out.println("******************Numero de hoja de pruebas:" + ctxHP.getId());
         ModeloTablaPruebas.cntTest = 0;
         ModeloTablaPruebas.cntColum = 0;
         modeloTablaPruebas.setListPruebas(ctxHP.getListPruebas());

@@ -110,7 +110,7 @@ public class ClienteIndra {
                 trama=trama.replace("NO FUNCIONAL", "");
                 //System.out.println("TRAMA DESPUES  DE REEMPLAZAR KILOMETRAJE : " + trama);
                 //JFM-------------------------------------------------------------------------------------------------------------------------------------                
-//Generar el archivo txt de la entrada, la entrada corregida y la salida          
+                //Generar el archivo txt de la entrada, la entrada corregida y la salida          
                 output = new PrintWriter(file);
                 output.println("-.** Trama Enviada .-** ");
                 output.println(" ");

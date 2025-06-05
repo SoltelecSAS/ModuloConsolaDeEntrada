@@ -389,9 +389,9 @@ public class ImpresionReporte {
                     nunValido = false;
                     ctxCertificado = new Certificado();
                     controlerCertificado = new CertificadoJpaController();
-                    String cert = controlerCertificado.maxCertificado();
-                    System.out.println("cargo el " + cert);
-                    cert = String.valueOf((Long.parseLong(cert) + 1));
+                    //String certVariable = controlerCertificado.maxCertificado();
+                    //System.out.println("cargo el " + certVariable);
+                    //certVariable = String.valueOf((Long.parseLong(certVariable) + 1));
                     System.out.println("llegue hasta aqui");
                     while (!nunValido) {
                         System.out.println("entro al while");
@@ -430,6 +430,8 @@ public class ImpresionReporte {
                     lstCertificado.add(ctxCertificado);
                     this.ctxHojaPrueba.setCertificados(lstCertificado);
                     nroCert = ctxCertificado.getConsecutivo();
+
+                    System.out.println("ctxCertificado: " + ctxCertificado);
                 }
 /////////////////////////////////AQUI DEBE IR CODIGO PARA GUARDAR QUIEN ENVIO EL FUR    
             }
@@ -584,6 +586,7 @@ public class ImpresionReporte {
 
                         this.ctxHojaPrueba.setEstadoSICOV("SINCRONIZADO");
                         if (this.ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA")) {
+                            System.out.println("Enviando certificado a indra: "+ctxCertificado);
                             controlerCertificado.nvoCertificado(ctxCertificado, this.ctxHojaPrueba);
                         }
                         controller.update(this.ctxHojaPrueba);

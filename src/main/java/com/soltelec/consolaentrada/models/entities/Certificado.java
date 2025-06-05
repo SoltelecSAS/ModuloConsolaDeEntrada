@@ -154,9 +154,14 @@ public class Certificado implements Serializable {
         return true;
     }
 
+    
+
     @Override
     public String toString() {
-        return "org.soltelec.persistencia.Certificado[certificate=" + id + "]";
+        return "Certificado [id=" + id + ", consecutivo=" + consecutivo + ", tipo=" + tipo + ", anulado=" + anulado
+                + ", comentario=" + comentario + ", impreso=" + impreso + ", hojaPruebas=" + hojaPruebas
+                + ", fechaImpresion=" + fechaImpresion + ", fechaAnulacion=" + fechaAnulacion + ", fechaExpedicion="
+                + fechaExpedicion + ", consecutivoRunt=" + consecutivoRunt + "]";
     }
 
     public Date getFechaExpedicion() {

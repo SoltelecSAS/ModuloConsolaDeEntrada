@@ -84,10 +84,21 @@ public class LlamarReporte {
     private String OpCiclo3Value;
     private String OpCiclo4Value;
 
+    private double permisibleResDiesel;
+
     private double permisibleHcRalenti;
     private double permisibleCoRalenti;
+    private double permisibleCoCrucero;
+    private double permisibleHcCrucero;
+    private double permisibleCo2Crucero;
 
-    private double permisisbleEficaciaFrenos;
+    private double permisibleDesequilibrio;
+
+    private double permisibleEficaciaFrenos;
+
+    private double permisibleEficaciaMano;
+
+    private double permisibleSumaLuces;
 
     private boolean esAprobado;
 
@@ -158,7 +169,7 @@ public class LlamarReporte {
                 }
                 
             }
-            configurarPermisibles();
+            configurarPermisibles(); ///configurar permisisbles
             reinspeccion = this.ctxHojaPrueba.getReinspeccionList().size() > 0;  //consultas.isReinspeccion(this.ctxHojaPrueba.getId() , cn);            
             if (reinspeccion) {
 
@@ -168,8 +179,10 @@ public class LlamarReporte {
 
                 parametros.put("kilometrajeMedida", km == 0 ? "NO FUNCIONAL" : kilometraje);
                 
+                preventiva = consultas.isRevisionPreventiva(this.ctxHojaPrueba);
+                String codigoHp = preventiva ? this.ctxHojaPrueba.getCon_preventiva()+"" : this.ctxHojaPrueba.getCon_hoja_prueba() + " - 2";
 
-                parametros.put("codigoPrueba", this.ctxHojaPrueba.getCon_hoja_prueba() + " - 2");
+                parametros.put("codigoPrueba", codigoHp);
                 reinspecionActual = this.ctxHojaPrueba.getReinspeccionList().iterator().next();
                 parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(reinspecionActual.getFechaSiguiente()));
                 parametros.put("isReinspeccion", "X");
@@ -189,8 +202,11 @@ public class LlamarReporte {
 
                 String kilometraje = km.toString();
 
+                preventiva = consultas.isRevisionPreventiva(this.ctxHojaPrueba);
+                String codigoHp = preventiva ? this.ctxHojaPrueba.getCon_preventiva()+"" : this.ctxHojaPrueba.getCon_hoja_prueba() + " - "+this.ctxHojaPrueba.getIntentos();
+
                 parametros.put("kilometrajeMedida", km == 0 ? "NO FUNCIONAL" : kilometraje);
-                parametros.put("codigoPrueba", this.ctxHojaPrueba.getCon_hoja_prueba() + " - "+this.ctxHojaPrueba.getIntentos());
+                parametros.put("codigoPrueba", codigoHp);
                 parametros.put("fecha", new SimpleDateFormat("yyyy-MM-dd hh:mm a").format(this.ctxHojaPrueba.getFechaIngreso()));
                 parametros.put("isReinspeccion", "NO");
                 ctxIndPruebas = cargarIdPruebasNoDuplicadas(this.ctxHojaPrueba, "I");
@@ -430,7 +446,10 @@ public class LlamarReporte {
         parametros.put("InstSusp", "");
         parametros.put("MarcaSusp", "");
 
-        parametros.put("codigoPrueba", Reinspeccion.getHojaPruebas().getCon_hoja_prueba() + " - 1");
+        preventiva = consultas.isRevisionPreventiva(this.ctxHojaPrueba);
+        String codigoHp = preventiva ? this.ctxHojaPrueba.getCon_preventiva()+"" : Reinspeccion.getHojaPruebas().getCon_hoja_prueba() + " - 1";
+
+        parametros.put("codigoPrueba", codigoHp);
 
         //no llama al procedimiento de medidas, puede ser necesario crear otro procedimiento pero para
         //reinspeccion
@@ -576,7 +595,7 @@ public class LlamarReporte {
                 }
 
                 if (idTipoPrueba == 8) {
-                    cargarMedidaPruebaGases(listaMedidas, idTipoGasolina, FormaMedTemperatura, disenoVehiculo, tipoVehiculo);
+                    cargarMedidaPruebaGases(listaMedidas, idTipoGasolina, FormaMedTemperatura, disenoVehiculo, tipoVehiculo); //medidas gases
                 }
 
                 if (idTipoPrueba == 9) {
@@ -1218,7 +1237,8 @@ public class LlamarReporte {
                     //----------------------------------------------------------      
                     case 2011: //SUMATORIA DE LAS INTESIDADES                         
                         String SumaLuces = String.valueOf(m.getValor());
-                        parametros.put("SumaLuces", ajustarValorMedida(SumaLuces) + m.getCondicion());
+                        asterisco = m.getValor() > 225 ? "*" : "";
+                        parametros.put("SumaLuces", ajustarValorMedida(SumaLuces) + asterisco);
                         break;
 
                     //----------------------------------------------------------
@@ -1311,12 +1331,12 @@ public class LlamarReporte {
                         simBajasIzq = "SI";
                     } 
                 }
-                if (tipoMedida.equals("2036") || tipoMedida.equals("2037") || tipoMedida.equals("2038") || tipoMedida.equals("2039")) {
+                if (tipoMedida.equals("2032") || tipoMedida.equals("2037") || tipoMedida.equals("2038") || tipoMedida.equals("2039")) {
                     if (rs.getString("Simult").equals("Y")) {
                         simAltasDer = "SI";
                     } 
                 }
-                if (tipoMedida.equals("2032") || tipoMedida.equals("2033") || tipoMedida.equals("2034") || tipoMedida.equals("2035")) {
+                if (tipoMedida.equals("2033") || tipoMedida.equals("2034") || tipoMedida.equals("2035") || tipoMedida.equals("2036")) {
                     if (rs.getString("Simult").equals("Y")) {
                         simAltasIzq = "SI";
                     } 
@@ -1410,20 +1430,25 @@ public class LlamarReporte {
                     case 8007://medida de HC Crucero Cuatro tiempos
                         // df.applyPattern("#0.0");
                         String HCCrucero = String.valueOf(m.getValor());
-                        parametros.put("HCCrucero", ajustarValorMedida(HCCrucero) + m.getCondicion());//No decimales
+                        //CMensajes.mensajeAdvertencia("PERMISISBLE hc"+permisibleHcCrucero);
+                        asterisco = permisibleHcCrucero < m.getValor() ? "*" : ""; 
+                        parametros.put("HCCrucero", ajustarValorMedida(HCCrucero) + asterisco);//No decimales
                         break;
 
                     case 8008: // medida de CO Crucero Cuatro tiempos
+                        asterisco = permisibleCoCrucero < m.getValor() ? "*" : "";
+                        //CMensajes.mensajeAdvertencia("PERMISISBLE CO"+permisibleCoCrucero);
                         df.applyPattern("#0.0");
                         String COCrucero = String.valueOf(m.getValor());
-                        parametros.put("COCrucero", ajustarValorMedida(COCrucero.trim()) + m.getCondicion());
+                        parametros.put("COCrucero", ajustarValorMedida(COCrucero.trim()) + asterisco);
                         break;
 
                     case 8009://medida de CO2  Crucero cuatro tiempos
                         df.applyPattern("#0.0");
                         if (idTipoGasolina == 1) {
+                            asterisco = permisibleCo2Crucero > m.getValor() ? "*" : "";
                             String CO2Crucero = String.valueOf(m.getValor());;
-                            parametros.put("CO2Crucero", ajustarValorMedida(CO2Crucero.trim()) + m.getCondicion());
+                            parametros.put("CO2Crucero", ajustarValorMedida(CO2Crucero.trim()) + asterisco);
                         } else {
                             parametros.put("CO2Crucero", ajustarValorMedida(String.valueOf(m.getValor())));
                         }
@@ -1680,7 +1705,9 @@ public class LlamarReporte {
                     //----------------------------------------------------------   
                     case 8017:
                         String ResultadoOp = String.valueOf(m.getValor());
-                        String ResultadoOpValue = ajustarValorMedida(ResultadoOp.trim()) + m.getCondicion();
+                        asterisco = permisibleResDiesel < m.getValor() ? "*" : ""; 
+                        //Mensajes.mensajeCorrecto("permisibleResDiesel: "+permisibleResDiesel);
+                        String ResultadoOpValue = ajustarValorMedida(ResultadoOp.trim()) + asterisco;
                         parametros.put("ResultadoOp", ResultadoOpValue);
 
                         System.out.println("----aaaaaaaaaaaaa---------" + ctxHojaPrueba.getFechaIngreso());
@@ -1767,6 +1794,8 @@ public class LlamarReporte {
         DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
         DecimalFormat dfEntero = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
         dfEntero.applyPattern("#");
+
+        String asterisco = "";
 
         try {
             //pruebas de frenos sin decimales
@@ -1937,43 +1966,53 @@ public class LlamarReporte {
                             break;
                         case 5024://Eficacia de frenado
                             String EficTotal = String.valueOf(m.getValor());
-                            String asterisco = permisisbleEficaciaFrenos > m.getValor() ? "*" : "";
+                            asterisco = permisibleEficaciaFrenos > m.getValor() ? "*" : "";
                             parametros.put("EficTotal", ajustarValorMedida(EficTotal) + asterisco);
                             break;
                         case 5032:
+                            asterisco = m.getValor() > permisibleDesequilibrio ? "*" : "";
                             String DesEje1 = String.valueOf(m.getValor());
-                            parametros.put("DesEje1", ajustarValorMedida(DesEje1) + m.getCondicion());
+                            parametros.put("DesEje1", ajustarValorMedida(DesEje1) + asterisco);
                             break;
                         case 5033:
+                            asterisco = m.getValor() > permisibleDesequilibrio ? "*" : "";
                             String DesEje2 = String.valueOf(m.getValor());
-                            parametros.put("DesEje2", ajustarValorMedida(DesEje2) + m.getCondicion());
+                            parametros.put("DesEje2", ajustarValorMedida(DesEje2) + asterisco);
                             break;
                         case 5034:
+                            asterisco = m.getValor() > permisibleDesequilibrio ? "*" : "";
                             String DesEje3 = String.valueOf(m.getValor());
-                            parametros.put("DesEje3", ajustarValorMedida(DesEje3) + m.getCondicion());
+                            parametros.put("DesEje3", ajustarValorMedida(DesEje3) + asterisco);
                             break;
                         case 5035:
+                            asterisco = m.getValor() > permisibleDesequilibrio ? "*" : "";
                             String DesEje4 = String.valueOf(m.getValor());
-                            parametros.put("DesEje4", ajustarValorMedida(DesEje4) + m.getCondicion());
+                            parametros.put("DesEje4", ajustarValorMedida(DesEje4) + asterisco);
                             break;
                         case 5031:
+                            asterisco = m.getValor() > permisibleDesequilibrio ? "*" : "";
                             String DesEje5 = String.valueOf(m.getValor());
-                            parametros.put("DesEje5", ajustarValorMedida(DesEje5) + m.getCondicion());
+                            parametros.put("DesEje5", ajustarValorMedida(DesEje5) + asterisco);
                             break;
                         case 5036:
 //                            df.applyPattern("#0.00");
+                            //Mensajes.mensajeCorrecto("eficacia de mano: " + m.getValor());
+                            permisibleEficaciaMano = 18;
+                            asterisco = m.getValor() < permisibleEficaciaMano ? "*" : "";
                             df.setMaximumFractionDigits(2);
                             String EficAux = String.valueOf(m.getValor());
-                            parametros.put("EficAux", ajustarValorMedida(EficAux) + m.getCondicion());//un decimal
+                            parametros.put("EficAux", ajustarValorMedida(EficAux) + asterisco);//un decimal
                         default:
                             break;
 
                     }//end of switch
-                    if (sumafi > 0 && sumafd > 0) {
-                        parametros.put("FrzSumIzq", Integer.toString(sumafi));
+                    if (sumafd > 0) {
                         parametros.put("FrzSumDer", Integer.toString(sumafd));
-                        parametros.put("PsSumIzq", Integer.toString(sumapi));
                         parametros.put("PsSumDer", Integer.toString(sumapd));
+                    }
+                    if (sumafi > 0) {
+                        parametros.put("PsSumIzq", Integer.toString(sumapi));
+                        parametros.put("FrzSumIzq", Integer.toString(sumafi));
                     }
 
                 } else {
@@ -2119,7 +2158,15 @@ public class LlamarReporte {
             while (rs.next()) {
                 String id_defecto = rs.getString("id_defecto");
                 if (id_defecto != null) {
-                    if (id_defecto.equals("14016") || id_defecto.equals("10094") || id_defecto.equals("10095") || id_defecto.equals("15050")) {
+                    if (
+                        id_defecto.equals("14016") || 
+                        id_defecto.equals("10094") || 
+                        id_defecto.equals("10095") || 
+                        id_defecto.equals("15050") ||
+                        id_defecto.equals("120136") ||
+                        id_defecto.equals("130151") ||
+                        id_defecto.equals("140194")
+                    ) {
                         System.out.println("se encontro defecto" + id_defecto);
                         defecto_profundidad += 1;
                     }
@@ -2127,6 +2174,7 @@ public class LlamarReporte {
             }
 
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("ERROR EN EL METODO : rDefectosPorfundidaLabrado() " + e.getErrorCode() + e.getMessage());
         }
         return defecto_profundidad;
@@ -2183,84 +2231,41 @@ public class LlamarReporte {
         df.setRoundingMode(RoundingMode.DOWN);
 
         Float[][] medidas = {{6016f, 0.0f},{6020f, 0.0f},{6017f, 0.0f},{6021f, 0.0f}};
+
+        String asterisco = "";
+
         try {
 //            df.applyPattern("#0.00");//un solo digito no creo no
             for (Medida m : listaMedidas) {
                 switch (m.getTipoMedida().getId()) {
                     case 6016:
-
+                        asterisco = m.getValor() < 40 ? "*" : "";
                         medidas[0][1] = m.getValor();
-                        //String DelanteraDer = String.valueOf(m.getValor());
-                        //parametros.put("DelanteraDer", ajustarValorMedida(DelanteraDer.trim()) + m.getCondicion());
+                        String DelanteraDer = String.valueOf(m.getValor());
+                        parametros.put("DelanteraDer", ajustarValorMedida(DelanteraDer.trim()) + asterisco);
                         break;
                     case 6020:
+                        asterisco = m.getValor() < 40 ? "*" : "";
                         medidas[1][1]  = m.getValor();
-                        //String DelanteraIzq = String.valueOf(m.getValor());
-                        //parametros.put("DelanteraIzq", ajustarValorMedida(DelanteraIzq.trim()) + m.getCondicion());
+                        String DelanteraIzq = String.valueOf(m.getValor());
+                        parametros.put("DelanteraIzq", ajustarValorMedida(DelanteraIzq.trim()) + asterisco);
                         break;
                     case 6017:
+                        asterisco = m.getValor() < 40 ? "*" : "";
                         medidas[2][1]  = m.getValor();
-                        //String TraseraDerecha = String.valueOf(m.getValor());
-                        //parametros.put("TraseraDerecha", ajustarValorMedida(TraseraDerecha) + m.getCondicion());//sin decimales
+                        String TraseraDerecha = String.valueOf(m.getValor());
+                        parametros.put("TraseraDerecha", ajustarValorMedida(TraseraDerecha) + asterisco);//sin decimales
                         break;
                     case 6021:
+                        asterisco = m.getValor() < 40 ? "*" : "";
                         medidas[3][1]  = m.getValor();
-                        //String TraseraIzq = String.valueOf(m.getValor());
-                        //parametros.put("TraseraIzq", ajustarValorMedida(TraseraIzq.trim()) + m.getCondicion());
+                        String TraseraIzq = String.valueOf(m.getValor());
+                        parametros.put("TraseraIzq", ajustarValorMedida(TraseraIzq.trim()) + asterisco);
                         break;
                     default:
                         break;
                 }//end of switch
             }//end of for ista de medidas
-
-            boolean tieneAsterisco = parametros.get("PerSusp").toString().equalsIgnoreCase("40");
-            boolean mostrarMensajeSuspension = false;
-            for (int i = 0; i < medidas.length; i++) {
-                if (medidas[i][1]  <= 0 || medidas[i][1]  >= 100) {
-
-                    Float suma = 0.0f;
-                    int totalNumerosValidos = 0;
-                    for (int j = 0; j < medidas.length; j++) {
-                        if (medidas[j][1]  > 0 && medidas[j][1]  < 100) {
-                            totalNumerosValidos++;
-                            suma += medidas[j][1] ;
-                        }
-                    }
-                    if (totalNumerosValidos > 0) {
-                        Float promedio = suma / totalNumerosValidos;
-                        medidas[i][1] = promedio;
-            
-                        // Guardar la nueva medida
-                        Utils.guardarOModificarMedida(medidas[i][0].intValue(), idPrueba, promedio.doubleValue(), "N");
-                    }else{
-                        mostrarMensajeSuspension = estaFinalizada;
-                    }
-                }
-                if (medidas[i][0].intValue() == 6016){
-                    String DelanteraDer = String.valueOf(medidas[i][1]);
-                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
-                    parametros.put("DelanteraDer", medidas[i][1] == 0 ? "" : ajustarValorMedida(DelanteraDer.trim()) + asterisco);
-                } 
-                if (medidas[i][0].intValue() == 6020) {
-                    String DelanteraIzq = String.valueOf(medidas[i][1]);
-                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
-                    parametros.put("DelanteraIzq", medidas[i][1] == 0 ? "" : ajustarValorMedida(DelanteraIzq.trim()) + asterisco);
-                }
-                if (medidas[i][0].intValue() == 6017) {
-                    String TraseraDerecha = String.valueOf(medidas[i][1]);
-                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
-                    parametros.put("TraseraDerecha", medidas[i][1] == 0 ? "" : ajustarValorMedida(TraseraDerecha) + asterisco);//sin decimales
-                }
-                if (medidas[i][0].intValue() == 6021) {
-                    String TraseraIzq = String.valueOf(medidas[i][1]);
-                    String asterisco = tieneAsterisco && medidas[i][0] < 40 ? "*" : "";
-                    parametros.put("TraseraIzq", medidas[i][1] == 0 ? "" : ajustarValorMedida(TraseraIzq.trim()) + asterisco);
-                }
-            }
-
-            if (mostrarMensajeSuspension) {
-                CMensajes.mensajeError("Se debe repetir la prueba de suspension debido a que ningun valor se encuentra dentro de los rangos permitidos");
-            }
 
 
         } catch (Exception e) {
@@ -2331,6 +2336,8 @@ public class LlamarReporte {
         DecimalFormat df = (DecimalFormat) NumberFormat.getInstance(Locale.ENGLISH);
         df.applyPattern("#0.00");
 
+        String asterisco = "";
+
         try {
             //prueba de taximetro cuantos decimales
             df.applyPattern("#0.0");
@@ -2338,12 +2345,14 @@ public class LlamarReporte {
             for (Medida m : listaMedidas) {
                 switch (m.getTipoMedida().getId()) {
                     case 9002:
+                        asterisco = Math.abs(m.getValor()) > 2 ? "*" :"";
                         String ErrorDistancia = String.valueOf(m.getValor());
-                        parametros.put("ErrorDistancia", ajustarValorMedida(ErrorDistancia.trim()) + m.getCondicion());
+                        parametros.put("ErrorDistancia", ajustarValorMedida(ErrorDistancia.trim()) + asterisco);
                         break;
                     case 9003:
+                        asterisco = Math.abs(m.getValor()) > 2 ? "*" :"";
                         String ErrorTiempo = df.format(m.getValor());
-                        parametros.put("ErrorTiempo", ajustarValorMedida(ErrorTiempo.trim()) + m.getCondicion());
+                        parametros.put("ErrorTiempo", ajustarValorMedida(ErrorTiempo.trim()) + asterisco);
                         break;
                     default:
                         break;
@@ -2445,11 +2454,14 @@ public class LlamarReporte {
             parametros.put("PerSusp", "---");
             //Frenos
             parametros.put("PerEficTotal", "30");//30%
-            permisisbleEficaciaFrenos = 30.0;
+            permisibleEficaciaFrenos = 30.0;
             parametros.put("PerEficAux", "18");//no hay desequilibrio
+            permisibleEficaciaMano = 18;
             parametros.put("PerDeseqB", "20-30");
+            permisibleDesequilibrio = 20;
             parametros.put("PerDeseq", ">30");
-            parametros.put("PerSumaLuces", "225");
+            parametros.put("PerSumaLuces", "225"); 
+            permisibleSumaLuces = 225.0;
         }
 
 
@@ -2464,9 +2476,11 @@ public class LlamarReporte {
             parametros.put("PerSusp", "---");
             //Frenos
             parametros.put("PerEficTotal", "30");//30%
-            permisisbleEficaciaFrenos = 30.0;
+            permisibleEficaciaFrenos = 30.0;
             parametros.put("PerEficAux", "18");//no hay desequilibrio
+            permisibleEficaciaMano = 18;
             parametros.put("PerDeseqB", "20-30");
+            permisibleDesequilibrio = 20;
             parametros.put("PerDeseq", ">30");
             parametros.put("PerSumaLuces", "---");
             //Desviacion : el permisible es solamente uno
@@ -2562,11 +2576,15 @@ public class LlamarReporte {
                 parametros.put("PerSusp", "---");
                 //Frenos
                 parametros.put("PerEficTotal", tipoVehiculo.equalsIgnoreCase("Moto") ? "30" : "40");//30%
-                permisisbleEficaciaFrenos = tipoVehiculo.equalsIgnoreCase("Moto") ? 30.0 : 40.0;
-                parametros.put("PerEficAux", "---");//no hay desequilibrio
+                permisibleEficaciaFrenos = tipoVehiculo.equalsIgnoreCase("Moto") ? 30.0 : 40.0;
+                String permisibleFrenoMano = tipoVehiculo.equalsIgnoreCase("Moto") ? "---" : "18";
+                parametros.put("PerEficAux", permisibleFrenoMano);//no hay desequilibrio
+                permisibleEficaciaMano = 1000;
                 parametros.put("PerDeseq", "---");
                 parametros.put("PerDeseqB", "---");
-                parametros.put("PerSumaLuces", "---");
+                permisibleDesequilibrio = 1000;
+                parametros.put("PerSumaLuces", "225");
+                permisibleSumaLuces = 225.0;
             }
             
             //Desviacion : el permisible es solamente uno
@@ -2646,15 +2664,18 @@ public class LlamarReporte {
         }else if(tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")){
             //Frenos:
             parametros.put("PerEficTotal","30");
-            permisisbleEficaciaFrenos = 30;
+            permisibleEficaciaFrenos = 30;
             parametros.put("PerEficAux", "18");
+            permisibleEficaciaMano = 18;
             parametros.put("PerDeseqB", "20-30");
+            permisibleDesequilibrio = 20;
             parametros.put("PerDeseq", ">30");//ojo de 20 a 30 es defecto tipo B
             parametros.put("PerSumaLuces", "225");
         } else if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 1 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 3 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 109 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 110) {// 1 -> Livianos ,  3-> pesados, 2-> 4x4 109 or 110-> aplica a taxi 
             if (this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 1 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 10 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 4 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 2) {
                 parametros.put("PerO2", "[0-5]");
                 parametros.put("PerCO2", "[ <7 ]");
+                permisibleCo2Crucero = 7;
             } else {
                 parametros.put("PerO2", " ");
                 parametros.put("PerCO2", " ");
@@ -2677,9 +2698,11 @@ public class LlamarReporte {
 
             //Frenos:
             parametros.put("PerEficTotal","50");
-            permisisbleEficaciaFrenos = 50;
+            permisibleEficaciaFrenos = 50;
             parametros.put("PerEficAux", "18");
+            permisibleEficaciaMano = 18;
             parametros.put("PerDeseqB", "20-30");
+            permisibleDesequilibrio = 20;
             parametros.put("PerDeseq", ">30");//ojo de 20 a 30 es defecto tipo B
             parametros.put("PerSumaLuces", "225");
 
@@ -2697,6 +2720,9 @@ public class LlamarReporte {
                         permisibleCoRalenti = 5.0;
                         parametros.put("PerHCCruc", "[0-800]");
                         parametros.put("PerCOCruc", "[0-5.0]");
+                        permisibleCoCrucero = 5.0;
+                        permisibleHcCrucero = 800;
+
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1970 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1984) {
                         parametros.put("PerHCRal", "[0-650]");
                         permisibleHcRalenti = 650;
@@ -2704,12 +2730,16 @@ public class LlamarReporte {
                         permisibleCoRalenti = 4.0;
                         parametros.put("PerHCCruc", "[0-650]");
                         parametros.put("PerCOCruc", "[0-4.0]");
+                        permisibleCoCrucero = 4.0;
+                        permisibleHcCrucero = 650;
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1984 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1997) {
                         parametros.put("PerHCRal", "[0-400]");
                         permisibleHcRalenti = 400;
                         parametros.put("PerCORal", "[0-3.0]");
                         parametros.put("PerHCCruc", "[0-400]");
                         parametros.put("PerCOCruc", "[0-3.0]");
+                        permisibleCoCrucero = 3.0;
+                        permisibleHcCrucero = 400;
                     } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1997) {
                         parametros.put("PerHCRal", "[0-200]");
                         permisibleHcRalenti = 200;
@@ -2718,6 +2748,8 @@ public class LlamarReporte {
                         parametros.put("PerHCCruc", "[0-200]");
                         parametros.put("PerCOCruc", "[0-1.0]");
                         cero200 = true;
+                        permisibleCoCrucero = 1.0;
+                        permisibleHcCrucero = 200;
                     }
                     parametros.put("PerOpac", "---");
                 } else {
@@ -2729,6 +2761,8 @@ public class LlamarReporte {
                         permisibleCoRalenti = 4.0;
                         parametros.put("PerHCCruc", "[0-650]");
                         parametros.put("PerCOCruc", "[0-4.0]");
+                        permisibleCoCrucero = 4.0;
+                        permisibleHcCrucero = 650;
                     } else if (modelo >= 1985 && modelo <= 1997) {
                         parametros.put("PerHCRal", "[0-400]");
                         permisibleHcRalenti = 400;
@@ -2736,6 +2770,8 @@ public class LlamarReporte {
                         permisibleCoRalenti = 3.0;
                         parametros.put("PerHCCruc", "[0-400]");
                         parametros.put("PerCOCruc", "[0-3.0]");
+                        permisibleCoCrucero = 3.0;
+                        permisibleHcCrucero = 400;
                     } else if (modelo >= 1998 && modelo <= 2009) {
                         parametros.put("PerHCRal", "[0-200]");
                         permisibleHcRalenti = 200;
@@ -2743,6 +2779,8 @@ public class LlamarReporte {
                         permisibleCoRalenti = 1.0;
                         parametros.put("PerHCCruc", "[0-200]");
                         parametros.put("PerCOCruc", "[0-1.0]");
+                        permisibleCoCrucero = 1.0;
+                        permisibleHcCrucero = 200;
                         cero200 = true;
                     } else {//modelo >= 2010
                         parametros.put("PerHCRal", "[0-160]");
@@ -2751,12 +2789,15 @@ public class LlamarReporte {
                         permisibleCoRalenti = 0.8;
                         parametros.put("PerHCCruc", "[0-160]");
                         parametros.put("PerCOCruc", "[0-0.8]");
+                        permisibleCoCrucero = 0.8;
+                        permisibleHcCrucero = 160;
                     }
                 }
                 if ( this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9  ){
                     if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9 ) {
                         parametros.put("PerO2", "[0-5]");
                         parametros.put("PerCO2", "[ <7 ]");
+                        permisibleCo2Crucero = 7;
                     } else {
                         parametros.put("PerO2", " ");
                         parametros.put("PerCO2", " ");
@@ -2768,29 +2809,37 @@ public class LlamarReporte {
                         if (this.ctxHojaPrueba.getVehiculo().getModelo() <= 1970) {
                             parametros.put("PerHCRal", "[0-800]");
                             permisibleHcRalenti = 800;
+                            permisibleHcCrucero = 800;
                             parametros.put("PerCORal", "[0-5.0]");
                             permisibleCoRalenti = 5.0;
+                            permisibleCoCrucero = 5.0;
                             parametros.put("PerHCCruc", "[0-800]");
                             parametros.put("PerCOCruc", "[0-5.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1970 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1984) {
                             parametros.put("PerHCRal", "[0-650]");
                             permisibleHcRalenti = 650;
+                            permisibleHcCrucero = 650;
                             parametros.put("PerCORal", "[0-4.0]");
                             permisibleCoRalenti = 4.0;
+                            permisibleCoCrucero = 4.0;
                             parametros.put("PerHCCruc", "[0-650]");
                             parametros.put("PerCOCruc", "[0-4.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1984 && this.ctxHojaPrueba.getVehiculo().getModelo() <= 1997) {
                             parametros.put("PerHCRal", "[0-400]");
                             permisibleHcRalenti = 400;
+                            permisibleHcCrucero = 400;
                             parametros.put("PerCORal", "[0-3.0]");
                             permisibleCoRalenti = 3.0;
+                            permisibleCoCrucero = 3.0;
                             parametros.put("PerHCCruc", "[0-400]");
                             parametros.put("PerCOCruc", "[0-3.0]");
                         } else if (this.ctxHojaPrueba.getVehiculo().getModelo() > 1997) {
                             parametros.put("PerHCRal", "[0-200]");
                             permisibleHcRalenti = 200;
+                            permisibleHcCrucero = 200;
                             parametros.put("PerCORal", "[0-1.0]");
                             permisibleCoRalenti = 1.0;
+                            permisibleCoCrucero = 1.0;
                             parametros.put("PerHCCruc", "[0-200]");
                             parametros.put("PerCOCruc", "[0-1.0]");
                             cero200 = true;
@@ -2800,30 +2849,38 @@ public class LlamarReporte {
                         if (modelo <= 1984) {
                             parametros.put("PerHCRal", "[0-650]");
                             permisibleHcRalenti = 650;
+                            permisibleHcCrucero = 650;
                             parametros.put("PerCORal", "[0-4.0]");
                             permisibleCoRalenti = 4.0;
+                            permisibleCoCrucero = 4.0;
                             parametros.put("PerHCCruc", "[0-650]");
                             parametros.put("PerCOCruc", "[0-4.0]");
                         } else if (modelo >= 1985 && modelo <= 1997) {
                             parametros.put("PerHCRal", "[0-400]");
                             permisibleHcRalenti = 400;
+                            permisibleHcCrucero = 400;
                             parametros.put("PerCORal", "[0-3.0]");
                             permisibleCoRalenti = 3.0;
+                            permisibleCoCrucero = 3.0;
                             parametros.put("PerHCCruc", "[0-400]");
                             parametros.put("PerCOCruc", "[0-3.0]");
                         } else if (modelo >= 1998 && modelo <= 2009) {
                             parametros.put("PerHCRal", "[0-200]");
                             permisibleHcRalenti = 200;
+                            permisibleHcCrucero = 200;
                             parametros.put("PerCORal", "[0-1.0]");
                             permisibleCoRalenti = 1.0;
+                            permisibleCoCrucero = 1.0;
                             parametros.put("PerHCCruc", "[0-200]");
                             parametros.put("PerCOCruc", "[0-1.0]");
                             cero200 = true;
                         } else {//modelo >= 2010
                             parametros.put("PerHCRal", "[0-160]");
                             permisibleHcRalenti = 160;
+                            permisibleHcCrucero = 160;
                             parametros.put("PerCORal", "[0-0.8]");
                             permisibleCoRalenti = 0.8;
+                            permisibleCoCrucero = 0.8;
                             parametros.put("PerHCCruc", "[0-160]");
                             parametros.put("PerCOCruc", "[0-0.8]");
                         }
@@ -2846,7 +2903,9 @@ public class LlamarReporte {
                     boolean esPosterior2025 = ctxHojaPrueba.getFechaIngreso().after(permisiblesDiesel2025);
                     
                     // Calcula los permisisbles en diesel en funcion del cilindraje, modelo y si es fecha posterior al 2025
-                    perOpecValue = calcularPermisiblesDiesel(vehiculo.getCilindraje(), vehiculo.getModelo(), esPosterior2025);
+                    permisibleResDiesel = calcularPermisiblesDiesel(vehiculo.getCilindraje(), vehiculo.getModelo(), esPosterior2025);
+
+                    perOpecValue = String.valueOf(permisibleResDiesel);
                     
                     parametros.put("PerOpac", perOpecValue);
 
@@ -2869,7 +2928,7 @@ public class LlamarReporte {
             }
         }//end of methoc configurarPermisibles
 
-        private String calcularPermisiblesDiesel(int cilindraje, int modelo, boolean esPosterior2025) {
+        /* private String calcularPermisiblesDiesel(int cilindraje, int modelo, boolean esPosterior2025) {
             //Los permisibles en diesel se reducen 1.5 a partir del 2025
             if (cilindraje < 5000) {
                 if (modelo > 2000 && modelo <= 2015) return esPosterior2025 ? "3.5" : "5.0";
@@ -2879,6 +2938,21 @@ public class LlamarReporte {
                 if (modelo > 2000 && modelo <= 2015) return esPosterior2025 ? "3.0" : "4.5";
                 if (modelo >= 2016) return esPosterior2025 ? "2.0" : "3.5";
                 if (modelo <= 2000) return esPosterior2025 ? "4.0" : "5.5";
+            }
+            CMensajes.mensajeError("Error al calcular permisisbles diesel.\nPor favor verifique el modelo y cilindraje del vehiculo.");
+            throw new RuntimeException("Error al calcular permisibles diesel.");
+        } */
+
+        private double calcularPermisiblesDiesel(int cilindraje, int modelo, boolean esPosterior2025) {
+            //Los permisibles en diesel se reducen 1.5 a partir del 2025
+            if (cilindraje < 5000) {
+                if (modelo > 2000 && modelo <= 2015) return esPosterior2025 ? 3.5 : 5.0;
+                if (modelo >= 2016) return esPosterior2025 ? 2.5 : 4.0;
+                if (modelo <= 2000) return esPosterior2025 ? 4.5 : 6.0;
+            } else {
+                if (modelo > 2000 && modelo <= 2015) return esPosterior2025 ? 3.0 : 4.5;
+                if (modelo >= 2016) return esPosterior2025 ? 2.0 : 3.5;
+                if (modelo <= 2000) return esPosterior2025 ? 4.0 : 5.5;
             }
             CMensajes.mensajeError("Error al calcular permisisbles diesel.\nPor favor verifique el modelo y cilindraje del vehiculo.");
             throw new RuntimeException("Error al calcular permisibles diesel.");

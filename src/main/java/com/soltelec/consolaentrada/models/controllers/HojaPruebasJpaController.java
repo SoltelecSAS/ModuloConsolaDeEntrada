@@ -1004,6 +1004,7 @@ public class HojaPruebasJpaController {
     }
 
     public HojaPruebas find(Integer id) {
+        System.out.println("id HojaPruebas: " + id);
         EntityManager em = getEntityManager();
         try {
             if(em.getTransaction().isActive()==true){                
@@ -1017,6 +1018,17 @@ public class HojaPruebasJpaController {
             em.getTransaction().commit();
             return hp;
         } finally {
+        }
+    }
+
+    public HojaPruebas find2(Integer id) {
+        System.out.println("id HojaPruebas: " + id);
+        EntityManager em = getEntityManager();
+        try {
+            // Para find no necesitas transacción si solo vas a leer
+            return em.find(HojaPruebas.class, id);
+        } finally {
+            em.close(); // importante para evitar fugas
         }
     }
 

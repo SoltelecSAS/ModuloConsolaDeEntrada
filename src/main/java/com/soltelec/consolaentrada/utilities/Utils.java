@@ -728,7 +728,7 @@ public class Utils {
     
 
     public static String getAprobadoReprobado(int idHojaPrueba) {
-        String consultaPruebas = "SELECT p.*, v.CARTYPE, v.esEnsenaza, hp.preventiva FROM pruebas p " +
+        String consultaPruebas = "SELECT p.*, v.CARTYPE, v.esEnsenaza, hp.preventiva, v.SERVICE FROM pruebas p " +
                                   "INNER JOIN hoja_pruebas hp on hp.TESTSHEET = p.hoja_pruebas_for " +
                                   "INNER JOIN vehiculos v on v.CAR = hp.Vehiculo_for " +
                                   "WHERE hp.TESTSHEET = ? ORDER BY p.Fecha_prueba DESC;";
@@ -775,15 +775,17 @@ public class Utils {
                         int idPrueba = rc.getInt("Id_Pruebas");
                         int tipoVehiculo = rc.getInt("CARTYPE");
                         boolean esEnsenaza = rc.getInt("esEnsenaza") == 1;
+                        int tipoServicio = rc.getInt("SERVICE");
     
                         puntajeTotalDefectos += calcularPuntajeDefectos(idPrueba);
     
-                        if (esReprobado(puntajeTotalDefectos, tipoVehiculo, esEnsenaza)) {
+                        if (esReprobado(puntajeTotalDefectos, tipoVehiculo, esEnsenaza, tipoServicio)) {
                             return "REPROBADA";
                         }
                     }
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -792,11 +794,13 @@ public class Utils {
     }
     
     // Método para centralizar la lógica de reprobación
-    private static boolean esReprobado(int puntaje, int tipoVehiculo, boolean esEnsenaza) {
+    private static boolean esReprobado(int puntaje, int tipoVehiculo, boolean esEnsenaza, int tipoServicio) {
         if (puntaje > 0 && (tipoVehiculo == 121 || tipoVehiculo == 123) && esEnsenaza) return true;
         if (puntaje > 6 && tipoVehiculo == 123) return true;
         if (puntaje > 4 && tipoVehiculo == 4) return true;
         if (puntaje > 9 && tipoVehiculo != 4) return true;
+        if (puntaje > 4 && tipoServicio == 2) return true;
+        if (puntaje > 4 && tipoServicio == 1 && esEnsenaza) return true;
         return false;
     }
     
@@ -1235,24 +1239,53 @@ public class Utils {
         return false; // Retorna false si no existe la columna o ocurre un error
     }
 
+
     public static boolean existenDefEnsenanza(int hojaPruebasId) {
+        Conexion.setConexionFromFile();
+        boolean[] pruebas = {false, false, false, false, false, false, false, false, false};
+        String query = "SELECT p.* FROM hoja_pruebas hp  \r\n" + //
+                        "INNER JOIN pruebas p ON p.hoja_pruebas_for = hp.TESTSHEET  \r\n" + //
+                        "WHERE hp.TESTSHEET = ? order by p.Fecha_prueba desc";
+
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+            PreparedStatement stmt = conexion.prepareStatement(query)) {
+
+            stmt.setInt(1, hojaPruebasId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                // Aquí puedes procesar cada prueba individualmente
+                int tipoPrueba = rs.getInt("Tipo_prueba_for");
+                if (!pruebas[tipoPrueba - 1]) {
+                    int idPrueba = rs.getInt("Id_Pruebas");
+                    pruebas[tipoPrueba - 1] = true;
+                    if (existenDefEnsenanzaPorPrueba(idPrueba)) return true; // Si existe un defecto de enseñanza, retorna true
+                }
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Retorna true si hay registros, false si no
+    }
+
+    public static boolean existenDefEnsenanzaPorPrueba(int idPrueba) {
         boolean existeRegistro = false; // Inicializamos en false
     
         Conexion.setConexionFromFile();
-    
         // Consulta SQL
-        String query = "SELECT gsg.* FROM hoja_pruebas hp " +
-                       "INNER JOIN pruebas p ON p.hoja_pruebas_for = hp.TESTSHEET " +
-                       "INNER JOIN defxprueba dp ON dp.id_prueba = p.Id_Pruebas " +
-                       "INNER JOIN defectos d ON d.CARDEFAULT = dp.id_defecto " +
-                       "INNER JOIN grupos_sub_grupos gsg ON gsg.SCDEFGROUPSUB = d.DEFGROUPSSUB " +
-                       "WHERE gsg.DEFGROUP = 21 AND hp.TESTSHEET = ?";
+        String query = "SELECT p.* FROM  pruebas p \r\n" + //
+                        "   INNER JOIN defxprueba dp ON dp.id_prueba = p.Id_Pruebas  \r\n" + //
+                        "   INNER JOIN defectos d ON d.CARDEFAULT = dp.id_defecto  \r\n" + //
+                        "   INNER JOIN grupos_sub_grupos gsg ON gsg.SCDEFGROUPSUB = d.DEFGROUPSSUB  \r\n" + //
+                        "   WHERE gsg.DEFGROUP = 21 AND p.Id_Pruebas  = ?";
     
         try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
              PreparedStatement stmt = conexion.prepareStatement(query)) {
     
             // Asignar el valor al parámetro
-            stmt.setInt(1, hojaPruebasId);
+            stmt.setInt(1, idPrueba);
     
             // Ejecutar la consulta
             ResultSet rs = stmt.executeQuery();

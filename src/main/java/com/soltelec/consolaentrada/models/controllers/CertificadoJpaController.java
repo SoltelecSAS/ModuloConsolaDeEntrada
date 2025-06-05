@@ -100,7 +100,7 @@ public class CertificadoJpaController implements Serializable {
         EntityManager em = getEntityManager();
         try {
             em.getTransaction().begin();            
-             HojaPruebas ctxHP = em.find(HojaPruebas.class, hojaPruebas.getId());
+            HojaPruebas ctxHP = em.find(HojaPruebas.class, hojaPruebas.getId());
             ctxHP.setEstadoSICOV(hojaPruebas.getEstadoSICOV());
             ctxHP.setConsecutivoRunt(hojaPruebas.getConsecutivoRunt());
             ctxHP.setCertificados(hojaPruebas.getCertificados());

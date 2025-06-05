@@ -514,7 +514,9 @@ public class SicovSoap_BindingStub extends org.apache.axis.client.Stub implement
         if(_call.getMessageContext().getPropertyNames() != null)System.out.println("Request Headers: " + _call.getMessageContext().getPropertyNames());
 
         try {
-            
+        
+            System.out.println("consecutivoRUNT: " + consecutivoRUNT);   
+
             java.lang.Object _resp = _call.invoke(
                 new java.lang.Object[] {nombreEmpleado, numeroIdentificacion, placa, extranjero, consecutivoRUNT, idRunt, direccionIpEquipo}
             ); //esta es la 483
