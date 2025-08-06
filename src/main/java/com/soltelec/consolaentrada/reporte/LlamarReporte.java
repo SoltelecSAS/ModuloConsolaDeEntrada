@@ -2291,27 +2291,29 @@ public class LlamarReporte {
             df.applyPattern("#0.0#");
             df.setMaximumFractionDigits(1);
             for (Medida m : listaMedidas) {
+                String asterisco = m.getValor() > 10 || m.getValor() < -10 ? "*" : "";
                 switch (m.getTipoMedida().getId()) {
+                    
                     case 4000:
                         String DvcnEje1 = String.valueOf(m.getValor());
-                        parametros.put("DvcnEje1", ajustarValorMedida(DvcnEje1.trim()) + m.getCondicion());
+                        parametros.put("DvcnEje1", ajustarValorMedida(DvcnEje1.trim()) + asterisco);
                         break;
                     case 4001:
                         String DvcnEje2 = String.valueOf(m.getValor());
 
-                        parametros.put("DvcnEje2", ajustarValorMedida(DvcnEje2.trim()) + m.getCondicion());
+                        parametros.put("DvcnEje2", ajustarValorMedida(DvcnEje2.trim()) + asterisco);
                         break;
                     case 4002:
                         String DvcnEje3 = String.valueOf(m.getValor());
-                        parametros.put("DvcnEje3", ajustarValorMedida(DvcnEje3.trim()) + m.getCondicion());
+                        parametros.put("DvcnEje3", ajustarValorMedida(DvcnEje3.trim()) + asterisco);
                         break;
                     case 4003:
                         String DvcnEje4 = String.valueOf(m.getValor());
-                        parametros.put("DvcnEje4", ajustarValorMedida(DvcnEje4.trim()) + m.getCondicion());
+                        parametros.put("DvcnEje4", ajustarValorMedida(DvcnEje4.trim()) + asterisco);
                         break;
                     case 4004:
                         String DvcnEje5 = String.valueOf(m.getValor());
-                        parametros.put("DvcnEje5", ajustarValorMedida(DvcnEje5.trim()) + m.getCondicion());
+                        parametros.put("DvcnEje5", ajustarValorMedida(DvcnEje5.trim()) + asterisco);
                         break;
                     default:
                         break;
