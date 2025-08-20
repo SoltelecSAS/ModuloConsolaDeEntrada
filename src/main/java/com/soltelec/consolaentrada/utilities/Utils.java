@@ -1126,6 +1126,16 @@ public class Utils {
         return null; // En caso de error o si no se encuentra el registro
     }
 
+    private static boolean enviaraSegundoFur = false;
+
+    public static boolean isEnviaraSegundoFur() {
+        return enviaraSegundoFur;
+    }
+
+    public static void setEnviaraSegundoFur(boolean enviaraSegundoFur) {
+        Utils.enviaraSegundoFur = enviaraSegundoFur;
+    }
+
     public static String getRutaPdf(int idHojaPruebas) throws IOException{
 
         InfoHojaPruebas info = getInfoPruebas(idHojaPruebas);

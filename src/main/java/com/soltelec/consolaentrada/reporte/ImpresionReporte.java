@@ -56,7 +56,7 @@ public class ImpresionReporte {
     EventosDao ev;
     private Long numeroHojaPrueba;
     private LlamarReporte llamarReporte;
-    
+    private boolean enviarFurVps = false;
     
     
     
@@ -188,7 +188,7 @@ public class ImpresionReporte {
             int seleccion = JOptionPane.showOptionDialog(null, "¿Desea Enviar el Segundo FUR de esta Revision TecnoMecanica ?", "Envio Segundo FUR", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
             if (seleccion == JOptionPane.YES_OPTION) {
 
-                
+                Utils.setEnviaraSegundoFur(true);
                 String strConsecutivo = null;
                 
                 envio = true;

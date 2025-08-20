@@ -50,7 +50,7 @@ public class HojaPruebas implements Serializable {
     @Basic(optional = false)
     @Column(name = "Fecha_ingreso_vehiculo")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaIngreso;
+    private Date fechaIngreso = new Date();
     @Column(name = "Anulado")
     private String anulado;
     @Column(name = "pin")
@@ -62,15 +62,15 @@ public class HojaPruebas implements Serializable {
     @Basic(optional = false)
     @Column(name = "Fecha_expiracion_revision")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaExpiracion;
+    private Date fechaExpiracion = new Date();
     @Column(name = "nro_soat")
     private String nroIdentificacionSoat;
     @Column(name = "fecha_exp_soat")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaExpSoat;
+    private Date fechaExpSoat = new Date();
     @Column(name = "fecha_venc_soat")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaVencSoat;
+    private Date fechaVencSoat = new Date();
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "Conductor")
     private Propietario conductor;
@@ -84,7 +84,7 @@ public class HojaPruebas implements Serializable {
     @Basic(optional = false)
     @Column(name = "Fecha_expedicion_certificados")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaExpedicion;
+    private Date fechaExpedicion = new Date();
     @Lob
     @Column(name = "Comentarios_cda")
     private String comentario;
@@ -119,7 +119,7 @@ public class HojaPruebas implements Serializable {
     private String kilometraje;
     @Column(name = "fecha_venc_gnv")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaVencimientoGnv;
+    private Date fechaVencimientoGnv = new Date();
 
     public HojaPruebas() {
         super();
@@ -453,11 +453,7 @@ public class HojaPruebas implements Serializable {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "org.soltelec.persistencia.HojaPruebas[testsheet=" + id + "]";
-    }
-
+    
     /**
      * @return the estado
      */

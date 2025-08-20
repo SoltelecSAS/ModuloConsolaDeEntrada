@@ -12,6 +12,7 @@ import com.soltelec.consolaentrada.models.entities.Prueba;
 import com.soltelec.consolaentrada.models.entities.HojaPruebas;
 import com.soltelec.consolaentrada.configuration.Conexion;
 import com.soltelec.consolaentrada.models.entities.Vehiculo;
+import com.soltelec.consolaentrada.models.Dtos.PdfInfo;
 import com.soltelec.consolaentrada.models.controllers.CdaJpaController;
 import com.soltelec.consolaentrada.models.controllers.EquiposJpaController1;
 import com.soltelec.consolaentrada.models.controllers.HojaPruebasJpaController;
@@ -299,6 +300,11 @@ public class LlamarReporte {
 
             // Obtener el reporte como un arreglo de bytes
             byte[] pdfBytes = JasperExportManager.exportReportToPdf(fillReport);
+
+            if (Utils.isEnviaraSegundoFur()) {
+                Utils.setEnviaraSegundoFur(false);
+                PdfInfo info = new PdfInfo(txtPlaca, Conexion.getNitCda(), pdfBytes);
+            }
 
             // Guardar el archivo en disco si es necesario
             FileOutputStream fos = new FileOutputStream(destFileNamePdf);

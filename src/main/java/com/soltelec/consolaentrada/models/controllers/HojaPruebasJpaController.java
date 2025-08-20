@@ -115,7 +115,7 @@ public class HojaPruebasJpaController {
                 ctxVehiculo.setCilindraje(hojaPruebas.getVehiculo().getCilindraje());
                 ctxVehiculo.setClaseVehiculo(hojaPruebas.getVehiculo().getClaseVehiculo());
                 ctxVehiculo.setColor(hojaPruebas.getVehiculo().getColor());
-//              ctxVehiculo.setDiametro(430); ///???   
+                ctxVehiculo.setFecha(new Date());
                 ctxVehiculo.setFechaRegistro(hojaPruebas.getVehiculo().getFechaRegistro());
                 ctxVehiculo.setLineaVehiculo(hojaPruebas.getVehiculo().getLineaVehiculo());
                 ctxVehiculo.setLlantas(hojaPruebas.getVehiculo().getLlantas());
@@ -146,6 +146,9 @@ public class HojaPruebasJpaController {
                 ctxVehiculo.setFecha(new Date());
                 hojaPruebas.setVehiculo(ctxVehiculo);
             }
+
+            System.out.println("Vehiculo: " + ctxVehiculo);
+            System.out.println("Hoja de Pruebas: " + hojaPruebas);
         }
         if (hojaPruebas.getVehiculo().getId() != null) {//si no es un carro nuevo
             if (em.find(hojaPruebas.getVehiculo().getClass(), hojaPruebas.getVehiculo().getId()) != null) {//si se encuentra en la bd
@@ -156,6 +159,9 @@ public class HojaPruebasJpaController {
             arrayList.add(hojaPruebas);
             hojaPruebas.getVehiculo().setHojaPruebasList(arrayList);
         }
+
+        
+
         em.persist(hojaPruebas);//ahora la hoja de pruebas queda en estado managed o administrada, los cambios solo se reflejan cuando la transaccion se confirme
         em.getTransaction().commit();
         

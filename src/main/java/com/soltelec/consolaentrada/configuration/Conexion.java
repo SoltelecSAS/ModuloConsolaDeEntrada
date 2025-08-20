@@ -143,7 +143,7 @@ public class Conexion implements Serializable {
                             while (rc.next()) {
                                 nit = rc.getString("NIT");
 
-                                Conexion.setNitCda(nit);
+                                Conexion.setNitCda(nit.trim());
 
                                 String urlPeticion = "http://api.soltelec.com:8087/api/public/" + nit;
                                 //String urlPeticion = "http://localhost/api/public/" + nit;

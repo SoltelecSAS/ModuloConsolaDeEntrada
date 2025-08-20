@@ -65,7 +65,7 @@ public class Vehiculo implements Serializable {
     @Basic(optional = false)
     @Column(name = "INDATE")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
+    private Date fecha = new Date();
     @Column(name = "Numero_exostos")
     private Integer exostos;
     @Column(name = "Diametro")
@@ -81,11 +81,11 @@ public class Vehiculo implements Serializable {
     @Basic(optional = false)
     @Column(name = "Fecha_soat")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaSOAT;
+    private Date fechaSOAT = new Date();
     @Basic(optional = false)
     @Column(name = "Fecha_exp_soat")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaExpedicionSOAT;
+    private Date fechaExpedicionSOAT = new Date();
     @Column(name = "Nacionalidad")
     private String nacionalidad;
     @Column(name = "Catalizador")
@@ -100,7 +100,7 @@ public class Vehiculo implements Serializable {
     @Basic(optional = false)
     @Column(name = "Fecha_registro")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaRegistro;
+    private Date fechaRegistro = new Date();
     /***Modificado esEnsenaza por Diego Garzon***/
     @Column(name = "esEnsenaza")
     //@Column(name = "es_ensenaza")
@@ -165,7 +165,7 @@ public class Vehiculo implements Serializable {
     private String esConversionGnv;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_vencimiento_gnv")
-    private Date fechaVencimientoGnv;
+    private Date fechaVencimientoGnv = new Date();
     public Vehiculo() {
         usuario = 1;
     }
@@ -554,7 +554,21 @@ public class Vehiculo implements Serializable {
 
     @Override
     public String toString() {
-        return "org.soltelec.persistencia.Vehiculo[car=" + id + "]";
+        return "Vehiculo [id=" + id + ", placa=" + placa + ", modelo=" + modelo + ", diseno=" + diseno + ", cilindraje="
+                + cilindraje + ", licencia=" + licencia + ", ejes=" + ejes + ", fecha=" + fecha + ", exostos=" + exostos
+                + ", diametro=" + diametro + ", tiemposMotor=" + tiemposMotor + ", pesoBruto=" + pesoBruto
+                + ", velocidad=" + velocidad + ", numeroSOAT=" + numeroSOAT + ", fechaSOAT=" + fechaSOAT
+                + ", fechaExpedicionSOAT=" + fechaExpedicionSOAT + ", nacionalidad=" + nacionalidad + ", catalizador="
+                + catalizador + ", servicioEspecial=" + servicioEspecial + ", motor=" + motor + ", vin=" + vin
+                + ", fechaRegistro=" + fechaRegistro + ", esEnsenaza=" + esEnsenaza + ", llantas=" + llantas
+                + ", servicios=" + servicios + ", aseguradora=" + aseguradora + ", usuario=" + usuario
+                + ", tipoGasolina=" + tipoGasolina + ", color=" + color + ", claseVehiculo=" + claseVehiculo
+                + ", tipoVehiculo=" + tipoVehiculo + ", propietario=" + propietario + ", marca=" + marca
+                + ", lineaVehiculo=" + lineaVehiculo + ", hojaPruebasList=" + hojaPruebasList + ", pais=" + pais
+                + ", kilometraje=" + kilometraje + ", sillas=" + sillas + ", vidriosPolarizados=" + vidriosPolarizados
+                + ", blindaje=" + blindaje + ", chasis=" + chasis + ", codigoInterno=" + codigoInterno + ", potencia="
+                + potencia + ", tipoCarroceria=" + tipoCarroceria + ", esConversionGnv=" + esConversionGnv
+                + ", fechaVencimientoGnv=" + fechaVencimientoGnv + "]";
     }
 
     /**
@@ -613,5 +627,6 @@ public class Vehiculo implements Serializable {
         this.fechaVencimientoGnv = fechaVencimientoGnv;
     }
 
+    
 
 }
