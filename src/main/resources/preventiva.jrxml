@@ -735,10 +735,10 @@ PREVENTIVA]]></text>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Fecha de Prueba]]></text>
+					<text><![CDATA[Fecha de Prueba:]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="0" y="9" width="85" height="10" uuid="7a5d4a5c-e42c-4a2a-888d-0c893f9d0f1e"/>
+					<reportElement x="1" y="9" width="85" height="10" uuid="7a5d4a5c-e42c-4a2a-888d-0c893f9d0f1e"/>
 					<box leftPadding="3"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
@@ -837,6 +837,14 @@ PREVENTIVA]]></text>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{Direccion}]]></textFieldExpression>
 				</textField>
+				<staticText>
+					<reportElement x="1" y="1" width="85" height="10" uuid="b9773703-6ee1-46ac-83af-1083ed4b87e2"/>
+					<box leftPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Dirección:]]></text>
+				</staticText>
 			</frame>
 			<frame>
 				<reportElement x="334" y="45" width="127" height="20" uuid="2c8a090d-d37d-417c-a309-2e1bd04dae8b"/>
@@ -1344,7 +1352,7 @@ PREVENTIVA]]></text>
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{Tiempos_motor} + " T"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[!"ELECTRICO".equalsIgnoreCase($F{Nombre_gasolina}) ? $F{Tiempos_motor} + " T" : "No aplica"]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>

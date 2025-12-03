@@ -1250,12 +1250,41 @@ public class Utils {
     }
 
 
-    public static boolean existenDefEnsenanza(int hojaPruebasId) {
+    public static boolean esEnsenaza(int idHojaPruebas) {
+        String consulta = "SELECT v.esEnsenaza FROM hoja_pruebas hp " +
+                          "INNER JOIN vehiculos v ON v.CAR = hp.Vehiculo_for " +
+                          "WHERE hp.TESTSHEET = ?";
+
+        try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
+             PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+
+            // Asigna el valor del parámetro
+            stmt.setInt(1, idHojaPruebas);
+
+            // Ejecuta la consulta
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                // Verifica si hay un resultado
+                if (resultSet.next()) {
+                    // Retorna el valor de la columna esEnsenaza
+                    return resultSet.getInt("esEnsenaza") == 1;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al consultar la base de datos.", e);
+        }
+
+        return false; // Si no se encuentra el registro, se asume que no es enseñanza
+    }
+
+
+    public static boolean existenDefEnsenanza(int hojaPruebasId, boolean isReinspeccion) {
+        String ascOrDesc = isReinspeccion ? "ASC" : "DESC";
         Conexion.setConexionFromFile();
         boolean[] pruebas = {false, false, false, false, false, false, false, false, false};
         String query = "SELECT p.* FROM hoja_pruebas hp  \r\n" + //
                         "INNER JOIN pruebas p ON p.hoja_pruebas_for = hp.TESTSHEET  \r\n" + //
-                        "WHERE hp.TESTSHEET = ? order by p.Fecha_prueba desc";
+                        "WHERE hp.TESTSHEET = ? order by p.Fecha_prueba " + ascOrDesc;
 
         try (Connection conexion = DriverManager.getConnection(Conexion.getUrl(), Conexion.getUsuario(), Conexion.getContrasena());
             PreparedStatement stmt = conexion.prepareStatement(query)) {

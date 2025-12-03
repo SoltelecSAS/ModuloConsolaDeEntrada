@@ -37,6 +37,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -581,23 +583,51 @@ public class ImpresionReporte {
                     }
                     System.out.println("Codigo de respuesta sicov: "+responseDTO.getCodigoRespuesta());
                     System.out.println("Descripcion de la respuesta sicov: "+responseDTO.getMensajeRespuesta());
+                    LocalDate tresMesesAtras = LocalDate.now().minusMonths(3);
+                    LocalDate fechaIngreso = this.ctxHojaPrueba.getFechaIngreso().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+
+                    boolean esDeHaceTresMeses = fechaIngreso.isBefore(tresMesesAtras);
                     if (responseDTO.getCodigoRespuesta().equals("1") || //ok
-                        responseDTO.getMensajeRespuesta().contains("se encuentra en estado Finalizada") ) { //ok
+                        responseDTO.getMensajeRespuesta().contains("se encuentra en estado Finalizada") || 
+                        esDeHaceTresMeses
+                        ) { //ok
 
                         this.ctxHojaPrueba.setEstadoSICOV("SINCRONIZADO");
                         if (this.ctxHojaPrueba.getEstado().equalsIgnoreCase("APROBADA")) {
                             System.out.println("Enviando certificado a indra: "+ctxCertificado);
                             controlerCertificado.nvoCertificado(ctxCertificado, this.ctxHojaPrueba);
                         }
+
                         controller.update(this.ctxHojaPrueba);
-                        JOptionPane.showMessageDialog(null, "Se ha Enviado el 2do FUR  perteneciente a la Placa  " + ctxHojaPrueba.getVehiculo().getPlaca() + " con exito ..!");
+                        if (!esDeHaceTresMeses) {
+                            JOptionPane.showMessageDialog(null, 
+                                "El segundo FUR del vehículo con placa " 
+                                + ctxHojaPrueba.getVehiculo().getPlaca() 
+                                + " se envió correctamente."
+                            );
+
+                            ev = new EventosDao();
+                            System.out.println(ev.InsertarEvento(UsuarioLogueado.getNick(), this.ctxHojaPrueba.getVehiculo().getPlaca(), this.ctxHojaPrueba));
+                        }else{
+                            JOptionPane.showMessageDialog(null, 
+                                "El vehículo con placa " 
+                                + ctxHojaPrueba.getVehiculo().getPlaca() 
+                                + " se ha registado con exito en el sistema sin envio sicov."
+                            );
+                        }
+                        
 //////////////////////////////////////////////////////////////////////////////////INSERTO INFORMACION EN LA TABLA EVENTO SICOV/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        ev = new EventosDao();
-                        System.out.println(ev.InsertarEvento(UsuarioLogueado.getNick(), this.ctxHojaPrueba.getVehiculo().getPlaca(), this.ctxHojaPrueba));
+                        
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     }else {
                         System.out.println("Fallo por " + responseDTO.getMensajeRespuesta());
-                        JOptionPane.showMessageDialog(null, "No pude SINCRONIZAR FUR perteneciente a  la Placa " + ctxHojaPrueba.getVehiculo().getPlaca() + " debido a  " + responseDTO.getMensajeRespuesta() + "..!");
+                        JOptionPane.showMessageDialog(null, 
+                            "No fue posible sincronizar el FUR del vehículo con placa " 
+                            + ctxHojaPrueba.getVehiculo().getPlaca() 
+                            + ".\n Respuesta sicov: " + responseDTO.getMensajeRespuesta() + "."
+                        );
                     }
 
                 }

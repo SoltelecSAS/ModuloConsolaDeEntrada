@@ -1344,7 +1344,7 @@ WHERE
 					<textElement verticalAlignment="Middle">
 						<font fontName="Arial" size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{Nombre_gasolina} !="ELECTRICO" ? $F{Tiempos_motor} + " T" : "No aplica" ]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{Tiempos_motor} + " T"]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>

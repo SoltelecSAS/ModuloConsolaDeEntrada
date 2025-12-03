@@ -589,13 +589,11 @@ public class Consultas {
         return ts;
     }
 
-    public boolean isRevisionPreventiva(HojaPruebas ctxHojaPrueba) throws SQLException { 
-        String eve = ctxHojaPrueba.getPreventiva();
-        if(ctxHojaPrueba.getPreventiva().equalsIgnoreCase("Y")){
-            return true;
-        }else{
+    public boolean isRevisionPreventiva(HojaPruebas ctxHojaPrueba) throws SQLException {
+        if (ctxHojaPrueba == null || ctxHojaPrueba.getPreventiva() == null) {
             return false;
-        }   
+        }
+        return ctxHojaPrueba.getPreventiva().equalsIgnoreCase("Y");
     }
 
     public long obtenerSiguienteConsecutivoPreimpreso(Connection cn) throws SQLException {

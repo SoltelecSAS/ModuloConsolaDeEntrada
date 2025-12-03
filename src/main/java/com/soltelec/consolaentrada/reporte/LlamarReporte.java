@@ -91,7 +91,7 @@ public class LlamarReporte {
     private double permisibleCoRalenti;
     private double permisibleCoCrucero;
     private double permisibleHcCrucero;
-    private double permisibleCo2Crucero;
+    private double permisibleCo2 = 1000;
 
     private double permisibleDesequilibrio;
 
@@ -100,6 +100,8 @@ public class LlamarReporte {
     private double permisibleEficaciaMano;
 
     private double permisibleSumaLuces;
+
+    private double permisibleO2;
 
     private boolean esAprobado;
 
@@ -137,6 +139,7 @@ public class LlamarReporte {
     public void cargarReporte(HojaPruebas ctxHojaPrueba, Cda ctxCDA, long consecutivoRUNT, String txtPlaca) throws JRException, SQLException, ClassNotFoundException, ParseException, IOException {
         this.ctxHojaPrueba = ctxHojaPrueba;
         this.esAprobado = Utils.getAprobadoReprobado(this.ctxHojaPrueba.getId()).equalsIgnoreCase("APROBADA");
+        
         this.ctxCDA = ctxCDA;
         idHojaPrueba = ctxHojaPrueba.getId();
         List<Prueba> ctxIndPruebas = null;
@@ -150,7 +153,6 @@ public class LlamarReporte {
             } catch (InterruptedException ex) {
             }
             parametros = new HashMap();
-
             parametros.put("ConsecutivoFecha", "");
             parametros.put("Aprobado", "");
             parametros.put("codigoPrueba", "");
@@ -253,6 +255,7 @@ public class LlamarReporte {
                     parametros.put("fechaFinRep", " ");
                 }
             }
+            
             JasperPrint fillReport;
 
             LocalDate date1 = LocalDate.of(2024, 7, 1);
@@ -439,8 +442,11 @@ public class LlamarReporte {
      * @throws java.lang.Exception
      */
     public void cargarReporteReinspeccion(Reinspeccion Reinspeccion) throws Exception {
-
         this.isReinspecion = true;
+        System.out.println("Reinspeccion hp ID: " + Reinspeccion.getHojaPruebas().getId());
+        boolean esEnsenanza = Utils.esEnsenaza(Reinspeccion.getHojaPruebas().getId());
+        
+        
         parametros = new HashMap();
         //cargar la hoja de prueba con la que esta asociada la reinspeccion
         parametros.put("idReinspeccion", Reinspeccion.getId());
@@ -451,6 +457,14 @@ public class LlamarReporte {
         parametros.put("InstDesvia", "");
         parametros.put("InstSusp", "");
         parametros.put("MarcaSusp", "");
+
+        if (esEnsenanza) { //perrohp
+            if (Utils.existenDefEnsenanza(Reinspeccion.getHojaPruebas().getId(), isReinspecion) || (Reinspeccion.getHojaPruebas().getVehiculo().getTipoVehiculo().getId() == 121 && !esAprobado)) {
+                parametros.put("ReprobadoEnse", "X");
+            } else {
+                parametros.put("AprobadoEnse", "X");
+            }
+        }
 
         preventiva = consultas.isRevisionPreventiva(this.ctxHojaPrueba);
         String codigoHp = preventiva ? this.ctxHojaPrueba.getCon_preventiva()+"" : Reinspeccion.getHojaPruebas().getCon_hoja_prueba() + " - 1";
@@ -1406,24 +1420,28 @@ public class LlamarReporte {
                         break;
                     case 8003:
                         // df.applyPattern("#0.0");
-
+                        
                         if (idTipoGasolina == 1) {
                             String CO2Ralenti = String.valueOf(m.getValor());
-                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()) + m.getCondicion());
+                            asterisco = permisibleCo2 > m.getValor() && tipoVehiculo != 4 ? "*" : "";
+                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()) + asterisco);
                         } else {
                             String CO2Ralenti = String.valueOf(m.getValor());
-                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()) + m.getCondicion());
+                            asterisco = permisibleCo2 > m.getValor() && tipoVehiculo != 4 ? "*" : "";
+                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()) + asterisco);
                         }
                         break;
                     case 8004://medida de O2 Ralenti Cuatro Tiempos
                         //df.applyPattern("#0.0");
+                        
                         if (idTipoGasolina == 1) {
+                            asterisco = m.getValor() > permisibleO2 && tipoVehiculo != 4 ? "*" : "";
                             String O2Ralenti = String.valueOf(m.getValor());
-                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti.trim()) + m.getCondicion());
+                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti.trim()) + asterisco);
                         } else {
-
+                            asterisco = m.getValor() > permisibleO2 && tipoVehiculo != 4 ? "*" : "";
                             String O2Ralenti = String.valueOf(m.getValor());
-                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti.trim()) + m.getCondicion());
+                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti.trim()) + asterisco);
                         }
                         break;
 
@@ -1452,7 +1470,7 @@ public class LlamarReporte {
                     case 8009://medida de CO2  Crucero cuatro tiempos
                         df.applyPattern("#0.0");
                         if (idTipoGasolina == 1) {
-                            asterisco = permisibleCo2Crucero > m.getValor() ? "*" : "";
+                            asterisco = permisibleCo2 > m.getValor() ? "*" : "";
                             String CO2Crucero = String.valueOf(m.getValor());;
                             parametros.put("CO2Crucero", ajustarValorMedida(CO2Crucero.trim()) + asterisco);
                         } else {
@@ -1463,11 +1481,13 @@ public class LlamarReporte {
                     case 8010://medida de O2 Crucero cuatro tiempos                               
                         df.applyPattern("#0.0");
                         if (idTipoGasolina == 1) {
+                            asterisco = m.getValor() > permisibleO2 && tipoVehiculo != 4 ? "*" : "";
                             String O2Crucero = String.valueOf(m.getValor());
-                            parametros.put("O2Crucero", ajustarValorMedida(O2Crucero.trim()) + m.getCondicion());
+                            parametros.put("O2Crucero", ajustarValorMedida(O2Crucero.trim()) + asterisco);
                         } else {
+                            asterisco = m.getValor() > permisibleO2 && tipoVehiculo != 4 ? "*" : "";
                             String O2Crucero = String.valueOf(m.getValor());
-                            parametros.put("O2Crucero", ajustarValorMedida(O2Crucero.trim()) + m.getCondicion());
+                            parametros.put("O2Crucero", ajustarValorMedida(O2Crucero.trim()) + asterisco);
                         }
                         break;
 
@@ -1483,11 +1503,13 @@ public class LlamarReporte {
                     case 8019:// medida de CO Ralenti dos tiempos
                         // df.applyPattern("#0.0");
                         if (idTipoGasolina == 1) {
-                            String CO2Ralenti = m.getValor() + m.getCondicion();
-                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()));
+                            String CO2Ralenti = m.getValor() + "";
+                            asterisco = permisibleCo2 > m.getValor() && tipoVehiculo != 4 ? "*" : "";
+                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()) + asterisco);
                         } else {
-                            String CO2Ralenti = m.getValor() + m.getCondicion();
-                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()));
+                            String CO2Ralenti = m.getValor() + "";
+                            asterisco = permisibleCo2 > m.getValor() && tipoVehiculo != 4 ? "*" : "";
+                            parametros.put("CO2Ralenti", ajustarValorMedida(CO2Ralenti.trim()) + asterisco);
                         }
                         break;
                     case 8020://medida de CO2 Ralenti dos tiempos
@@ -1508,11 +1530,13 @@ public class LlamarReporte {
                     case 8021://medida de O2 Ralenti dos tiempos
                         df.applyPattern("#0.0");
                         if (idTipoGasolina == 1) {
-                            String O2Ralenti2T = m.getValor() + m.getCondicion();
-                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti2T.trim()));
+                            asterisco = m.getValor() > permisibleO2 && tipoVehiculo != 4 ? "*" : "";
+                            String O2Ralenti2T = m.getValor() + "";
+                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti2T.trim()) + asterisco);
                         } else {
-                            String O2Ralenti2T = m.getValor() + m.getCondicion();
-                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti2T.trim()));
+                            asterisco = m.getValor() > permisibleO2 && tipoVehiculo != 4 ? "*" : "";
+                            String O2Ralenti2T = m.getValor() + "";
+                            parametros.put("O2Ralenti", ajustarValorMedida(O2Ralenti2T.trim()) + asterisco);
                         }
                         break;
 
@@ -2454,6 +2478,7 @@ public class LlamarReporte {
         if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 123) {//Motocarro
             //parametros.put("PerO2","[0-11]");
             parametros.put("PerCO2", "---");
+            permisibleCo2 = 1000;
             //Desviacion
             parametros.put("PerDesv", "---");
             //Taximetro
@@ -2476,6 +2501,7 @@ public class LlamarReporte {
         if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 5) {//Motocarro
             //parametros.put("PerO2","[0-11]");
             parametros.put("PerCO2", "---");
+            permisibleCo2 = 1000;
             //Desviacion
             parametros.put("PerDesv", "---");
             //Taximetro
@@ -2497,11 +2523,14 @@ public class LlamarReporte {
 
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 4) {
                 parametros.put("PerO2", "[0-6]");
+                permisibleO2 = 6.0;
             }
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2 && this.ctxHojaPrueba.getVehiculo().getModelo() < 2010) {
                 parametros.put("PerO2", "[0-11]");
+                permisibleO2 = 11.0;
             } else {
                 parametros.put("PerO2", "[0-6]");
+                permisibleO2 = 6.0;
             }
 
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2) {
@@ -2573,6 +2602,8 @@ public class LlamarReporte {
 
             //parametros.put("PerO2","[0-11]");
             parametros.put("PerCO2", "---");
+            permisibleO2 = 1000;
+            permisibleCo2 = 1000;
             if (!tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")) {
                 
                 
@@ -2600,11 +2631,14 @@ public class LlamarReporte {
             //Gases :
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 4 || tipoVehiculo.equalsIgnoreCase("CUATRIMOTO")) {
                 parametros.put("PerO2", "[0-6]");
+                permisibleO2 = 6.0;
             }
             if (this.ctxHojaPrueba.getVehiculo().getTiemposMotor() == 2 && this.ctxHojaPrueba.getVehiculo().getModelo() < 2010) {
                 parametros.put("PerO2", "[0-11]");
+                permisibleO2 = 11.0;
             } else {
                 parametros.put("PerO2", "[0-6]");
+                permisibleO2 = 6.0;
             }
             System.out.println("aqui estoy-------voy a entra a validar seteo-----------------------------------");
             //Date date1 = new Date(fechaIngresoVehiculo);
@@ -2682,11 +2716,14 @@ public class LlamarReporte {
         } else if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 1 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 3 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 109 || this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 110) {// 1 -> Livianos ,  3-> pesados, 2-> 4x4 109 or 110-> aplica a taxi 
             if (this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 1 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 10 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 4 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 2) {
                 parametros.put("PerO2", "[0-5]");
+                permisibleO2 = 5.0;
                 parametros.put("PerCO2", "[ <7 ]");
-                permisibleCo2Crucero = 7;
+                permisibleCo2 = 7;
             } else {
                 parametros.put("PerO2", " ");
                 parametros.put("PerCO2", " ");
+                permisibleCo2 = 1000;
+                permisibleO2 = 1000;
             }
             //Desviacion
             parametros.put("PerDesv", "10");
@@ -2804,11 +2841,14 @@ public class LlamarReporte {
                 if ( this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9  ){
                     if (this.ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 2 || this.ctxHojaPrueba.getVehiculo().getTipoGasolina().getId() == 9 ) {
                         parametros.put("PerO2", "[0-5]");
+                        permisibleO2 = 5.0;
                         parametros.put("PerCO2", "[ <7 ]");
-                        permisibleCo2Crucero = 7;
+                        permisibleCo2 = 7;
                     } else {
                         parametros.put("PerO2", " ");
                         parametros.put("PerCO2", " ");
+                        permisibleCo2 = 1000;
+                        permisibleO2 = 1000;
                     }
                 }
 
@@ -3052,8 +3092,8 @@ public class LlamarReporte {
         rs.next();
         int defEnse = rs.getInt(1);
 
-        if (valida > 0) {
-            if (Utils.existenDefEnsenanza(ctxHojaPrueba.getId()) || (ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 121 && !esAprobado)) {
+        if (valida > 0 || isReinspecion) {
+            if (Utils.existenDefEnsenanza(ctxHojaPrueba.getId(), isReinspecion) || (ctxHojaPrueba.getVehiculo().getTipoVehiculo().getId() == 121 && !esAprobado)) {
                 parametros.put("ReprobadoEnse", "X");
             } else {
                 parametros.put("AprobadoEnse", "X");
